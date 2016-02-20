@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AA510CC3-20F4-4475-9A0A-CAAE73E1E1C1}</ProjectGuid>
+    <RootNamespace>BearishEngine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(SolutionDir)/deps/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)/deps/lib;$(LibraryPath)</LibraryPath>
+    <CodeAnalysisRuleSet>NativeMinimumRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(SolutionDir)/deps/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)/deps/lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>CHAISCRIPT_NO_THREADS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;glload.lib;opengl32.lib;soil.lib;assimp.lib;squirrel.lib;sqstdlib.lib;sqplus.lib;freetype26.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/NODEFAULTLIB:"LIBCMT" %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>CHAISCRIPT_NO_THREADS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>glfw3.lib;glload.lib;opengl32.lib;soil.lib;assimp.lib;squirrel.lib;sqstdlib.lib;sqplus.lib;freetype26.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/NODEFAULTLIB:"LIBCMT" %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="src\Components\MeshRendererComponent.cpp" />
+    <ClCompile Include="src\Core\Actor.cpp" />
+    <ClCompile Include="src\Core\Keyboard.cpp" />
+    <ClCompile Include="src\Core\Logger.cpp" />
+    <ClCompile Include="src\Core\Model.cpp" />
+    <ClCompile Include="src\Core\Mouse.cpp" />
+    <ClCompile Include="src\Core\Transform.cpp" />
+    <ClCompile Include="src\Core\Window.cpp" />
+    <ClCompile Include="src\Graphics\Camera.cpp" />
+    <ClCompile Include="src\Graphics\Buffer\IBO.cpp" />
+    <ClCompile Include="src\Graphics\Font.cpp" />
+    <ClCompile Include="src\Graphics\ImageBuffer.cpp" />
+    <ClCompile Include="src\Graphics\Mesh\Mesh.cpp" />
+    <ClCompile Include="src\Graphics\Mesh\MeshAnimation.cpp" />
+    <ClCompile Include="src\Graphics\Mesh\MeshNode.cpp" />
+    <ClCompile Include="src\Graphics\Mesh\MeshNodeAnimation.cpp" />
+    <ClCompile Include="src\Graphics\OpenGL.cpp" />
+    <ClCompile Include="src\Graphics\ParticleSytem.cpp" />
+    <ClCompile Include="src\Graphics\Renderer.cpp" />
+    <ClCompile Include="src\Graphics\RenderingEngine.cpp" />
+    <ClCompile Include="src\Graphics\Shader.cpp" />
+    <ClCompile Include="src\Core\Timer.cpp" />
+    <ClCompile Include="src\Graphics\Texture.cpp" />
+    <ClCompile Include="src\Graphics\Buffer\VAO.cpp" />
+    <ClCompile Include="src\Graphics\Buffer\VBO.cpp" />
+    <ClCompile Include="src\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Bearish.h" />
+    <ClInclude Include="src\Components\CameraComponent.h" />
+    <ClInclude Include="src\Components\FreeLookComponent.h" />
+    <ClInclude Include="src\Components\FreeMoveComponent.h" />
+    <ClInclude Include="src\Components\SkyboxComponent.h" />
+    <ClInclude Include="src\Components\LightComponents.h" />
+    <ClInclude Include="src\Components\MeshRendererComponent.h" />
+    <ClInclude Include="src\Components\UIButton.h" />
+    <ClInclude Include="src\Components\UIDraggable.h" />
+    <ClInclude Include="src\Components\UILabel.h" />
+    <ClInclude Include="src\Components\UIPanel.h" />
+    <ClInclude Include="src\Core\Actor.h" />
+    <ClInclude Include="src\Core\BEMFile.h" />
+    <ClInclude Include="src\Core\BlockAllocator.h" />
+    <ClInclude Include="src\Core\ButtonState.h" />
+    <ClInclude Include="src\Core\Callback.h" />
+    <ClInclude Include="src\Core\IActorComponent.h" />
+    <ClInclude Include="src\Core\IAllocatable.h" />
+    <ClInclude Include="src\Core\Keyboard.h" />
+    <ClInclude Include="src\Core\Logger.h" />
+    <ClInclude Include="src\Core\Model.h" />
+    <ClInclude Include="src\Core\Mouse.h" />
+    <ClInclude Include="src\Core\Transform.h" />
+    <ClInclude Include="src\Graphics\Camera.h" />
+    <ClInclude Include="src\Graphics\Buffer\IBO.h" />
+    <ClInclude Include="src\Graphics\Font.h" />
+    <ClInclude Include="src\Graphics\ImageBuffer.h" />
+    <ClInclude Include="src\Graphics\Lights.h" />
+    <ClInclude Include="src\Graphics\Material.h" />
+    <ClInclude Include="src\Graphics\Mesh\Mesh.h" />
+    <ClInclude Include="src\Graphics\Mesh\MeshAnimation.h" />
+    <ClInclude Include="src\Graphics\Mesh\MeshBone.h" />
+    <ClInclude Include="src\Graphics\Mesh\MeshNode.h" />
+    <ClInclude Include="src\Graphics\Mesh\MeshNodeAnimation.h" />
+    <ClInclude Include="src\Graphics\Mesh\MeshNodeAnimationKeyframe.h" />
+    <ClInclude Include="src\Graphics\Mesh\MeshSkeleton.h" />
+    <ClInclude Include="src\Graphics\Particle.h" />
+    <ClInclude Include="src\Graphics\ParticleSystem.h" />
+    <ClInclude Include="src\Graphics\Renderer.h" />
+    <ClInclude Include="src\Graphics\RenderingEngine.h" />
+    <ClInclude Include="src\Graphics\Shader.h" />
+    <ClInclude Include="src\Graphics\Texture.h" />
+    <ClInclude Include="src\Graphics\Buffer\VAO.h" />
+    <ClInclude Include="src\Graphics\Buffer\VBO.h" />
+    <ClInclude Include="src\Graphics\Vertex.h" />
+    <ClInclude Include="src\Math\mat4.h" />
+    <ClInclude Include="src\Math\Math.h" />
+    <ClInclude Include="src\Math\quat.h" />
+    <ClInclude Include="src\Math\vec4.h" />
+    <ClInclude Include="src\pch.h" />
+    <ClInclude Include="src\Scripting\Core.h" />
+    <ClInclude Include="src\Scripting\Graphics.h" />
+    <ClInclude Include="src\Scripting\Math.h" />
+    <ClInclude Include="src\Scripting\ScriptingEngine.h" />
+    <ClInclude Include="src\Utils.h" />
+    <ClInclude Include="src\Math\vec2.h" />
+    <ClInclude Include="src\Graphics\OpenGL.h" />
+    <ClInclude Include="src\Types.h" />
+    <ClInclude Include="src\Core\Window.h" />
+    <ClInclude Include="src\Math\vec3.h" />
+    <ClInclude Include="src\Core\Timer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitattributes" />
+    <None Include=".gitignore" />
+    <None Include="res\TestShader.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <Text Include="res\TestShader.vert">
+      <DeploymentContent>true</DeploymentContent>
+      <FileType>Document</FileType>
+    </Text>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
