@@ -22,9 +22,5 @@ int main(int argc, char** argv) {
 	output.ConvertToBET();
 
 	output.WriteToFile(outputPath);
-
-	output.ConvertToRaw();
-	SOIL_save_image("test.tga", SOIL_SAVE_TYPE_TGA, output.width, output.height, 4, output.data);
-
 	return 0;
 }
