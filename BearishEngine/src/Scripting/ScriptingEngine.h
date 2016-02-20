@@ -1,6 +1,6 @@
 #ifndef _BEARISH_SCRIPTING_ENGINE_H_
 #define _BEARISH_SCRIPTING_ENGINE_H_
-
+/*
 #include <squirrel.h>
 #include <sqstdio.h>
 #include <sqstdaux.h>
@@ -90,5 +90,5 @@ namespace Bearish { namespace Scripting {
 		sq_settop(Squirrel, oldtop);
 	}
 } }
-
+*/
 #endif // _BEARISH_SCRIPTING_ENGINE_H_

@@ -1,6 +1,6 @@
 #ifndef _BEARISH_SCRIPTING_CORE_H_
 #define _BEARISH_SCRIPTING_CORE_H_
-
+/*
 #include "../Core/IActorComponent.h"
 #include "ScriptingEngine.h"
 #include "../Core/Actor.h"
@@ -54,5 +54,5 @@ namespace Bearish { namespace Scripting {
 		Sqrat::RootTable(Squirrel).Bind("Actor", actor);
 	}
 } }
-
+*/
 #endif // _BEARISH_SCRIPTING_CORE_H_

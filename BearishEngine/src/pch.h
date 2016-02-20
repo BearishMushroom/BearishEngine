@@ -14,4 +14,4 @@
 #include <time.h>
 #include <math.h>
 
-#include <gl_all.h>
+#include <glad.h>

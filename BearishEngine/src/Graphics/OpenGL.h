@@ -3,7 +3,7 @@
 
 #include "../Types.h"
 #include "../Core/Logger.h"
-#include <gl_load.h>
+#include <glad.h>
 
 namespace Bearish { namespace Graphics {
 	class OpenGL {

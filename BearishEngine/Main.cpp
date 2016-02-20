@@ -4,7 +4,6 @@
 using namespace Bearish;
 
 using namespace Components;
-using namespace Scripting;
 using namespace Graphics;
 using namespace Core;
 using namespace Math;

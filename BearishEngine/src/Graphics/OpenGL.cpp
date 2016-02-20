@@ -1,6 +1,7 @@
 #include "OpenGL.h"
 #include "../Core/Logger.h"
 #include "../Utils.h"
+#include <glfw3.h>
 
 void APIENTRY gl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid *userParam) {
 	switch (type) {
@@ -42,22 +43,11 @@ bool OpenGL::_isOGLLoaded = false;
 std::vector<string> OpenGL::_extensions;
 
 void OpenGL::Init() {
-	i32 result = ogl_LoadFunctions();
-
-	if (result == ogl_LOAD_SUCCEEDED) {
-	}
-	else if (result == ogl_LOAD_FAILED) {
-		Logger::Fatal("OpenGL failed to load!");
-		return;
-	}
-	else {
-		Logger::Error("Some (%d) core OpenGL functions failed to load!", result - ogl_LOAD_SUCCEEDED);
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		Logger::Fatal("Failed to load OpenGL functions!");
 	}
 
-	i32 major = ogl_GetMajorVersion();
-	i32 minor = ogl_GetMinorVersion();
-
-	Logger::Info("OpenGL loaded! Version %d.%d", major, minor);
+	Logger::Info("OpenGL loaded! Version %d.%d", GLVersion.major, GLVersion.minor);
 
 	GetAllExtensions();
 	SetDebugCallback();

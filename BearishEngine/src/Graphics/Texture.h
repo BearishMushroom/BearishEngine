@@ -37,7 +37,6 @@ namespace Bearish { namespace Graphics {
 	};
 	
 	enum class TextureFormat : i32 {
-		R      = GL_R,
 		RG     = GL_RG,
 		RGB    = GL_RGB,
 		RGBA   = GL_RGBA,

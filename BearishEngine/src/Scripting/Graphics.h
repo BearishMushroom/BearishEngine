@@ -1,6 +1,6 @@
 #ifndef _BEARISH_SCRIPTING_GRAPHICS_H_
 #define _BEARISH_SCRIPTING_GRAPHICS_H_
-
+/*
 #include "ScriptingEngine.h"
 #include "../Graphics/RenderingEngine.h"
 #include "../Graphics/Shader.h"
@@ -50,5 +50,5 @@ namespace Bearish { namespace Scripting {
 		Sqrat::RootTable(Squirrel).Bind("Shader", shader);
 	}
 } }
-
+*/
 #endif // _BEARISH_SCRIPTING_GRAPHICS_H_

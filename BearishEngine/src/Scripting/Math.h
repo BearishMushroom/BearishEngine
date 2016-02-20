@@ -1,6 +1,6 @@
 #ifndef _BEARISH_SCRIPTING_MATH_H_
 #define _BEARISH_SCRIPTING_MATH_H_
-
+/*
 #include "ScriptingEngine.h"
 #include "../Math/vec2.h"
 #include "../Math/vec3.h"
@@ -116,5 +116,5 @@ namespace Bearish { namespace Scripting {
 		Sqrat::RootTable(Squirrel).Bind("mat4", mat4);
 	}
 } }
-
+*/
 #endif // _BEARISH_SCRIPTING_MATH_H_
