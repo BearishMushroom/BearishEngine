@@ -71,12 +71,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(SolutionDir)/deps/lib;$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir)/deps/include;$(IncludePath)</IncludePath>
-    <IntDir>$(SolutionDir)$(Configuration)\Intermediates</IntDir>
+    <IntDir>$(SolutionDir)$(Configuration)\Intermediates\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir)/deps/include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)/deps/lib;$(LibraryPath)</LibraryPath>
-    <IntDir>$(SolutionDir)$(Configuration)\Intermediates</IntDir>
+    <IntDir>$(SolutionDir)$(Configuration)\Intermediates\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

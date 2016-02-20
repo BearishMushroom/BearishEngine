@@ -163,7 +163,7 @@ Action<std::vector<i32>> testAC;
 
 // Temporary update solution.
 void Update() {
-	for (i32 i = 0; i < actors.size(); i++) {
+	for (i32 i = 0; i < (i32)actors.size(); i++) {
 		if (actors.at(i)->IsDead()) {
 			Actor* todel = actors.at(i);
 			actors.insert(actors.begin() + i, actors.at(actors.size() - 1));
@@ -316,7 +316,7 @@ i32 main(i32 argc, c8** argv) {
 	point1->AddComponent(new PointLightComponent(vec3(1, 1, 0), 0, Attenuation(0, 0, 1), 2));
 
 	Actor* point2 = new Actor(Transform(vec3(-2, -1.5f, 0)));
-	point2->AddComponent(new PointLightComponent(vec3(1, 0, 0), 0, Attenuation(0, 0, 0.85), 5));
+	point2->AddComponent(new PointLightComponent(vec3(1, 0, 0), 0, Attenuation(0, 0, 0.85f), 5));
 
 	actors.push_back(player);
 	actors.push_back(plane);

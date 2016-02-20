@@ -99,7 +99,7 @@ void Shader::AddShader(const string& source, const ShaderType type) {
 	if (type == ShaderType::Geometry && _isFeedback) {
 		AddAllGSVaryings(source);
 		const c8** cstrs = new const c8*[_gsVaryings.size()];
-		for (i32 i = 0; i < _gsVaryings.size(); i++) {
+		for (i32 i = 0; i < (i32)_gsVaryings.size(); i++) {
 			cstrs[i] = _gsVaryings[i].c_str();
 		}
 
@@ -299,7 +299,7 @@ void Shader::AddUniform(const string& name, const string& type) {
 		structComponents = _structs.at(type);
 		shouldAdd = false;
 
-		for (i32 i = 0; i < structComponents.size(); i++) {
+		for (i32 i = 0; i < (i32)structComponents.size(); i++) {
 			AddUniform(nameToAdd + "." + structComponents.at(i).first, structComponents.at(i).second);
 		}
 	}

@@ -36,5 +36,5 @@ void VBO::SetData(Vertex* vertices, const u64 numVertices, const DrawStyle style
 
 void VBO::SubData(void* data, const u64 start, const u64 dataSize) {
 	Bind();
-	glBufferSubData(GL_ARRAY_BUFFER, start, dataSize, data);
+	glBufferSubData(GL_ARRAY_BUFFER, (GLintptr)start, (GLsizeiptr)dataSize, data);
 }

@@ -54,34 +54,34 @@ Mesh Model::ToMesh() {
 	MeshSkeleton* skeleton = new MeshSkeleton(_data->boneMap, bones, _data->boneTransform);
 	
 	std::vector<MeshAnimation> animations;
-	for (i32 i = 0; i < _data->numAnimations; i++) {
+	for (i32 i = 0; i < (i32)_data->numAnimations; i++) {
 		BEMAnimation anim = _data->animations[i];
 		string name = anim.name;
 		f32 tickRate = anim.tickRate;
 		f32 duration = anim.duration;
 
 		std::vector<MeshNodeAnimation*> channels;
-		for (i32 j = 0; j < anim.numChannels; j++) {
+		for (i32 j = 0; j < (i32)anim.numChannels; j++) {
 			std::vector<MeshNodeAnimationKeyframe> positions;
 			std::vector<MeshNodeAnimationKeyframe> scales;
 			std::vector<MeshNodeAnimationKeyframe> rotations;
 			string name = string(anim.channels[j].name);
 
-			for (i32 p = 0; p < anim.channels[j].numPositions; p++) {
+			for (i32 p = 0; p < (i32)anim.channels[j].numPositions; p++) {
 				MeshNodeAnimationKeyframe key;
 				key.position = anim.channels[j].positions[p].first;
 				key.time = anim.channels[j].positions[p].second;
 				positions.push_back(key);
 			}
 
-			for (i32 s = 0; s < anim.channels[j].numScales; s++) {
+			for (i32 s = 0; s < (i32)anim.channels[j].numScales; s++) {
 				MeshNodeAnimationKeyframe key;
 				key.scale = anim.channels[j].scales[s].first;
 				key.time = anim.channels[j].scales[s].second;
 				scales.push_back(key);
 			}
 
-			for (i32 r = 0; r < anim.channels[j].numRotations; r++) {
+			for (i32 r = 0; r < (i32)anim.channels[j].numRotations; r++) {
 				MeshNodeAnimationKeyframe key;
 				key.rotation = quat(anim.channels[j].rotations[r].first.x, anim.channels[j].rotations[r].first.y,
 					anim.channels[j].rotations[r].first.z, anim.channels[j].rotations[r].first.w);
@@ -104,7 +104,7 @@ MeshNode* Model::BEMToBENode(BEMNode node) {
 	string name = string(node.name);
 	mat4 transform = node.transform;
 	std::vector<MeshNode*> nodes;
-	for (i32 i = 0; i < node.children.size(); i++) {
+	for (i32 i = 0; i < (i32)node.children.size(); i++) {
 		nodes.push_back(BEMToBENode(node.children[i]));
 	}
 

@@ -101,8 +101,8 @@ struct BEMAnimation {
 class BEMFile {
 public:
 	u8 header[4];
-	u32 numVertices = 0;
-	u32 numIndices = 0;
+	i32 numVertices = 0;
+	i32 numIndices = 0;
 	u8 skinned = false;
 
 	u32* indices;
@@ -116,12 +116,12 @@ public:
 	vec4* boneWeightData;
 
 	mat4 boneTransform;
-	u32 numBones;
+	i32 numBones;
 	std::map<string, i32> boneMap;
 	std::vector<mat4> boneOffsets;
 	BEMNode rootNode;
 
-	u32 numAnimations;
+	i32 numAnimations;
 	std::vector<BEMAnimation> animations;
 
 	u32 bytesWritten;
@@ -172,7 +172,7 @@ public:
 
 	void WriteNode(FILE* file, BEMNode node) {
 		u8 len = (u8)node.name.length();
-		u32 num = node.children.size();
+		i32 num = (i32)node.children.size();
 		WriteBytes(file, &len, 1, sizeof(u8));
 		WriteBytes(file, (u8*)node.name.c_str(), len, sizeof(u8));
 		WriteBytes(file, (u8*)&node.transform, 1, sizeof(mat4));
@@ -187,7 +187,7 @@ public:
 		u8 len = *ReadBytes(file, 1, sizeof(u8));
 		res.name = string((char*)ReadBytes(file, len, sizeof(u8)), len);
 		res.transform = *(mat4*)ReadBytes(file, 1, sizeof(mat4));
-		u32 num = *(u32*)ReadBytes(file, 1, sizeof(u32));
+		i32 num = *(i32*)ReadBytes(file, 1, sizeof(i32));
 		for (i32 i = 0; i < num; i++) {
 			res.children.push_back(ReadNode(file));
 		}
@@ -259,7 +259,7 @@ public:
 				WriteBytes(output, (u8*)&animations[i].duration, 1, sizeof(f32));
 				WriteBytes(output, (u8*)&animations[i].numChannels, 1, sizeof(u32));
 
-				for (i32 j = 0; j < animations[i].numChannels; j++) {
+				for (i32 j = 0; j < (i32)animations[i].numChannels; j++) {
 					BEMAnimationChannel ch = animations[i].channels[j];
 					u8 length = (u8)ch.name.length();
 					WriteBytes(output, &length, 1, sizeof(u8));
@@ -330,7 +330,7 @@ public:
 				anim.duration = *(f32*)ReadBytes(file, 1, sizeof(f32));
 				anim.numChannels = *(u32*)ReadBytes(file, 1, sizeof(u32));
 
-				for (i32 j = 0; j < anim.numChannels; j++) {
+				for (i32 j = 0; j < (i32)anim.numChannels; j++) {
 					BEMAnimationChannel ch;
 					u8 length = *ReadBytes(file, 1, sizeof(u8));
 					ch.name = string((char*)ReadBytes(file, length, sizeof(u8)), length);

@@ -19,7 +19,7 @@ bool MeshAnimation::Update(f32 time, MeshNode* root) {
 }
 
 MeshNodeAnimation* MeshAnimation::GetNodeAnimation(string name) {
-	for (i32 i = 0; i < _channels.size(); i++) {
+	for (i32 i = 0; i < (i32)_channels.size(); i++) {
 		if (_channels[i]->name == name) {
 			return _channels[i];
 		}

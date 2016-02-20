@@ -49,8 +49,8 @@ Font::Font(const string& filepath, i32 padding, f32 spread) {
 		}
 
 
-		for (i32 x = 0; x < face->glyph->bitmap.width; x++) {
-			for (i32 y = 0; y < face->glyph->bitmap.rows; y++) {
+		for (i32 x = 0; x < (i32)face->glyph->bitmap.width; x++) {
+			for (i32 y = 0; y < (i32)face->glyph->bitmap.rows; y++) {
 				alphaBuffer[(FONT_TEXTURE_SIZE - (penPositionX + x)) + ((penPositionY + y) * FONT_TEXTURE_SIZE)] =
 					face->glyph->bitmap.buffer[x + y * face->glyph->bitmap.width];	//A
 			}
@@ -202,7 +202,7 @@ f32 Font::FindSignedDistance(i32 centerX, i32 centerY, bool* bitmap, i32 width, 
 			if (base != bitmap[y * width + x]) {
 				i32 squareDist = SquareDist(centerX, centerY, x, y);
 				if (squareDist < closestSquareDist) {
-					closestSquareDist = squareDist;
+					closestSquareDist = (f32)squareDist;
 				}
 			}
 		}

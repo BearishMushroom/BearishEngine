@@ -213,11 +213,11 @@ void Mesh::CalculateNormals(std::vector<Vertex>& vertices, std::vector<u32>& ind
 void Mesh::Animate(f32 deltaTime) {
 	_boneTransforms.resize(_skeleton->GetNumBones());
 
-	for (i32 i = 0; i < _animations.size(); i++) {
+	for (i32 i = 0; i < (i32)_animations.size(); i++) {
 		bool didAnimate = _animations.at(i).Update(deltaTime, _rootNode);
 
 		if (didAnimate) {
-			for (i32 j = 0; j < _skeleton->GetNumBones(); j++) {
+			for (i32 j = 0; j < (i32)_skeleton->GetNumBones(); j++) {
 				_boneTransforms.at(j) = _animations.at(i).GetTransform(j);
 			}
 		}

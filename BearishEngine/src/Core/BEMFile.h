@@ -184,7 +184,7 @@ namespace Bearish {
 			WriteBytes(file, (u8*)node.name.c_str(), len, sizeof(u8));
 			WriteBytes(file, (u8*)&node.transform, 1, sizeof(mat4));
 			WriteBytes(file, (u8*)&num, 1, sizeof(i32));
-			for (i32 i = 0; i < num; i++) {
+			for (i32 i = 0; i < (i32)num; i++) {
 				WriteNode(file, node.children[i]);
 			}
 		}
@@ -195,7 +195,7 @@ namespace Bearish {
 			res.name = string((char*)ReadBytes(file, len, sizeof(u8)), len);
 			res.transform = *(mat4*)ReadBytes(file, 1, sizeof(mat4));
 			u32 num = *(u32*)ReadBytes(file, 1, sizeof(u32));
-			for (i32 i = 0; i < num; i++) {
+			for (i32 i = 0; i < (i32)num; i++) {
 				res.children.push_back(ReadNode(file));
 			}
 			return res;
@@ -258,7 +258,7 @@ namespace Bearish {
 				printf("Writing animation data...         ");
 				WriteBytes(output, (u8*)&numAnimations, 1, sizeof(u32));
 
-				for (i32 i = 0; i < numAnimations; i++) {
+				for (i32 i = 0; i < (i32)numAnimations; i++) {
 					u8 len = (u8)animations[i].name.length();
 					WriteBytes(output, &len, 1, sizeof(u8));
 					WriteBytes(output, (u8*)animations[i].name.c_str(), len, sizeof(u8));
@@ -266,7 +266,7 @@ namespace Bearish {
 					WriteBytes(output, (u8*)&animations[i].duration, 1, sizeof(f32));
 					WriteBytes(output, (u8*)&animations[i].numChannels, 1, sizeof(u32));
 
-					for (i32 j = 0; j < animations[i].numChannels; j++) {
+					for (i32 j = 0; j < (i32)animations[i].numChannels; j++) {
 						BEMAnimationChannel ch = animations[i].channels[j];
 						u8 length = (u8)ch.name.length();
 						WriteBytes(output, &length, 1, sizeof(u8));
@@ -317,7 +317,7 @@ namespace Bearish {
 				numBones = *(u32*)ReadBytes(file, 1, sizeof(u32));
 				boneOffsets.resize(numBones);
 
-				for (i32 i = 0; i < numBones; i++) {
+				for (i32 i = 0; i < (i32)numBones; i++) {
 					u8 len = *ReadBytes(file, 1, sizeof(u8));
 					string name = string((char*)ReadBytes(file, len, sizeof(u8)), len);
 					u32 id = *(u32*)ReadBytes(file, 1, sizeof(u32));
@@ -329,7 +329,7 @@ namespace Bearish {
 				rootNode = ReadNode(file);
 
 				numAnimations = *(u32*)ReadBytes(file, 1, sizeof(u32));
-				for (i32 i = 0; i < numAnimations; i++) {
+				for (i32 i = 0; i < (i32)numAnimations; i++) {
 					BEMAnimation anim;
 					u8 len = *ReadBytes(file, 1, sizeof(u8));
 					anim.name = string((char*)ReadBytes(file, len, sizeof(u8)), len);
@@ -337,7 +337,7 @@ namespace Bearish {
 					anim.duration = *(f32*)ReadBytes(file, 1, sizeof(f32));
 					anim.numChannels = *(u32*)ReadBytes(file, 1, sizeof(u32));
 
-					for (i32 j = 0; j < anim.numChannels; j++) {
+					for (i32 j = 0; j < (i32)anim.numChannels; j++) {
 						BEMAnimationChannel ch;
 						u8 length = *ReadBytes(file, 1, sizeof(u8));
 						ch.name = string((char*)ReadBytes(file, length, sizeof(u8)), length);

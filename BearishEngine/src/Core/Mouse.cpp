@@ -15,7 +15,7 @@ void Mouse::Update() {
 	i32 width, height;
 	glfwGetWindowSize(_window->GetWindow(), &width, &height);
 
-	Math::vec2 currentPos(x * ((f32)Graphics::Renderer::UI_RESOLUTION_X / (f32)width), y * ((f32)Graphics::Renderer::UI_RESOLUTION_Y / (f32)height));
+	Math::vec2 currentPos((f32)x * ((f32)Graphics::Renderer::UI_RESOLUTION_X / (f32)width), (f32)y * ((f32)Graphics::Renderer::UI_RESOLUTION_Y / (f32)height));
 
 	_mouseDelta = currentPos - _mousePosition;
 	_mousePosition = currentPos;

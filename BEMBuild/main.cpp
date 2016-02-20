@@ -10,7 +10,7 @@ BEMNode AiToBEMNode(aiNode* node) {
 	string name = string(node->mName.data);
 	mat4 transform = node->mTransformation;
 	std::vector<BEMNode> nodes;
-	for (i32 i = 0; i < node->mNumChildren; i++) {
+	for (i32 i = 0; i < (i32)node->mNumChildren; i++) {
 		nodes.push_back(AiToBEMNode(node->mChildren[i]));
 	}
 
@@ -36,7 +36,7 @@ i32 main(i32 argc, cstring* argv) {
 	if (scene) {
 		const aiVector3D zero(0, 0, 0);
 		
-		for (i32 i = 0; i < scene->mNumMeshes; i++) {
+		for (i32 i = 0; i < (i32)scene->mNumMeshes; i++) {
 			string path = outputPath;
 			if (scene->mNumMeshes > 1) {
 				string name = path.substr(0, path.find_last_of('.'));
@@ -99,32 +99,32 @@ i32 main(i32 argc, cstring* argv) {
 
 			std::vector<BEMAnimation> animations;
 
-			for (i32 i = 0; i < scene->mNumAnimations; i++) {
+			for (i32 i = 0; i < (i32)scene->mNumAnimations; i++) {
 				aiAnimation* anim = scene->mAnimations[i];
 				string name = string(anim->mName.data);
 				f32 tickRate = anim->mTicksPerSecond ? (f32)anim->mTicksPerSecond : 30.0f;
 				f32 duration = (f32)anim->mDuration;
 
 				std::vector<BEMAnimationChannel> channels;
-				for (i32 j = 0; j < anim->mNumChannels; j++) {
+				for (i32 j = 0; j < (i32)anim->mNumChannels; j++) {
 					std::vector<std::pair<vec3, f32>> positions;
 					std::vector<std::pair<vec3, f32>> scales;
 					std::vector<std::pair<vec4, f32>> rotations;
 					string name = string(anim->mChannels[j]->mNodeName.data);
 
-					for (i32 p = 0; p < anim->mChannels[j]->mNumPositionKeys; p++) {
+					for (i32 p = 0; p < (i32)anim->mChannels[j]->mNumPositionKeys; p++) {
 						aiVector3D aipos = anim->mChannels[j]->mPositionKeys[p].mValue;
 						auto key = std::make_pair(vec3(aipos.x, aipos.y, aipos.z), anim->mChannels[j]->mPositionKeys[p].mTime);
 						positions.push_back(key);
 					}
 
-					for (i32 s = 0; s < anim->mChannels[j]->mNumScalingKeys; s++) {
+					for (i32 s = 0; s < (i32)anim->mChannels[j]->mNumScalingKeys; s++) {
 						aiVector3D aiscale = anim->mChannels[j]->mScalingKeys[s].mValue;
 						auto key = std::make_pair(vec3(aiscale.x, aiscale.y, aiscale.z), anim->mChannels[j]->mScalingKeys[s].mTime);
 						scales.push_back(key);
 					}
 
-					for (i32 r = 0; r < anim->mChannels[j]->mNumRotationKeys; r++) {
+					for (i32 r = 0; r < (i32)anim->mChannels[j]->mNumRotationKeys; r++) {
 						aiQuaternion airot = anim->mChannels[j]->mRotationKeys[r].mValue;
 						auto key = std::make_pair(vec4(airot.x, airot.y, airot.z, airot.w), anim->mChannels[j]->mRotationKeys[r].mTime);
 						rotations.push_back(key);

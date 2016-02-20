@@ -94,7 +94,7 @@ void Texture::Load(const string posX, const string negX, const string posY, cons
 	for (i32 i = 0; i < 6; i++) {
 		i32 width, height;
 		u8* image = SOIL_load_image(names[i].c_str(), &width, &height, 0, 0);
-		_size = vec2(width, height);
+		_size = vec2((f32)width, (f32)height);
 
 		InitCubeMapFace(CubeMapFaces[i], image);
 
@@ -128,7 +128,7 @@ void Texture::InitTextures(const TextureType type, std::vector<TextureFormat> fo
 	_ids = new u32[num];
 	glGenTextures(num, _ids);
 
-	for (i32 i = 0; i < num; i++) {
+	for (i32 i = 0; i < (i32)num; i++) {
 		Bind(0, i);
 
 		u8* d = 0;
@@ -164,7 +164,7 @@ void Texture::InitRenderTargets(std::vector<TextureAttachment> attachments) {
 	TextureAttachment drawBuffers[32];
 	bool hasDepth = false;
 
-	for (i32 i = 0; i < _numTextures; i++) {
+	for (i32 i = 0; i < (i32)_numTextures; i++) {
 		if (attachments[i] == TextureAttachment::Depth) {
 			drawBuffers[i] = TextureAttachment::None;
 			hasDepth = true;
