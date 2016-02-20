@@ -1,11 +1,19 @@
 *.bem
+*.bet
+
 *.png
 *.jpg
+*.tga
+
 *.obj
 *.dae
 *.fbx
+
+*.ttf
+
 */Release/
 */Debug/
+
 *.exe
 *.dll
 deps/
@@ -16,5 +24,4 @@ deps/
 VertexLayout.txt
 BearishEngineLog.txt
 *.smproj
-*.ttf
 *.db
