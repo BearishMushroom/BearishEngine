@@ -53,6 +53,17 @@ i32 main(i32 argc, c8** argv) {
 
 		string resPath = "./res/" + b;
 		string outPath = "./asset/" + c;
+		int fileType = -1;
+
+		string ext = b.substr(b.find_last_of('.'));
+		if (ext == ".png" || ext == ".jpg" || ext == ".tga" || ext == ".bmp" || ext == ".dds") {
+			outPath += ".bet";
+			fileType = 0;
+		}
+		else if (ext == ".obj" || ext == ".fbx" || ext == ".dae") {
+			outPath += ".bem";
+			fileType = 1;
+		}
 
 		struct stat st;
 		stat(resPath.c_str(), &st);
@@ -76,13 +87,11 @@ i32 main(i32 argc, c8** argv) {
 			deffile << "\"" << a << "\"" << "\"" << outPath << "\"" << "\n";
 			string ext = b.substr(b.find_last_of('.'));
 
-			if (ext == ".png" || ext == ".jpg" || ext == ".tga" || ext == ".bmp" || ext == ".dds") {
-				outPath += ".bet";
+			if (fileType == 0) {
 				string command = "BETBuild.exe " + resPath + " " + outPath;
 				system(command.c_str());
 			}
-			else if (ext == ".obj" || ext == ".fbx" || ext == ".dae") {
-				outPath += ".bem";
+			else if (fileType == 1) {
 				string command = "BEMBuild.exe " + resPath + " " + outPath;
 				system(command.c_str());
 			}

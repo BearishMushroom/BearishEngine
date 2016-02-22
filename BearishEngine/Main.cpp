@@ -161,6 +161,8 @@ RenderingEngine renderer;
 Callback<i32, i32> testCB;
 Action<std::vector<i32>> testAC;
 
+std::unordered_map<string, string> Assets::_values;
+
 // Temporary update solution.
 void Update() {
 	for (i32 i = 0; i < (i32)actors.size(); i++) {
@@ -235,6 +237,8 @@ i32 main(i32 argc, c8** argv) {
 	Timer timer;
 	timer.Start();
 
+	Assets::LoadAssetDefinitions();
+
 	//InitSquirrel();
 	//RegisterMath();
 	//RegisterGraphics();
@@ -257,14 +261,13 @@ i32 main(i32 argc, c8** argv) {
 	i64 fps = 0;
 	f32 secondTimer = 0;
 
-	Mesh mesh = Model("res/models/test.bem").ToMesh();
-	Mesh mesh2 = Model("res/models/plane.bem").ToMesh();
+	Mesh mesh = Model(Assets::Get("man")).ToMesh();
+	Mesh mesh2 = Model(Assets::Get("plane")).ToMesh();
 
-	Texture texture("res/bricks2.png");
-	Texture normalMap("res/bricks2Normal.png");
+	Texture texture(Assets::Get("bricks"));
+	Texture normalMap(Assets::Get("bricksNormal"));
 
-	Texture texture2("res/test_m.png");
-	Texture texture2n("res/bat_spc.jpg");
+	Texture texture2(Assets::Get("defaultNormal"));
 
 	Mesh cp1(mesh);
 	Mesh cp2(mesh);
@@ -296,7 +299,7 @@ i32 main(i32 argc, c8** argv) {
 	actors.push_back(fpsCounter);
 	
 	Actor* player = new Actor;
-	player->AddComponent(new SkyboxComponent(new Texture("res/right.png", "res/left.png", "res/top.png", "res/bottom.png", "res/front.png", "res/back.png")));
+	player->AddComponent(new SkyboxComponent(new Texture(Assets::Get("right"), Assets::Get("left"), Assets::Get("top"), Assets::Get("bottom"), Assets::Get("front"), Assets::Get("back"))));
 	
 	player->AddComponent(new CameraComponent(new Camera(mat4().CreateProjection(AsRadians(70.f), 16.f / 9.f, 0.1f, 1000))));
 	//player->AddComponent(new IActorComponent("CameraComponent", mat4().CreateProjection(AsRadians(70.f), 16.f / 9.f, 0.1f, 1000)));

@@ -17,6 +17,7 @@
 #include "Core\Callback.h"
 #include "Core\Logger.h"
 #include "Core\Window.h"
+#include "Core\Assets.h"
 #include "Core\Model.h"
 #include "Core\Mouse.h"
 #include "Core\Timer.h"

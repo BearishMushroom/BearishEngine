@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "OpenGL.h"
 #include "../Core/Timer.h"
+#include "BETFile.h"
 
 using namespace Bearish;
 using namespace Graphics;
@@ -68,13 +69,14 @@ void Texture::Load(const string filename, const TextureType type, TextureFormat 
 	_formats = std::vector<TextureFormat> { format };
 	_filename = filename;
 
-	i32 width, height;
-	u8* image = SOIL_load_image(filename.c_str(), &width, &height, 0, 0);
-	_size = vec2(static_cast<f32>(width), static_cast<f32>(height));
+	BETFile file;
+	file.ReadFromFile(filename);
+	u8* image = file.ConvertToRaw();
+	_size = vec2((f32)file.width, (f32)file.height);
 
 	InitTextures(type, std::vector<TextureFormat> { format }, &image);
 
-	SOIL_free_image_data(image);
+	free(file.data);
 	Logger::Info("Texture %s loaded in %.3fms", filename.c_str(), time.DeltaMS());
 }
 
@@ -92,13 +94,14 @@ void Texture::Load(const string posX, const string negX, const string posY, cons
 	glBindTexture(GL_TEXTURE_CUBE_MAP, _ids[0]);
 
 	for (i32 i = 0; i < 6; i++) {
-		i32 width, height;
-		u8* image = SOIL_load_image(names[i].c_str(), &width, &height, 0, 0);
-		_size = vec2((f32)width, (f32)height);
+		BETFile file;
+		file.ReadFromFile(names[i]);
+		u8* image = file.ConvertToRaw();
+		_size = vec2((f32)file.width, (f32)file.height);
 
 		InitCubeMapFace(CubeMapFaces[i], image);
 
-		SOIL_free_image_data(image);
+		free(file.data);
 	}
 
 	glTexParameteri((GLenum)_type, GL_TEXTURE_MAG_FILTER, (GLenum)_filter);
