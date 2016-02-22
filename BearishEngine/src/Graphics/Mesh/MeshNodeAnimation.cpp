@@ -56,8 +56,11 @@ Math::quat MeshNodeAnimation::CalcInterpolatedRotation(f32 time) {
 }
 
 u32 MeshNodeAnimation::FindPosition(f32 time) {
-	for (u32 i = 0; i < positionKeys.size() - 1; i++) {
-		if (time < (f32)positionKeys[i + 1].time) {
+	u32 size = positionKeys.size() - 1;
+	MeshNodeAnimationKeyframe* frames = &positionKeys[0];
+
+	for (u32 i = 0; i < size; i++) {
+		if (time < frames[i + 1].time) {
 			return i;
 		}
 	}
@@ -66,8 +69,10 @@ u32 MeshNodeAnimation::FindPosition(f32 time) {
 }
 
 u32 MeshNodeAnimation::FindScale(f32 time) {
-	for (u32 i = 0; i < scaleKeys.size() - 1; i++) {
-		if (time < (f32)scaleKeys[i + 1].time) {
+	u32 size = scaleKeys.size() - 1;
+	MeshNodeAnimationKeyframe* frames = &scaleKeys[0];
+	for (u32 i = 0; i < size; i++) {
+		if (time < frames[i + 1].time) {
 			return i;
 		}
 	}
@@ -76,8 +81,10 @@ u32 MeshNodeAnimation::FindScale(f32 time) {
 }
 
 u32 MeshNodeAnimation::FindRotation(f32 time) {
-	for (u32 i = 0; i < rotationKeys.size() - 1; i++) {
-		if (time < (f32)rotationKeys[i + 1].time) {
+	u32 size = rotationKeys.size() - 1;
+	MeshNodeAnimationKeyframe* frames = &rotationKeys[0];
+	for (u32 i = 0; i < size; i++) {
+		if (time < frames[i + 1].time) {
 			return i;
 		}
 	}

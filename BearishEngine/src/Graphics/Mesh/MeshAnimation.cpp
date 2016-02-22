@@ -18,9 +18,10 @@ bool MeshAnimation::Update(f32 time, MeshNode* root) {
 	return false;
 }
 
-MeshNodeAnimation* MeshAnimation::GetNodeAnimation(string name) {
-	for (i32 i = 0; i < (i32)_channels.size(); i++) {
-		if (_channels[i]->name == name) {
+MeshNodeAnimation* MeshAnimation::GetNodeAnimation(u32 nameHash) {
+	i32 size = (i32)_channels.size();
+	for (i32 i = 0; i < size; i++) {
+		if (_channels[i]->nameHash == nameHash) {
 			return _channels[i];
 		}
 	}

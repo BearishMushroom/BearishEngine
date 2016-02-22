@@ -11,13 +11,15 @@ namespace Bearish { namespace Graphics {
 
 	class MeshNode : public Core::IAllocatable<MeshNode> {
 	public:
-		MeshNode(Math::mat4 transform, std::vector<MeshNode*> nodes, string name) : _transform(transform), _children(nodes), _name(name) {}
+		MeshNode(Math::mat4 transform, std::vector<MeshNode*> nodes, string name) : _transform(transform), _children(nodes), 
+			_name(name), _nameHash(std::hash<string>()(name)) {}
 
 		void Animate(MeshAnimation* anim, MeshSkeleton* skeleton, f32 time, Math::mat4 parent = Math::mat4().CreateIdentity());
 	private:
 		Math::mat4 _transform;
 		std::vector<MeshNode*> _children;
 		string _name;
+		u32 _nameHash;
 	};
 } }
 
