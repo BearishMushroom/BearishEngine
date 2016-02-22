@@ -65,14 +65,29 @@ vec4 CalculateSpotLight(SpotLight light, vec3 normal, vec3 wp) {
     }
 }
 
+const int pcfSize = 3;
+const float texelCount = (pcfSize * 2.0 + 1.0) * (pcfSize * 2.0 + 1.0);
+
 float CalculateShadow(sampler2D sm, vec4 lightPos) {
-	float result = 1;
+	//float result = 1;
 	vec4 coords = lightPos / lightPos.w;
-	for (int i = 0; i < 4; i++){
-		if (texture(sm, coords.xy + poissonDisk[i] / 700.0).r < coords.z - 0.03) {
-			result -= 0.2;
-		}
-	}
+  float texelSize = 1.0 / 2048.0;
+  //for (int i = 0; i < 4; i++){
+	//	if (texture(sm, coords.xy + poissonDisk[i] / 700.0).r < coords.z - 0.03) {
+	//		result -= 0.2;
+	//	}
+	//}
+
+  float texels = 0;
+  for(int x = -pcfSize; x <= pcfSize; x++) {
+    for(int y = -pcfSize; y <= pcfSize; y++) {
+      if(texture(sm, coords.xy + vec2(x, y) * texelSize).r < coords.z - 0.03) {
+        texels++;
+      }
+    }
+  }
+
+  float result = 1 - texels / texelCount;
 
 	return result;
 }

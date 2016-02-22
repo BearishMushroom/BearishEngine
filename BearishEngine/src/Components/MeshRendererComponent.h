@@ -17,7 +17,7 @@ namespace Bearish { namespace Components {
 
 		virtual void Draw(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) override;
 	private:
-		Graphics::Mesh* _mesh;
+		Graphics::Mesh* _mesh;		
 		Graphics::Texture* _texture;
 		Graphics::Texture* _normalMap;
 		Graphics::Material* _material;
