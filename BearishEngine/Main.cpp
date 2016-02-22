@@ -202,6 +202,30 @@ void Update() {
 		renderer.SetDebugDeffered(true);
 	}
 
+	if (Keyboard::IsKeyPressed(Key::F6)) {
+		renderer.SetShadowQuality(ShadowQuality::Off);
+	}
+
+	if (Keyboard::IsKeyPressed(Key::F7)) {
+		renderer.SetShadowQuality(ShadowQuality::Terrible);
+	}
+
+	if (Keyboard::IsKeyPressed(Key::F8)) {
+		renderer.SetShadowQuality(ShadowQuality::Low);
+	}
+	
+	if (Keyboard::IsKeyPressed(Key::F9)) {
+		renderer.SetShadowQuality(ShadowQuality::Medium);
+	}
+	
+	if (Keyboard::IsKeyPressed(Key::F10)) {
+		renderer.SetShadowQuality(ShadowQuality::High);
+	}
+
+	if (Keyboard::IsKeyPressed(Key::F11)) {
+		renderer.SetShadowQuality(ShadowQuality::Ultra);
+	}
+
 	if (Keyboard::IsKeyPressed(Key::L)) {
 		Actor* panelTest = new Actor(Transform(vec3(400, 400, -1), vec3(300, 230, 1)));
 		panelTest->AddComponent(new UIPanel(new Texture(vec4(1, 0, 1, 1))));

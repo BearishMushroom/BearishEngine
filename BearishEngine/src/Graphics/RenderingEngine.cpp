@@ -39,7 +39,7 @@ void RenderingEngine::Load() {
 	_shadowShader = new Shader("res/shadowmap.vert", "res/shadowmap.frag");
 	_guiShader = new Shader("res/gui.vert", "res/gui.frag");
 
-	_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::R32);
+	SetShadowQuality(ShadowQuality::High);
 
 	std::vector<TextureAttachment> att = {
 		TextureAttachment::Color0,
@@ -124,8 +124,6 @@ void RenderingEngine::Submit(Mesh* mesh, Material* mat) {
 }
 
 void RenderingEngine::Draw() {
-	
-
 	_materialsToRender.clear();
 	_maxMaterial = 0;
 	_lights.clear();
@@ -141,24 +139,26 @@ void RenderingEngine::Draw() {
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 
-	for (Light* light : _lights) {
-		if (light->GetType() == LightType::Directional) {
-			_shadowMap->BindAsRenderTarget();
-			_shadowMap->Clear();
-			_shadowShader->Bind();
-			Camera scamera = Camera(mat4().CreateOrthographic(-15, 15, -15, 15, -40, 40), Transform(vec3(0, 5, -5),
-				vec3(1), ((DirectionalLight*)light)->GetDirection()));
+	if (_shadowMap) {
+		for (Light* light : _lights) {
+			if (light->GetType() == LightType::Directional) {
+				_shadowMap->BindAsRenderTarget();
+				_shadowMap->Clear();
+				_shadowShader->Bind();
+				Camera scamera = Camera(mat4().CreateOrthographic(-15, 15, -15, 15, -40, 40), Transform(vec3(0, 5, -5),
+					vec3(1), ((DirectionalLight*)light)->GetDirection()));
 
-			glCullFace(GL_FRONT);
+				glCullFace(GL_FRONT);
 
-			for (auto& a : *_actors) {
-				a->Draw(this, _shadowShader, &scamera);
+				for (auto& a : *_actors) {
+					a->Draw(this, _shadowShader, &scamera);
+				}
+				FlushMeshes(false);
+
+				glCullFace(GL_BACK);
+
+				_window->BindAsRenderTarget();
 			}
-			FlushMeshes(false);
-
-			glCullFace(GL_BACK);
-
-			_window->BindAsRenderTarget();
 		}
 	}
 
@@ -202,6 +202,8 @@ void RenderingEngine::Draw() {
 					mat.first->GetShader()->SetUniform("gTangent", 1);
 					mat.first->GetShader()->SetUniform("gNormal", 2);
 					mat.first->GetShader()->SetUniform("gTexCoord", 3);
+					mat.first->GetShader()->SetUniform("pcfSize", (i32)_shadowPcfSize);
+					mat.first->GetShader()->SetUniform("shadowSize", _shadowMap == nullptr ? 0 : (i32)_shadowMap->GetSize().x);
 					_currentShader = mat.first->GetShader();
 					shaderChanged = true;
 				}
@@ -228,8 +230,10 @@ void RenderingEngine::Draw() {
 						vec3(1), dl->GetDirection()));
 
 					if (shaderChanged) {
-						mat.first->GetShader()->SetUniform("shadowMap", 4);
-						_shadowMap->Bind(4);
+						if (_shadowMap) {
+							mat.first->GetShader()->SetUniform("shadowMap", 4);
+							_shadowMap->Bind(4);
+						}
 
 						mat.first->GetShader()->SetUniform("lightMVP", scamera.GetViewMatrix());
 						mat.first->GetShader()->SetUniform("dLight", *dl);
@@ -352,4 +356,42 @@ i32 RenderingEngine::PushMaterial(Material* material) {
 	_materialsToRender.push_back(std::make_pair(material, _maxMaterial));
 	_maxMaterial++;
 	return _maxMaterial - 1;
+}
+
+void RenderingEngine::SetShadowQuality(ShadowQuality quality) {
+	if (quality != _shadowQuality) {
+		_shadowQuality = quality;
+		delete _shadowMap;
+		_shadowMap = nullptr;
+		switch (quality) {
+		case ShadowQuality::Off:
+			_shadowPcfSize = 0;
+			break;
+
+		case ShadowQuality::Terrible:
+			_shadowMap = new Texture(vec2(512), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::R32);
+			_shadowPcfSize = 0;
+			break;
+
+		case ShadowQuality::Low:
+			_shadowMap = new Texture(vec2(1024), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::R32);
+			_shadowPcfSize = 1;
+			break;
+
+		case ShadowQuality::Medium:
+			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::R32);
+			_shadowPcfSize = 2;
+			break;
+
+		case ShadowQuality::High:
+			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::R32);
+			_shadowPcfSize = 3;
+			break;
+
+		case ShadowQuality::Ultra:
+			_shadowMap = new Texture(vec2(4096), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::R32);
+			_shadowPcfSize = 4;
+			break;
+		}
+	}
 }

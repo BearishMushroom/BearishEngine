@@ -25,6 +25,15 @@ namespace Bearish {
 	class PointLight;
 	class Material;
 
+	enum class ShadowQuality : u8 {
+		Off,
+		Terrible,
+		Low,
+		Medium,
+		High,
+		Ultra,
+	};
+
 	struct MeshEntry {
 		Mesh* mesh;
 		Material* material;
@@ -58,9 +67,11 @@ namespace Bearish {
 		std::vector<Core::Actor*>* GetActors() { return _actors; }
 		Camera* GetCamera() { return _camera; }
 		i32 PushMaterial(Material* material);
+
+		void SetShadowQuality(ShadowQuality quality);
 	private:
 		std::vector<Light*> _lights;
-		Texture* _shadowMap, *_gbuffer;
+		Texture* _gbuffer;
 		Renderer* _renderer;
 
 		Mesh* _sphere,* _quad;
@@ -74,6 +85,10 @@ namespace Bearish {
 		std::vector<MeshEntry> _meshesToRender;
 		std::vector<std::pair<Material*, i32>> _materialsToRender;
 		i32 _maxMaterial;
+
+		Texture* _shadowMap;
+		f32 _shadowPcfSize;
+		ShadowQuality _shadowQuality;
 
 		f32 PointLightSize(PointLight* pl);
 

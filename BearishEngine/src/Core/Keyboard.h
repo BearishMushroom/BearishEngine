@@ -83,6 +83,9 @@ namespace Bearish { namespace Core {
 		F7 = GLFW_KEY_F7,
 		F8 = GLFW_KEY_F8,
 		F9 = GLFW_KEY_F9,
+		F10 = GLFW_KEY_F10,
+		F11 = GLFW_KEY_F11,
+		F12 = GLFW_KEY_F12,
 	};
 
 	class Keyboard {
