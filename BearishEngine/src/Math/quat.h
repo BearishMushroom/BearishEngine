@@ -208,8 +208,8 @@ namespace Bearish { namespace Math {
 			T angle = static_cast<T>(atan2(sin, cos));
 			T invSin = static_cast<T>(1.0 / sin);
 
-			T srcFactor = static_cast<T>(sin((1.0f - lerpFactor) * angle) * invSin);
-			T destFactor = static_cast<T>(sin((lerpFactor)* angle) * invSin);
+			T srcFactor = static_cast<T>(sinf((1.0f - lerpFactor) * angle) * invSin);
+			T destFactor = static_cast<T>(sinf((lerpFactor)* angle) * invSin);
 
 			return (*this) * srcFactor + (correctedDest * destFactor);
 		}

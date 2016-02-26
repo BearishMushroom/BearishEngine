@@ -15,9 +15,6 @@ namespace Bearish { namespace Core {
 
 		virtual ~IActorComponent() {}
 
-		void GetSqFuncs() {
-		}
-
 		virtual void Init() {
 		}
 
@@ -47,17 +44,9 @@ namespace Bearish { namespace Core {
 
 		virtual void OnTrigger(string id, void* data) {}
 
-		void SetParent(Actor* actor) {
-			_actor = actor;
-		}
-
-		Actor* GetParent() {
-			return _actor;
-		}
-
-		Transform& GetTransform() {
-			return _transform;
-		}
+		void SetParent(Actor* actor) { _actor = actor; }
+		Actor* GetParent() { return _actor; }
+		Transform& GetTransform() {	return _transform; }
 
 		string GetID() { return _id; }
 		void SetID(string id) { _id = id; }

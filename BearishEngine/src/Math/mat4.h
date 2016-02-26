@@ -325,6 +325,10 @@ namespace Bearish { namespace Math {
 			return _v[x][y];
 		}
 
+		inline void Set(i32 x, i32 y, T value) {
+			_v[x][y] = value;
+		}
+
 		inline string ToString() const {
 			return "{ " + std::to_string(_v[0][0]) + " " + std::to_string(_v[0][1]) + " " + std::to_string(_v[0][2]) + " " + std::to_string(_v[0][3]) + "\n" +
 				"  " + std::to_string(_v[1][0]) + " " + std::to_string(_v[1][1]) + " " + std::to_string(_v[1][2]) + " " + std::to_string(_v[1][3]) + "\n" +

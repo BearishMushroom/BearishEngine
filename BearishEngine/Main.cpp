@@ -163,6 +163,8 @@ Action<std::vector<i32>> testAC;
 
 std::unordered_map<string, string> Assets::_values;
 
+#include <lua.hpp>
+
 // Temporary update solution.
 void Update() {
 	for (i32 i = 0; i < (i32)actors.size(); i++) {
@@ -254,6 +256,8 @@ void Update() {
 	renderer.testPart->Update(renderer.GetCamera(), 1.f / 60.f);
 }
 
+#include <luabind/luabind.hpp>
+
 i32 main(i32 argc, c8** argv) {
 	SeedRandom();
 	Window window("Bearish Engine 0.160a", 1280, 720);
@@ -263,22 +267,14 @@ i32 main(i32 argc, c8** argv) {
 
 	Assets::LoadAssetDefinitions();
 
-	//InitSquirrel();
-	//RegisterMath();
-	//RegisterGraphics();
-	//RegisterCore();
-	//
-	//auto libs = GetFilesInFolder("./scr/lib/", "nut");
-	//for (auto lib : libs) {
-	//	Logger::Info("Loading script: " + lib);
-	//	Scripting::RunFile(lib);
-	//}
-	//
-	//libs = GetFilesInFolder("./scr/run/", "nut");
-	//for (auto lib : libs) {
-	//	Logger::Info("Loading component: " + lib);
-	//	Scripting::RunFile(lib);
-	//}
+	Scripting::InitLua();
+	Scripting::RegisterMath();
+
+	Scripting::RunString(R"(
+		local v = vec3(10, 10, 10)
+		local f = v * vec3(5, 2, 6)
+		print(f)
+	)");
 
 	renderer.Load();
 
