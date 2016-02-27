@@ -1,10 +1,8 @@
 export class Test2
-  new: (@pos) =>
-    @secret = "Boo!"
+  new: =>
 
-  Unspook: =>
-    @pos\Normalize!
-    @secret = "Yay!"
+  Init: =>
+    print "Starting..."
 
-  Print: (x) =>
-	   print @secret, x, @pos
+  FixedUpdate: =>
+	  p = vec2 20, 20

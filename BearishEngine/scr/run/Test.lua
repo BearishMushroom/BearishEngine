@@ -1,15 +1,13 @@
 Test = class()
 
-function Test:new(pos)
-	self.pos = pos
-	self.secret = "Boo!"
+function Test:new() end
+
+function Test:Init()
+	print("Starting...")
 end
 
-function Test:Unspook()
-  self.pos:Normalize()
-	self.secret = "Yay!"
-end
-
-function Test:Print(x)
-	print(self.secret, x, self.pos)
+function Test:FixedUpdate()
+	local p = vec2(20, 20)
+	local l = vec2(40, 40)
+	local r = p * l
 end

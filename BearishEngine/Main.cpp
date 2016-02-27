@@ -286,6 +286,34 @@ i32 main(i32 argc, c8** argv) {
 		Scripting::DoMoonFile(file);
 	}
 
+
+	Scripting::RunString(R"(
+local p = Test2()
+for i, v in pairs(getmetatable(p)) do
+	print(i, v)
+end
+
+local l = Test()
+for i, v in pairs(getmetatable(l)) do
+	print(i, v)
+end
+)");
+
+	object1->AddComponent(new IActorComponent("Test"));
+	object1->AddComponent(new IActorComponent("Test2"));
+	object1->AddComponent(new IActorComponent("Test2"));
+	object1->AddComponent(new IActorComponent("Test2"));
+	object1->AddComponent(new IActorComponent("Test2"));
+	object1->AddComponent(new IActorComponent("Test2"));
+	object1->AddComponent(new IActorComponent("Test2"));
+	object1->AddComponent(new IActorComponent("Test2"));
+	object1->AddComponent(new IActorComponent("Test2"));
+	object1->AddComponent(new IActorComponent("Test2"));
+	object1->AddComponent(new IActorComponent("Test2"));
+	object1->AddComponent(new IActorComponent("Test2"));
+	object1->AddComponent(new IActorComponent("Test2"));
+	object1->AddComponent(new IActorComponent("Test2"));
+
 	renderer.Load();
 
 

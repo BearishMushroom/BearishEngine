@@ -29,6 +29,16 @@ namespace Bearish { namespace Scripting {
 				Core::Logger::Error(e.what());
 			}
 		}
+
+		inline bool HasFunction(string name) {
+			auto obj = _self[name.c_str()];
+			
+			return luabind::type(obj) != LUA_TNIL;
+		}
+
+		inline bool Valid() {
+			return luabind::type(_self) != LUA_TNIL;
+		}
 	private:
 		luabind::object _self;
 	};
@@ -70,12 +80,14 @@ namespace Bearish { namespace Scripting {
 	}
 
 	static void RunMoon(string moon) {
-		RunString(CompileMoon(moon));
+		string str = CompileMoon(moon);
+		Core::Logger::Info("%s", str.c_str());
+		RunString(str);
 	}
 
 	static void DoMoonFile(string filename) {
 		try {
-		luabind::call_function<void>(moonDoFile, filename);
+			luabind::call_function<void>(moonDoFile, filename);
 		}
 		catch (luabind::error e) {
 			Core::Logger::Error("Lua: %s\n", lua_tostring(Scripting::L, -1));
@@ -86,6 +98,12 @@ namespace Bearish { namespace Scripting {
 	template<typename... Args>
 	static LuaObject CreateInstance(string name, Args&&... args) {
 		return LuaObject(luabind::call_function<luabind::object>(Scripting::L, name.c_str(), args...));
+	}
+
+	static LuaObject CreateInstance(string func) {
+		luaL_loadstring(L, ("return " + func).c_str());
+		luabind::object obj(luabind::from_stack(L, -1));
+		return LuaObject(obj());
 	}
 } }
 
