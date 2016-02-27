@@ -139,6 +139,7 @@ namespace Bearish { namespace Scripting {
 				.def("Left", &quat::Left),
 
 			class_<mat4>("mat4")
+				.def(constructor<>())
 				.def("CreateIdentity", &mat4::CreateIdentity)
 				.def("CreateTranslation", &mat4::CreateTranslation)
 				.def("CreateScale", &mat4::CreateScale)

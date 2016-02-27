@@ -33,11 +33,16 @@ namespace Bearish { namespace Scripting {
 		inline bool HasFunction(string name) {
 			auto obj = _self[name.c_str()];
 			
-			return luabind::type(obj) != LUA_TNIL;
+			return luabind::type(luabind::rawget(_self, name)) != LUA_TNIL || luabind::type(obj) != LUA_TNIL;
+		}
+
+		template<typename T>
+		inline void Set(string name, T value) {
+			_self[name] = value;
 		}
 
 		inline bool Valid() {
-			return luabind::type(_self) != LUA_TNIL;
+			return _self.interpreter() && luabind::type(_self) != LUA_TNIL;
 		}
 	private:
 		luabind::object _self;

@@ -42,12 +42,15 @@ namespace Bearish { namespace Core {
 		}
 
 		virtual void PreDraw(Graphics::RenderingEngine* renderer, Graphics::Camera* camera) {
+			if (_hasPreDraw) _lua.CallFunction<void>("PreDraw", renderer, camera);
 		}
 
 		virtual void Draw(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) {
+			if (_hasDraw) _lua.CallFunction<void>("Draw", renderer, shader, camera);
 		}
 
 		virtual void PostDraw(Graphics::RenderingEngine* renderer, Graphics::Camera* camera) {
+			if (_hasPostDraw) _lua.CallFunction<void>("PostDraw", renderer, camera);
 		}
 
 		virtual void PreDraw2D(Graphics::RenderingEngine* renderer, Graphics::Camera* camera) {
@@ -61,7 +64,7 @@ namespace Bearish { namespace Core {
 
 		virtual void OnTrigger(string id, void* data) {}
 
-		void SetParent(Actor* actor) { _actor = actor; }
+		void SetParent(Actor* actor) { _actor = actor; if (_lua.Valid()) _lua.Set("actor", actor); }
 		Actor* GetParent() { return _actor; }
 		Transform& GetTransform() {	return _transform; }
 

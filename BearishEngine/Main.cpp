@@ -271,6 +271,8 @@ i32 main(i32 argc, c8** argv) {
 	Scripting::RunFile("scr/lib/init.lua");
 
 	Scripting::RegisterMath();
+	Scripting::RegisterCore();
+	Scripting::RegisterGraphics();
 
 	Scripting::RunFile("scr/lib/class.lua");
 	Scripting::InitMoonScript();
@@ -285,34 +287,6 @@ i32 main(i32 argc, c8** argv) {
 		Logger::Info("Running %s", file.c_str());
 		Scripting::DoMoonFile(file);
 	}
-
-
-	Scripting::RunString(R"(
-local p = Test2()
-for i, v in pairs(getmetatable(p)) do
-	print(i, v)
-end
-
-local l = Test()
-for i, v in pairs(getmetatable(l)) do
-	print(i, v)
-end
-)");
-
-	object1->AddComponent(new IActorComponent("Test"));
-	object1->AddComponent(new IActorComponent("Test2"));
-	object1->AddComponent(new IActorComponent("Test2"));
-	object1->AddComponent(new IActorComponent("Test2"));
-	object1->AddComponent(new IActorComponent("Test2"));
-	object1->AddComponent(new IActorComponent("Test2"));
-	object1->AddComponent(new IActorComponent("Test2"));
-	object1->AddComponent(new IActorComponent("Test2"));
-	object1->AddComponent(new IActorComponent("Test2"));
-	object1->AddComponent(new IActorComponent("Test2"));
-	object1->AddComponent(new IActorComponent("Test2"));
-	object1->AddComponent(new IActorComponent("Test2"));
-	object1->AddComponent(new IActorComponent("Test2"));
-	object1->AddComponent(new IActorComponent("Test2"));
 
 	renderer.Load();
 
@@ -359,9 +333,9 @@ end
 	
 	Actor* player = new Actor;
 	player->AddComponent(new SkyboxComponent(new Texture(Assets::Get("right"), Assets::Get("left"), Assets::Get("top"), Assets::Get("bottom"), Assets::Get("front"), Assets::Get("back"))));
-	
-	player->AddComponent(new CameraComponent(new Camera(mat4().CreateProjection(AsRadians(70.f), 16.f / 9.f, 0.1f, 1000))));
-	//player->AddComponent(new IActorComponent("CameraComponent", mat4().CreateProjection(AsRadians(70.f), 16.f / 9.f, 0.1f, 1000)));
+
+	//player->AddComponent(new CameraComponent(new Camera(mat4().CreateProjection(AsRadians(70.f), 16.f / 9.f, 0.1f, 1000))));
+	player->AddComponent(new IActorComponent("CameraComponent"));
 
 	player->AddComponent(new FreeMoveComponent(1.0f / 3.0f));
 	player->AddComponent(new FreeLookComponent(0.2f));
