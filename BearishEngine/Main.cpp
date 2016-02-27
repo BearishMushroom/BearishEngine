@@ -268,22 +268,33 @@ i32 main(i32 argc, c8** argv) {
 	Assets::LoadAssetDefinitions();
 
 	Scripting::InitLua();
+	Scripting::RunFile("scr/lib/init.lua");
+
 	Scripting::RegisterMath();
 
-	Scripting::RunString(R"(
-		local v = vec3(10, 10, 10)
-		local f = v * vec3(5, 2, 6)
-		print(f)
-	)");
+	Scripting::RunFile("scr/lib/class.lua");
+	Scripting::InitMoonScript();
+
+
+	for (auto& file : Util::GetFilesInFolder("./scr/run/", "lua")) {
+		Logger::Info("Running %s", file.c_str());
+		Scripting::RunFile(file);
+	}
+
+	for (auto& file : Util::GetFilesInFolder("./scr/run/", "moon")) {
+		Logger::Info("Running %s", file.c_str());
+		Scripting::DoMoonFile(file);
+	}
 
 	renderer.Load();
+
 
 	i64 fps = 0;
 	f32 secondTimer = 0;
 
 	Mesh mesh = Model(Assets::Get("man")).ToMesh();
 	Mesh mesh2 = Model(Assets::Get("plane")).ToMesh();
-
+	
 	Texture texture(Assets::Get("bricks"));
 	Texture normalMap(Assets::Get("bricksNormal"));
 
