@@ -8,7 +8,6 @@
 #include "../Types.h"
 
 namespace Bearish { namespace Components {
-
 	class FreeLookComponent : public Core::IActorComponent, public Core::IAllocatable<FreeLookComponent> {
 	public:
 		FreeLookComponent(f32 sensitivity = 0.2f) : _sensitivity(sensitivity) { _id = "FreeLook"; }

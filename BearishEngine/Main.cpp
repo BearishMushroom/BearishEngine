@@ -288,6 +288,11 @@ i32 main(i32 argc, c8** argv) {
 		Scripting::DoMoonFile(file);
 	}
 
+	Scripting::RunString(R"(
+for i, v in pairs(Key) do
+	print(i, v)
+end)");
+
 	renderer.Load();
 
 
@@ -337,13 +342,14 @@ i32 main(i32 argc, c8** argv) {
 	//player->AddComponent(new CameraComponent(new Camera(mat4().CreateProjection(AsRadians(70.f), 16.f / 9.f, 0.1f, 1000))));
 	player->AddComponent(new IActorComponent("CameraComponent"));
 
-	player->AddComponent(new FreeMoveComponent(1.0f / 3.0f));
-	player->AddComponent(new FreeLookComponent(0.2f));
+	//player->AddComponent(new FreeMoveComponent(1.0f / 3.0f));
+	//player->AddComponent(new FreeLookComponent(0.2f));
+	player->AddComponent(new IActorComponent("FreeLookComponent", 0.2f));
+	player->AddComponent(new IActorComponent("FreeMoveComponent", 1.0f / 3.0f));
 	Mouse::FreeFromCentre();
 
 	Actor* plane = new Actor(Transform(vec3(0, -2.5f, 0), vec3(5, 1, 5)));
 	plane->AddComponent(new MeshRendererComponent(&mesh2, &texture, &normalMap));
-	//plane->AddComponent(new IActorComponent("Component"));
 
 	Actor* dir = new Actor(Transform(vec3(0), vec3(1), quat().CreateRotation(vec3(1, 0, 0), AsRadians(45.f))));
 	dir->AddComponent(new DirectionalLightComponent(vec3(1), 0.1f, 0.2f));
@@ -357,10 +363,6 @@ i32 main(i32 argc, c8** argv) {
 	actors.push_back(player);
 	actors.push_back(plane);
 	actors.push_back(object1);
-	
-	//object1->AddComponent(new IActorComponent("Component"));
-	//object2->AddComponent(new IActorComponent("Component"));
-	//object3->AddComponent(new IActorComponent("Component"));
 
 	actors.push_back(object2);
 	actors.push_back(object3);

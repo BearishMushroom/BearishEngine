@@ -2,11 +2,15 @@
 #define _BEARISH_SCRIPTING_CORE_H_
 
 #include "../Core/IActorComponent.h"
-#include "ScriptingEngine.h"
+#include "../Core/Mouse.h"
 #include "../Core/Actor.h"
+
+#include "ScriptingEngine.h"
 #include "../Types.h"
 
 namespace Bearish { namespace Scripting {
+	struct key_wrappper {};
+
 	static void RegisterCore() {
 		using namespace luabind;
 		using namespace Core;
@@ -30,7 +34,46 @@ namespace Bearish { namespace Scripting {
 				.def("GetTransform", &Actor::GetTransform)
 				.def("GetTransformation", &Actor::GetTransformation)
 				.def("GetParent", &Actor::GetParent)
-				.def("SetParent", &Actor::SetParent)
+				.def("SetParent", &Actor::SetParent),
+
+			class_<Mouse>("Mouse")
+				.scope [
+					def("GetDelta", &Mouse::GetMouseDelta),
+					def("LockToCentre", &Mouse::LockToCentre),
+					def("FreeFromCentre", &Mouse::FreeFromCentre)
+				],
+
+			class_<Keyboard>("Keyboard")
+				.scope [
+					def("IsKeyDown", &Keyboard::IsKeyDown),
+					def("IsKeyUp", &Keyboard::IsKeyUp),
+					def("IsKeyPressed", &Keyboard::IsKeyPressed),
+					def("IsKeyReleased", &Keyboard::IsKeyReleased)
+				],
+
+			class_<key_wrappper>("Key")
+				.enum_("constants") [
+					value("A", (i32)Key::A), value("B", (i32)Key::B), value("C", (i32)Key::C),
+					value("D", (i32)Key::D), value("E", (i32)Key::E), value("F", (i32)Key::F),
+					value("G", (i32)Key::G), value("H", (i32)Key::H), value("I", (i32)Key::I),
+					value("J", (i32)Key::J), value("K", (i32)Key::K), value("L", (i32)Key::L),
+					value("M", (i32)Key::M), value("N", (i32)Key::N), value("O", (i32)Key::O),
+					value("P", (i32)Key::P), value("Q", (i32)Key::Q), value("R", (i32)Key::R), 
+					value("S", (i32)Key::S), value("T", (i32)Key::T), value("U", (i32)Key::U),
+					value("V", (i32)Key::V), value("W", (i32)Key::W), value("X", (i32)Key::X),
+					value("Y", (i32)Key::Y), value("Z", (i32)Key::Z),
+
+					value("One", (i32)Key::One), value("Two", (i32)Key::Two), value("Three", (i32)Key::Three),
+					value("Four", (i32)Key::Four), value("Five", (i32)Key::Five), value("Six", (i32)Key::Six),
+					value("Seven", (i32)Key::Seven), value("Eight", (i32)Key::Eight), value("Nine", (i32)Key::Nine),
+					value("Zero", (i32)Key::Zero),
+
+					value("Left", (i32)Key::Left),
+					value("Right", (i32)Key::Right),
+					value("Up", (i32)Key::Up),
+					value("Down", (i32)Key::Down)
+				]
+			
 		];
 	}
 } }
