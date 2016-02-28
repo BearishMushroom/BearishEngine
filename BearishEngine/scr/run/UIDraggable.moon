@@ -42,7 +42,6 @@ export class UIDraggable
     if Mouse.IsButtonPressed MouseButton.Left
       @isDragging = pointInVec4 @rect, Mouse.GetPosition!
       @dragPos = position - Mouse.GetPosition!
-      print "Mouse", @rect, @pos, UIDragPosition
 
     if Mouse.IsButtonDown(MouseButton.Left) and @isDragging
       newpos = Mouse.GetPosition! + @dragPos
