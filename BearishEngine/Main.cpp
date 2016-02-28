@@ -231,7 +231,8 @@ void Update() {
 	if (Keyboard::IsKeyPressed(Key::L)) {
 		Actor* panelTest = new Actor(Transform(vec3(400, 400, -1), vec3(300, 230, 1)));
 		panelTest->AddComponent(new UIPanel(new Texture(vec4(1, 0, 1, 1))));
-		panelTest->AddComponent<UIDraggable>();
+		//panelTest->AddComponent<UIDraggable>();
+		panelTest->AddComponent(new IActorComponent("UIDraggable"));
 
 		Actor* buttonTest = new Actor(Transform(vec3(130, -85, -2), vec3(30, 30, 1)));
 		buttonTest->AddComponent(new UIButton(new Texture(vec4(0, 0, 1, 1)), [](UIButton* button) {
@@ -242,7 +243,6 @@ void Update() {
 		subpanelTest->AddComponent(new UIPanel(new Texture(vec4(1, 0, 0, 1))));
 		auto l = new UILabel(new Font("res/Roboto.ttf"), "This is text.\nIt's really cool.\nIt's really not. B-)", 32.f);
 		subpanelTest->AddComponent(l);
-		subpanelTest->AddComponent(new UIDraggable(UIDragPosition::Centre));
 
 		panelTest->AddChild(buttonTest);
 		panelTest->AddChild(subpanelTest);
@@ -287,11 +287,6 @@ i32 main(i32 argc, c8** argv) {
 		Logger::Info("Running %s", file.c_str());
 		Scripting::DoMoonFile(file);
 	}
-
-	Scripting::RunString(R"(
-for i, v in pairs(Key) do
-	print(i, v)
-end)");
 
 	renderer.Load();
 

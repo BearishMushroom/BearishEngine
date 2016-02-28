@@ -65,6 +65,9 @@ namespace Bearish { namespace Core {
 		Math::vec3 GetTranslation();
 
 		Actor* const GetParent() const;
+
+		bool HasParent() const { return !(_parent == nullptr); }
+
 		void SetParent(Actor* const parent);
 		void AddChild(Actor* child);
 

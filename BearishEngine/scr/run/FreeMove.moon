@@ -6,22 +6,22 @@ export class FreeMoveComponent
     rot = @actor\GetTransform!\GetRotation!
     move = vec3 @speed, @speed, @speed
 
-    if Keyboard.IsKeyDown(@forward)
+    if Keyboard.IsKeyDown @forward
       tr += rot\Forward! * move
 
-    if Keyboard.IsKeyDown(@backward)
+    if Keyboard.IsKeyDown @backward
       tr += rot\Back! * move
 
-    if Keyboard.IsKeyDown(@left)
+    if Keyboard.IsKeyDown @left
       tr += rot\Left! * move
 
-    if Keyboard.IsKeyDown(@right)
+    if Keyboard.IsKeyDown @right
       tr += rot\Right! * move
 
-    if Keyboard.IsKeyDown(@up)
+    if Keyboard.IsKeyDown @up
       tr += rot\Up! * move
 
-    if Keyboard.IsKeyDown(@down)
+    if Keyboard.IsKeyDown @down
       tr += rot\Down! * move
 
     @actor\GetTransform!\SetTranslation tr

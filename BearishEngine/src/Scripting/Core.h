@@ -10,6 +10,7 @@
 
 namespace Bearish { namespace Scripting {
 	struct key_wrappper {};
+	struct button_wrapper {};
 
 	static void RegisterCore() {
 		using namespace luabind;
@@ -34,13 +35,19 @@ namespace Bearish { namespace Scripting {
 				.def("GetTransform", &Actor::GetTransform)
 				.def("GetTransformation", &Actor::GetTransformation)
 				.def("GetParent", &Actor::GetParent)
+				.def("HasParent", &Actor::HasParent)
 				.def("SetParent", &Actor::SetParent),
 
 			class_<Mouse>("Mouse")
 				.scope [
+					def("GetPosition", &Mouse::GetMousePosition),
 					def("GetDelta", &Mouse::GetMouseDelta),
 					def("LockToCentre", &Mouse::LockToCentre),
-					def("FreeFromCentre", &Mouse::FreeFromCentre)
+					def("FreeFromCentre", &Mouse::FreeFromCentre),
+					def("IsButtonPressed", &Mouse::IsButtonPressed),
+					def("IsButtonReleased", &Mouse::IsButtonReleased),
+					def("IsButtonDown", &Mouse::IsButtonDown),
+					def("IsButtonUp", &Mouse::IsButtonUp)
 				],
 
 			class_<Keyboard>("Keyboard")
@@ -72,8 +79,14 @@ namespace Bearish { namespace Scripting {
 					value("Right", (i32)Key::Right),
 					value("Up", (i32)Key::Up),
 					value("Down", (i32)Key::Down)
+				],
+
+			class_<button_wrapper>("MouseButton")
+				.enum_("Constants") [
+					value("Left", (i32)MouseButton::Left),
+					value("Right", (i32)MouseButton::Right),
+					value("Middle", (i32)MouseButton::Middle)
 				]
-			
 		];
 	}
 } }

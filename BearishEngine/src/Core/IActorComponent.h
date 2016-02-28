@@ -19,6 +19,11 @@ namespace Bearish { namespace Core {
 			GetLuaFuncs();
 		}
 
+		IActorComponent(string luaName) {
+			_lua = Scripting::CreateInstance(luaName + "()");
+			GetLuaFuncs();
+		}
+
 		IActorComponent(string luaName, string luaArgs) {
 			_lua = Scripting::CreateInstance(luaName + "(" + luaArgs + ")");
 			GetLuaFuncs();
