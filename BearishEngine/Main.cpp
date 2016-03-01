@@ -235,9 +235,11 @@ void Update() {
 		panelTest->AddComponent(new IActorComponent("UIDraggable"));
 
 		Actor* buttonTest = new Actor(Transform(vec3(130, -85, -2), vec3(30, 30, 1)));
-		buttonTest->AddComponent(new UIButton(new Texture(vec4(0, 0, 1, 1)), [](UIButton* button) {
-			button->GetParent()->GetParent()->Kill();
-		}));
+		//buttonTest->AddComponent(new UIButton(new Texture(vec4(0, 0, 1, 1)), [](UIButton* button) {
+		//	button->GetParent()->GetParent()->Kill();
+		//}));
+
+		buttonTest->AddComponent(new IActorComponent("UIButton", std::string("Texture(vec4(0, 0, 1, 1)), function(self) self.actor:GetParent():Kill() end")));
 
 		Actor* subpanelTest = new Actor(Transform(vec3(-135, -60, -2), vec3(1)));
 		subpanelTest->AddComponent(new UIPanel(new Texture(vec4(1, 0, 0, 1))));

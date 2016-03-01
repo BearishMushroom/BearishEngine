@@ -18,6 +18,7 @@ namespace Bearish { namespace Scripting {
 
 		module(L)[
 			class_<Transform>("Transform")
+				.def(constructor<Transform>())
 				.def(constructor<vec3, vec3, quat>())
 				.def("GetTranslation", &Transform::GetTranslation)
 				.def("GetScale", &Transform::GetScale)
@@ -36,7 +37,8 @@ namespace Bearish { namespace Scripting {
 				.def("GetTransformation", &Actor::GetTransformation)
 				.def("GetParent", &Actor::GetParent)
 				.def("HasParent", &Actor::HasParent)
-				.def("SetParent", &Actor::SetParent),
+				.def("SetParent", &Actor::SetParent)
+				.def("Kill", &Actor::Kill),
 
 			class_<Mouse>("Mouse")
 				.scope [

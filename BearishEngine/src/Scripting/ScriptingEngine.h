@@ -106,9 +106,15 @@ namespace Bearish { namespace Scripting {
 	}
 
 	static LuaObject CreateInstance(string func) {
-		luaL_loadstring(L, ("return " + func).c_str());
-		luabind::object obj(luabind::from_stack(L, -1));
-		return LuaObject(obj());
+		try {
+			luaL_loadstring(L, ("return " + func).c_str());
+			luabind::object obj(luabind::from_stack(L, -1));
+			return LuaObject(obj());
+		}
+		catch (luabind::error e) {
+			Core::Logger::Error("Lua: %s\n", lua_tostring(Scripting::L, -1));
+			Core::Logger::Error(e.what());
+		}
 	}
 } }
 

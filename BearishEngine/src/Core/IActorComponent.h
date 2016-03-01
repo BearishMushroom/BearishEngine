@@ -59,12 +59,15 @@ namespace Bearish { namespace Core {
 		}
 
 		virtual void PreDraw2D(Graphics::RenderingEngine* renderer, Graphics::Camera* camera) {
+			if (_hasPreDraw2D) _lua.CallFunction<void>("PreDraw2D", renderer, camera);
 		}
 
 		virtual void Draw2D(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) {
+			if (_hasDraw2D) _lua.CallFunction<void>("Draw2D", renderer, shader, camera);
 		}
 
 		virtual void PostDraw2D(Graphics::RenderingEngine* renderer, Graphics::Camera* camera) {
+			if (_hasPostDraw2D) _lua.CallFunction<void>("PostDraw2D", renderer, camera);
 		}
 
 		virtual void OnTrigger(string id, void* data) {}
@@ -82,7 +85,8 @@ namespace Bearish { namespace Core {
 		string _id;
 		Scripting::LuaObject _lua;
 		bool _hasInit, _hasUpdate, _hasFixedUpdate, 
-			_hasPreDraw, _hasDraw, _hasPostDraw;
+			_hasPreDraw, _hasDraw, _hasPostDraw,
+			_hasPreDraw2D, _hasDraw2D, _hasPostDraw2D;
 	private:
 		void GetLuaFuncs() {
 			_hasInit = false;
@@ -99,6 +103,10 @@ namespace Bearish { namespace Core {
 				_hasPreDraw = _lua.HasFunction("PreDraw");
 				_hasDraw = _lua.HasFunction("Draw");
 				_hasPostDraw = _lua.HasFunction("PostDraw");
+				_hasPreDraw2D = _lua.HasFunction("PreDraw2D");
+				_hasDraw2D = _lua.HasFunction("Draw2D");
+				_hasPostDraw2D = _lua.HasFunction("PostDraw2D");
+
 			}
 		}
 	};

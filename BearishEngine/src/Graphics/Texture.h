@@ -46,7 +46,7 @@ namespace Bearish { namespace Graphics {
 		RGBA32 = GL_RGBA32F,
 		BGR    = GL_BGR,
 		ABGR   = GL_ABGR_EXT,
-		Dpeth  = GL_DEPTH_COMPONENT,
+		Depth  = GL_DEPTH_COMPONENT,
 	};
 
 	enum class TextureFilter : i32 {
