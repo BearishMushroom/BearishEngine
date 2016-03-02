@@ -15,8 +15,6 @@ namespace Bearish {
 	}
 
 	namespace Graphics {
-
-
 	class Shader;
 	class Camera;
 	class Light;
@@ -60,7 +58,6 @@ namespace Bearish {
 
 		void Draw();
 		void FlushMeshes(bool bind);
-		void SetDebugDeffered(bool b);
 
 		void DrawGuiQuad(Core::Transform t, Texture* tex, u32 subid = 0);
 
@@ -69,6 +66,8 @@ namespace Bearish {
 		i32 PushMaterial(Material* material);
 
 		void SetShadowQuality(ShadowQuality quality);
+
+		void SetDebugMode(i32 mode) { _debugMode = mode; }
 	private:
 		std::vector<Light*> _lights;
 		Texture* _gbuffer;
@@ -80,7 +79,7 @@ namespace Bearish {
 		Core::Window* _window;
 		Camera* _camera;
 		std::vector<Core::Actor*>* _actors;
-		bool _debugDeffered;
+		i32 _debugMode;
 
 		std::vector<MeshEntry> _meshesToRender;
 		std::vector<std::pair<Material*, i32>> _materialsToRender;

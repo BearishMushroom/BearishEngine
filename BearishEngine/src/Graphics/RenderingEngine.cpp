@@ -68,7 +68,7 @@ void RenderingEngine::Load() {
 			Vertex(vec3(1, -1, 0), vec2(1, 0)),
 	}, std::vector<u32> {0, 2, 3, 0, 1, 2});
 
-	_debugDeffered = false;
+	_debugMode = 0;
 
 	testFont = new Font("res/Roboto.ttf");
 
@@ -182,7 +182,7 @@ void RenderingEngine::Draw() {
 
 	_window->BindAsRenderTarget();
 	_gbuffer->BindForReading();
-	if (!_debugDeffered) {
+	if (_debugMode == 0) {
 		_renderer->Clear();
 
 		_gbuffer->Bind(0, 0);
@@ -262,7 +262,7 @@ void RenderingEngine::Draw() {
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
-	if (!_debugDeffered) {
+	if (_debugMode == 0) {
 		_gbuffer->BindForReading();
 		glBlitFramebuffer(0, 0, 1280, 1280, 0, 0, 1280, 1280, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
@@ -274,6 +274,7 @@ void RenderingEngine::Draw() {
 	glEnable(GL_BLEND);
 	Renderer::SetBlendState(BlendState::Additive);
 	glDepthMask(GL_FALSE);
+
 	testPart->Draw(_camera);
 
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -281,7 +282,28 @@ void RenderingEngine::Draw() {
 	glEnable(GL_BLEND);
 	Renderer::SetBlendState(BlendState::AlphaBlend);
 
-	Camera guiCamera = Camera(mat4().CreateOrthographic(0, (f32)Renderer::UI_RESOLUTION_X, (f32)Renderer::UI_RESOLUTION_Y, 0, -1000.f, 1000.f));
+	if (_debugMode) {
+		FillMode start = Renderer::GetFillMode();
+		Renderer::SetFillMode(FillMode::Normal);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glDepthFunc(GL_LESS);
+		if(_debugMode == 1) DrawGuiQuad(Transform(vec3(0.5, 0.5, 0.0), vec3(0.5, 0.5, 1)), _gbuffer, 0);
+		if(_debugMode == 2) DrawGuiQuad(Transform(vec3(1.5, 0.5, 0.0), vec3(0.5, 0.5, 1)), _gbuffer, 1);
+		if(_debugMode == 3) DrawGuiQuad(Transform(vec3(2.5, 0.5, 0.0), vec3(0.5, 0.5, 1)), _gbuffer, 2);
+		if(_debugMode == 4) DrawGuiQuad(Transform(vec3(0.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _gbuffer, 3);
+		if (_shadowMap) {
+			if(_debugMode == 5) DrawGuiQuad(Transform(vec3(2.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _shadowMap, 0);
+		}
+		Renderer::SetFillMode(start);
+	}
+
+	glDepthFunc(GL_LESS);
+	glDepthMask(GL_TRUE);
+	glClearDepth(1.0);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+
+	Camera guiCamera = Camera(mat4().CreateOrthographic(0, (f32)Renderer::UI_RESOLUTION_X, (f32)Renderer::UI_RESOLUTION_Y, 0, -50.f, 50.f));
 	_guiShader->Bind();
 
 	for (auto& a : *_actors) {
@@ -294,21 +316,6 @@ void RenderingEngine::Draw() {
 
 	for (auto& a : *_actors) {
 		a->PostDraw2D(this, &guiCamera);
-	}
-
-	if (_debugDeffered) {
-		FillMode start = Renderer::GetFillMode();
-		Renderer::SetFillMode(FillMode::Normal);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glDepthFunc(GL_LESS);
-		DrawGuiQuad(Transform(vec3(0.5, 0.5, 0.0), vec3(0.5, 0.5, 1)), _gbuffer, 0);
-		DrawGuiQuad(Transform(vec3(1.5, 0.5, 0.0), vec3(0.5, 0.5, 1)), _gbuffer, 1);
-		DrawGuiQuad(Transform(vec3(2.5, 0.5, 0.0), vec3(0.5, 0.5, 1)), _gbuffer, 2);
-		DrawGuiQuad(Transform(vec3(0.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _gbuffer, 3);
-		if (_shadowMap) {
-			DrawGuiQuad(Transform(vec3(2.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _shadowMap, 0);
-		}
-		Renderer::SetFillMode(start);
 	}
 
 }
@@ -333,17 +340,13 @@ f32 RenderingEngine::PointLightSize(PointLight* pl) {
 	return ret;
 }
 
-void RenderingEngine::SetDebugDeffered(bool b) {
-	_debugDeffered = b;
-}
-
 void RenderingEngine::DrawGuiQuad(Transform t, Texture* tex, u32 subid) {
 	glDisable(GL_DEPTH_TEST);
 	_window->BindAsRenderTarget();
 	_guiShader->Bind();
 	_guiShader->SetUniform("diffuse", 0);
 	tex->Bind(0, subid);
-	_quad->Submit(mat4().CreateIdentity(), mat4().CreateOrthographic(0, 3, 0, 2, 0, 1) * t.GetTransformation());
+	_quad->Submit(mat4().CreateIdentity(), mat4().CreateIdentity());
 	_quad->Flush();
 	_guiShader->Unbind();
 }

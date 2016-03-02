@@ -67,7 +67,7 @@ namespace Bearish { namespace Scripting {
 					value("G", (i32)Key::G), value("H", (i32)Key::H), value("I", (i32)Key::I),
 					value("J", (i32)Key::J), value("K", (i32)Key::K), value("L", (i32)Key::L),
 					value("M", (i32)Key::M), value("N", (i32)Key::N), value("O", (i32)Key::O),
-					value("P", (i32)Key::P), value("Q", (i32)Key::Q), value("R", (i32)Key::R), 
+					value("P", (i32)Key::P), value("Q", (i32)Key::Q), value("R", (i32)Key::R),
 					value("S", (i32)Key::S), value("T", (i32)Key::T), value("U", (i32)Key::U),
 					value("V", (i32)Key::V), value("W", (i32)Key::W), value("X", (i32)Key::X),
 					value("Y", (i32)Key::Y), value("Z", (i32)Key::Z),
@@ -80,7 +80,9 @@ namespace Bearish { namespace Scripting {
 					value("Left", (i32)Key::Left),
 					value("Right", (i32)Key::Right),
 					value("Up", (i32)Key::Up),
-					value("Down", (i32)Key::Down)
+					value("Down", (i32)Key::Down),
+
+					value("LeftAlt", (i32)Key::LeftAlt)
 				],
 
 			class_<button_wrapper>("MouseButton")

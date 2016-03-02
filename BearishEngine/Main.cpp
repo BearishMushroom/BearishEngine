@@ -158,21 +158,25 @@ Actor* fpsCounter = new Actor(Transform(vec3(10, 40, -2)));
 std::vector<Actor*> actors;
 RenderingEngine renderer;
 
-Callback<i32, i32> testCB;
-Action<std::vector<i32>> testAC;
-
 std::unordered_map<string, string> Assets::_values;
 
-#include <lua.hpp>
+Font* UI_FONT;
+Actor* UI_PANEL;
+bool PANEL_OPEN;
 
 // Temporary update solution.
 void Update() {
 	for (i32 i = 0; i < (i32)actors.size(); i++) {
 		if (actors.at(i)->IsDead()) {
 			Actor* todel = actors.at(i);
-			actors.insert(actors.begin() + i, actors.at(actors.size() - 1));
+
+			if (i < actors.size() - 1) {
+				actors.insert(actors.begin() + i, actors.at(actors.size() - 1));
+			}
+
 			actors.resize(actors.size() - 1);
 			delete todel;
+			todel = nullptr;
 		}
 	}
 
@@ -194,14 +198,6 @@ void Update() {
 
 	if (Keyboard::IsKeyPressed(Key::F3)) {
 		Renderer::SetFillMode(FillMode::Points);
-	}
-
-	if (Keyboard::IsKeyPressed(Key::F4)) {
-		renderer.SetDebugDeffered(false);
-	}
-
-	if (Keyboard::IsKeyPressed(Key::F5)) {
-		renderer.SetDebugDeffered(true);
 	}
 
 	if (Keyboard::IsKeyPressed(Key::F6)) {
@@ -229,38 +225,80 @@ void Update() {
 	}
 
 	if (Keyboard::IsKeyPressed(Key::L)) {
-		Actor* panelTest = new Actor(Transform(vec3(400, 400, -1), vec3(300, 230, 1)));
-		panelTest->AddComponent(new UIPanel(new Texture(vec4(1, 0, 1, 1))));
-		//panelTest->AddComponent<UIDraggable>();
-		panelTest->AddComponent(new IActorComponent("UIDraggable"));
+		// DEBUG MENU CREATION!!!?!
+		if (!PANEL_OPEN) {
+			UI_PANEL = new Actor(Transform(vec3(150, 540, -1), vec3(300, 1080, 1)));
+			UI_PANEL->AddComponent(new UIPanel(new Texture(vec4(0.2, 0.2, 0.2, 0.5))));
 
-		Actor* buttonTest = new Actor(Transform(vec3(130, -85, -2), vec3(30, 30, 1)));
-		//buttonTest->AddComponent(new UIButton(new Texture(vec4(0, 0, 1, 1)), [](UIButton* button) {
-		//	button->GetParent()->GetParent()->Kill();
-		//}));
+			Actor* button1 = new Actor(Transform(vec3(0, -440, 1), vec3(260, 75, 1)));
+			button1->AddComponent(new UIButton(new Texture(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+				renderer.SetDebugMode(0);
+			}));
+			Actor* label1 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label1->AddComponent(new UILabel(UI_FONT, "Full render", 48));
+			button1->AddChild(label1);
+			UI_PANEL->AddChild(button1);
 
-		buttonTest->AddComponent(new IActorComponent("UIButton", std::string("Texture(vec4(0, 0, 1, 1)), function(self) self.actor:GetParent():Kill() end")));
+			Actor* button2 = new Actor(Transform(vec3(0, -340, 1), vec3(260, 75, 1)));
+			button2->AddComponent(new UIButton(new Texture(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+				renderer.SetDebugMode(1);
+			}));
+			Actor* label2 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label2->AddComponent(new UILabel(UI_FONT, "World", 48));
+			button2->AddChild(label2);
+			UI_PANEL->AddChild(button2);
 
-		Actor* subpanelTest = new Actor(Transform(vec3(-135, -60, -2), vec3(1)));
-		subpanelTest->AddComponent(new UIPanel(new Texture(vec4(1, 0, 0, 1))));
-		auto l = new UILabel(new Font("res/Roboto.ttf"), "This is text.\nIt's really cool.\nIt's really not. B-)", 32.f);
-		subpanelTest->AddComponent(l);
+			Actor* button3 = new Actor(Transform(vec3(0, -240, 1), vec3(260, 75, 1)));
+			button3->AddComponent(new UIButton(new Texture(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+				renderer.SetDebugMode(4);
+			}));
+			Actor* label3 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label3->AddComponent(new UILabel(UI_FONT, "Tex + Mat", 48));
+			button3->AddChild(label3);
+			UI_PANEL->AddChild(button3);
 
-		panelTest->AddChild(buttonTest);
-		panelTest->AddChild(subpanelTest);
+			Actor* button4 = new Actor(Transform(vec3(0, -140, 1), vec3(260, 75, 1)));
+			button4->AddComponent(new UIButton(new Texture(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+				renderer.SetDebugMode(3);
+			}));
+			Actor* label4 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label4->AddComponent(new UILabel(UI_FONT, "Normal", 48));
+			button4->AddChild(label4);
+			UI_PANEL->AddChild(button4);
 
-		actors.push_back(panelTest);
-		actors.push_back(subpanelTest);
-		actors.push_back(buttonTest);
+			Actor* button5 = new Actor(Transform(vec3(0, -40, 1), vec3(260, 75, 1)));
+			button5->AddComponent(new UIButton(new Texture(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+				renderer.SetDebugMode(2);
+			}));
+			Actor* label5 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label5->AddComponent(new UILabel(UI_FONT, "Tangent", 48));
+			button5->AddChild(label5);
+			UI_PANEL->AddChild(button5);
+
+			Actor* button6 = new Actor(Transform(vec3(0, 60, 1), vec3(260, 75, 1)));
+			button6->AddComponent(new UIButton(new Texture(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+				renderer.SetDebugMode(5);
+			}));
+			Actor* label6 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label6->AddComponent(new UILabel(UI_FONT, "Shadow", 48));
+			button6->AddChild(label6);
+			UI_PANEL->AddChild(button6);
+
+			actors.push_back(UI_PANEL);
+			PANEL_OPEN = true;
+		}
+		else {
+			PANEL_OPEN = false;
+			UI_PANEL->Kill();
+		}
 	}
 
 	renderer.testPart->Emit(1, vec3(-12, -4, -8));
 	renderer.testPart->Update(renderer.GetCamera(), 1.f / 60.f);
 }
 
-#include <luabind/luabind.hpp>
-
 i32 main(i32 argc, c8** argv) {
+	PANEL_OPEN = false;
 	SeedRandom();
 	Window window("Bearish Engine 0.160a", 1280, 720);
 	
@@ -292,9 +330,10 @@ i32 main(i32 argc, c8** argv) {
 
 	renderer.Load();
 
-
 	i64 fps = 0;
 	f32 secondTimer = 0;
+
+	UI_FONT = new Font("res/Roboto.ttf");
 
 	Mesh mesh = Model(Assets::Get("man")).ToMesh();
 	Mesh mesh2 = Model(Assets::Get("plane")).ToMesh();
@@ -341,8 +380,9 @@ i32 main(i32 argc, c8** argv) {
 
 	//player->AddComponent(new FreeMoveComponent(1.0f / 3.0f));
 	//player->AddComponent(new FreeLookComponent(0.2f));
-	player->AddComponent(new IActorComponent("FreeLookComponent", 0.2f));
-	player->AddComponent(new IActorComponent("FreeMoveComponent", 1.0f / 3.0f));
+	player->AddComponent(new IActorComponent("EditorLookComponent"));
+	//player->AddComponent(new IActorComponent("FreeLookComponent", 0.2f));
+	//player->AddComponent(new IActorComponent("FreeMoveComponent", 1.0f / 3.0f));
 	Mouse::FreeFromCentre();
 
 	Actor* plane = new Actor(Transform(vec3(0, -2.5f, 0), vec3(5, 1, 5)));

@@ -17,7 +17,7 @@ namespace Bearish { namespace Components {
 		virtual void Draw2D(Graphics::RenderingEngine* engine, Graphics::Shader* shader, Graphics::Camera* camera) override {
 			Math::vec3 offset = _actor->GetParent() ? _actor->GetParent()->GetTranslation() : Math::vec3(0);
 			Core::Transform model = _actor->GetTransform();
-			model.GetTranslation() += offset - Math::vec3(0, 0, 1);
+			model.GetTranslation() += offset;
 
 			_mesh->Submit(model.GetTransformation(), camera->GetViewMatrix() * model.GetTransformation());
 

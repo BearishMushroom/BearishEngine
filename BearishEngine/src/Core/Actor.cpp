@@ -13,14 +13,20 @@ Actor::Actor(Transform transform) {
 Actor::~Actor() {
 	for (i32 i = 0; i < (i32)_children.size(); i++) {
 		delete _children.at(i);
+		_children.clear();
 	}
 
 	for (i32 i = 0; i < (i32)_components.size(); i++) {
 		delete _components.at(i);
+		_components.clear();
 	}
 }
 
 void Actor::Trigger(string id, void* data) {
+	for (auto& a : _children) {
+		a->Trigger(id, data);
+	}
+
 	for (auto& c : _components) {
 		//if (c) {
 			c->OnTrigger(id, data);
@@ -29,6 +35,10 @@ void Actor::Trigger(string id, void* data) {
 }
 
 void Actor::Update() {
+	for (auto& a : _children) {
+		a->Update();
+	}
+
 	for (auto& c : _components) {
 		//if (c) {
 			c->Update();
@@ -37,6 +47,10 @@ void Actor::Update() {
 }
 
 void Actor::FixedUpdate() {
+	for (auto& a : _children) {
+		a->FixedUpdate();
+	}
+
 	for (auto& c : _components) {
 		//if (c) {
 			c->FixedUpdate();
@@ -45,6 +59,10 @@ void Actor::FixedUpdate() {
 }
 
 void Actor::PreDraw(Graphics::RenderingEngine* renderer, Camera* camera) {
+	for (auto& a : _children) {
+		a->PreDraw(renderer, camera);
+	}
+
 	for (auto& c : _components) {
 		//if (c) {
 			c->PreDraw(renderer, camera);
@@ -53,6 +71,10 @@ void Actor::PreDraw(Graphics::RenderingEngine* renderer, Camera* camera) {
 }
 
 void Actor::Draw(Graphics::RenderingEngine* renderer, Shader* shader, Camera* camera) {
+	for (auto& a : _children) {
+		a->Draw(renderer, shader, camera);
+	}
+
 	for (auto& c : _components) {
 		//if (c) {
 			c->Draw(renderer, shader, camera);
@@ -61,6 +83,10 @@ void Actor::Draw(Graphics::RenderingEngine* renderer, Shader* shader, Camera* ca
 }
 
 void Actor::PostDraw(Graphics::RenderingEngine* renderer, Camera* camera) {
+	for (auto& a : _children) {
+		a->PostDraw(renderer, camera);
+	}
+
 	for (auto& c : _components) {
 		//if (c) {
 			c->PostDraw(renderer, camera);
@@ -69,6 +95,10 @@ void Actor::PostDraw(Graphics::RenderingEngine* renderer, Camera* camera) {
 }
 
 void Actor::PreDraw2D(Graphics::RenderingEngine* renderer, Camera* camera) {
+	for (auto& a : _children) {
+		a->PreDraw2D(renderer, camera);
+	}
+
 	for (auto& c : _components) {
 		//if (c) {
 			c->PreDraw2D(renderer, camera);
@@ -77,6 +107,10 @@ void Actor::PreDraw2D(Graphics::RenderingEngine* renderer, Camera* camera) {
 }
 
 void Actor::Draw2D(Graphics::RenderingEngine* renderer, Shader* shader, Camera* camera) {
+	for (auto& a : _children) {
+		a->Draw2D(renderer, shader, camera);
+	}
+
 	for (auto& c : _components) {
 		//if (c) {
 			c->Draw2D(renderer, shader, camera);
@@ -85,6 +119,10 @@ void Actor::Draw2D(Graphics::RenderingEngine* renderer, Shader* shader, Camera* 
 }
 
 void Actor::PostDraw2D(Graphics::RenderingEngine* renderer, Camera* camera) {
+	for (auto& a : _children) {
+		a->PostDraw2D(renderer, camera);
+	}
+
 	for (auto& c : _components) {
 		//if (c) {
 			c->PostDraw2D(renderer, camera);
