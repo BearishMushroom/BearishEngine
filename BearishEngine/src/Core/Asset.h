@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 namespace Bearish { namespace Core {
-	class Assets {
+	class Asset {
 	public:
 		static void LoadAssetDefinitions() {
 			static string filename = "asset/assets.def";
@@ -39,8 +39,8 @@ namespace Bearish { namespace Core {
 			return _values.at(assetName);
 		}
 	private:
-		Assets() {}
-		~Assets() {}
+		Asset() {}
+		~Asset() {}
 
 		static std::unordered_map<string, string> _values;
 	};

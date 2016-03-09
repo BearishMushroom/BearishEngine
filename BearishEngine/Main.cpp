@@ -9,94 +9,7 @@ using namespace Core;
 using namespace Math;
 using namespace Util;
 
-	/*------------- TERRIBLE CHANGELOG THINGY -------------*\
-	 0.011a
-		- Simple shader loading and uniform support.
-		- Logging.
-
-	 0.013a
-		- Wrappers for VBO and IBO.
-		- Simple Renderer class.
-		- Simple rendering loop.
-
-	 0.0131a
-		- Fixed allocator issues.
-
-	0.015a
-		- Added a working transform class.
-		- Cleaned up math headers.
-
-	0.016a
-		- Keyboard input, ho!
-		- Mouse input, too!
-
-	0.017a
-		- Textures.
-
-	0.018a
-		- Directional lighting.
-
-	0.019a
-		- Much more advanced shader pre-processing.
-		- Now finds and parses structs as datatypes and recursive uniforms.
-		- Also added functions to automatically set all uniforms for lights.
-
-	0.020a
-		- Point light support.
-
-	0.022a
-		- Spot lights implemented.
-		- Added simple model loading.
-		- Added a very crude resource-cache to limit 
-		  reloading of same models.
-
-	0.023a
-		- Added Actor class.
-		- Added IActorComponent interface.
-		- Created MeshRenderer component.
-		- Restructured sample scene to use new systems.
-		- Basic FBO support.
-
-	0.024a
-		- Added a trigger system to Actors and Components.
-		- Made better use of references for performance in loops.
-
-	0.025a
-		- Shadowmapping for directional lights.
-		- RenderingEngine class to contain rendering code.
-
-	0.026a
-		- Skybox component.
-
-	0.027a
-		- Refactored things into components.
-		- Made component names more consistant.
-
-	0.043a
-		- Added a general scripting engine (Squirrel) and
-		  added support for creating components entirely
-		  in squirrel.
-		- Added debug views on F1, F2, and F3.
-
-	0.044a
-		- Added VAO encapsulation class.
-		- Moved all mesh structure into VAOs.
-		- Global rendering state no longer changes vertex
-		  attributes as this can now be stored in VAOs.
-
-	0.046a
-		- Implmented instanced rendering with a primitive
-		  rendering queue.
-
-	0.160a
-		- Holy shit I did everything.
-
-	0.184a
-	    - Fuck.
-	\*-----------------------------------------------------*/
-
 #define UPDATE_TIME 1.0 / 60.0
-
 
 Actor* object1 = new Actor(Transform(vec3(0, 0, 0), vec3(0.1f)));
 Actor* object2 = new Actor(Transform(vec3(1.5f, 0, 0), vec3(0.1f)));
@@ -107,7 +20,7 @@ Actor* fpsCounter = new Actor(Transform(vec3(10, 40, -2)));
 std::vector<Actor*> actors;
 RenderingEngine renderer;
 
-std::unordered_map<string, string> Assets::_values;
+std::unordered_map<string, string> Asset::_values;
 
 Font* UI_FONT;
 Actor* UI_PANEL;
@@ -251,7 +164,7 @@ i32 main(i32 argc, c8** argv) {
 	Timer timer;
 	timer.Start();
 
-	Assets::LoadAssetDefinitions();
+	Asset::LoadAssetDefinitions();
 
 	Scripting::InitLua();
 	Scripting::RunFile("scr/lib/init.lua");
@@ -281,13 +194,13 @@ i32 main(i32 argc, c8** argv) {
 
 	UI_FONT = new Font("res/Roboto.ttf");
 
-	Mesh mesh = Model(Assets::Get("man")).ToMesh();
-	Mesh mesh2 = Model(Assets::Get("plane")).ToMesh();
+	Mesh mesh = Model(Asset::Get("man")).ToMesh();
+	Mesh mesh2 = Model(Asset::Get("plane")).ToMesh();
 	
-	Texture texture(Assets::Get("bricks"));
-	Texture normalMap(Assets::Get("bricksNormal"));
+	Texture texture(Asset::Get("bricks"));
+	Texture normalMap(Asset::Get("bricksNormal"));
 
-	Texture texture2(Assets::Get("defaultNormal"));
+	Texture texture2(Asset::Get("defaultNormal"));
 
 	Mesh cp1(mesh);
 	Mesh cp2(mesh);
@@ -319,7 +232,7 @@ i32 main(i32 argc, c8** argv) {
 	actors.push_back(fpsCounter);
 	
 	Actor* player = new Actor;
-	player->AddComponent(new SkyboxComponent(new Texture(Assets::Get("right"), Assets::Get("left"), Assets::Get("top"), Assets::Get("bottom"), Assets::Get("front"), Assets::Get("back"))));
+	player->AddComponent(new SkyboxComponent(new Texture(Asset::Get("right"), Asset::Get("left"), Asset::Get("top"), Asset::Get("bottom"), Asset::Get("front"), Asset::Get("back"))));
 
 	player->AddComponent(new IActorComponent("CameraComponent"));
 
@@ -393,6 +306,6 @@ i32 main(i32 argc, c8** argv) {
 		}
 	}
 
-	//KillSquirrel();
+	Scripting::KillLua();
 	return (i32)null;
 }
