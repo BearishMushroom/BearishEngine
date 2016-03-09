@@ -3,7 +3,7 @@
 
 #include "../Core/IActorComponent.h"
 #include "../Core/IAllocatable.h"
-#include "../Core/Assets.h"
+#include "../Core/Asset.h"
 #include "../Graphics/Texture.h"
 #include "../Graphics/Mesh/Mesh.h"
 #include "../Types.h"
@@ -12,7 +12,7 @@
 namespace Bearish { namespace Components {
 	class MeshRendererComponent : public Core::IActorComponent, public Core::IAllocatable<MeshRendererComponent> {
 	public:
-		MeshRendererComponent(Graphics::Mesh* mesh, Graphics::Texture* texture, Graphics::Texture* normalMap = new Graphics::Texture(Core::Assets::Get("defaultNormal")));
+		MeshRendererComponent(Graphics::Mesh* mesh, Graphics::Texture* texture, Graphics::Texture* normalMap = new Graphics::Texture(Core::Asset::Get("defaultNormal")));
 		~MeshRendererComponent();
 
 		virtual void Draw(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) override;
@@ -25,7 +25,7 @@ namespace Bearish { namespace Components {
 
 	class AnimatedMeshRendererComponent : public Core::IActorComponent, public Core::IAllocatable<AnimatedMeshRendererComponent> {
 	public:
-		AnimatedMeshRendererComponent(string name, f32 speed, Graphics::Mesh* mesh, Graphics::Texture* texture, Graphics::Texture* normalMap = new Graphics::Texture(Core::Assets::Get("defaultNormal")));
+		AnimatedMeshRendererComponent(string name, f32 speed, Graphics::Mesh* mesh, Graphics::Texture* texture, Graphics::Texture* normalMap = new Graphics::Texture(Core::Asset::Get("defaultNormal")));
 		~AnimatedMeshRendererComponent();
 
 		virtual void FixedUpdate() override;

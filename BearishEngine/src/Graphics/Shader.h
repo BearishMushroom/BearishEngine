@@ -11,6 +11,7 @@
 
 namespace Bearish { namespace Graphics {
 	class Shader;
+	class Texture;
 
 	enum class ShaderType : u32 {
 		Vertex = GL_VERTEX_SHADER,
@@ -68,6 +69,7 @@ namespace Bearish { namespace Graphics {
 		void SetUniform(const string& name, const Attenuation& value);
 		void SetUniform(const string& name, const PointLight& value);
 		void SetUniform(const string& name, const SpotLight& value);
+		void SetUniform(const string& name, const Texture* const value);
 
 		void Bind() const;
 		void Unbind() const;
@@ -101,6 +103,7 @@ namespace Bearish { namespace Graphics {
 
 		// Runtime variables.
 		std::unordered_map<string, ShaderUniform> _uniformLocations;
+		std::unordered_map<string, i32> _samplerLocations;
 		string _vsPath, _fsPath;
 		string _name;
 		u32 _programID;

@@ -2,7 +2,7 @@
 
 #include "../Core/Transform.h"
 #include "../Core/Window.h"
-#include "../Core/Assets.h"
+#include "../Core/Asset.h"
 #include "../Core/Actor.h"
 #include "../Core/Model.h"
 
@@ -59,7 +59,7 @@ void RenderingEngine::Load() {
 
 	_geomShader = new Shader("res/geometrypass.vert", "res/geometrypass.frag");
 	_geomShader->SetName("geom");
-	_sphere = new Mesh(Model(Assets::Get("sphere")).ToMesh());
+	_sphere = new Mesh(Model(Asset::Get("sphere")).ToMesh());
 
 	_quad = new Mesh(std::vector<Vertex> {
 		Vertex(vec3(-1, -1, 0), vec2(0, 0)),
@@ -72,7 +72,7 @@ void RenderingEngine::Load() {
 
 	testFont = new Font("res/Roboto.ttf");
 
-	testPart = new ParticleSystem(new Texture(Assets::Get("particle")),
+	testPart = new ParticleSystem(new Texture(Asset::Get("particle")),
 	[](const vec3& pos) -> Particle {
 		timef += 1.f / 60.f / 16.f;
 		Particle ret;

@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "Texture.h"
 #include "../Core/Timer.h"
 
 using namespace Bearish;
@@ -260,6 +261,12 @@ void Shader::SetUniform(const string& name, std::vector<Math::mat4>& value) {
 	glUniformMatrix4fv(_uniformLocations.at(name), value.size(), GL_TRUE, &((value[0])[0][0]));
 }
 
+void Shader::SetUniform(const string& name, const Texture* const value) {
+	i32 loc = _samplerLocations[name];
+	SetUniform(name, loc);
+	value->Bind(loc);
+}
+
 void Shader::Bind() const {
 	glUseProgram(_programID);
 }
@@ -339,6 +346,11 @@ void Shader::AddUniform(const string& name, const string& type) {
 
 		for (i32 i = 0; i < (i32)structComponents.size(); i++) {
 			AddUniform(nameToAdd + "." + structComponents.at(i).first, structComponents.at(i).second);
+		}
+	}
+	else {
+		if (type.find("sampler") != string::npos) {
+			_samplerLocations.emplace(name, _samplerLocations.size());
 		}
 	}
 

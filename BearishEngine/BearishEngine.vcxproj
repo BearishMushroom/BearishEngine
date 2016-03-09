@@ -135,7 +135,7 @@
     <ClInclude Include="src\Components\UILabel.h" />
     <ClInclude Include="src\Components\UIPanel.h" />
     <ClInclude Include="src\Core\Actor.h" />
-    <ClInclude Include="src\Core\Assets.h" />
+    <ClInclude Include="src\Core\Asset.h" />
     <ClInclude Include="src\Core\BEMFile.h" />
     <ClInclude Include="src\Core\BlockAllocator.h" />
     <ClInclude Include="src\Core\ButtonState.h" />
