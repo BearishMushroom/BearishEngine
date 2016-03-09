@@ -1,5 +1,6 @@
 export class FreeMoveComponent
   new: (@speed, @forward = Key.W, @backward = Key.S, @left = Key.A, @right = Key.D, @up = Key.E, @down = Key.Q) =>
+    @id = "FreeMove"
 
   FixedUpdate: =>
     tr = @actor\GetTransform!\GetTranslation!

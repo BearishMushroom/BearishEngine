@@ -1,5 +1,6 @@
 export class CameraComponent
   new: =>
+    @id = "Camera"
 
   Init: =>
     @camera = Camera mat4!\CreateProjection(70 * 3 / 180, 16 / 9, 0.1, 1000),

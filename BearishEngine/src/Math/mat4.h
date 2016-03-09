@@ -65,9 +65,9 @@ namespace Bearish { namespace Math {
 		inline mat4_t<T> CreateRotation(T x, T y, T z) {
 			mat4_t<T> rx, ry, rz;
 
-			x = x * RADIANS;
-			y = y * RADIANS;
-			z = z * RADIANS;
+			x = x * (f32)RADIANS;
+			y = y * (f32)RADIANS;
+			z = z * (f32)RADIANS;
 
 			rz[0][0] = static_cast<T>(cos(z));	rz[0][1] = -static_cast<T>(sin(z));	rz[0][2] = 0;	rz[0][3] = 0;
 			rz[1][0] = static_cast<T>(sin(z));	rz[1][1] = static_cast<T>(cos(z));	rz[1][2] = 0;	rz[1][3] = 0;

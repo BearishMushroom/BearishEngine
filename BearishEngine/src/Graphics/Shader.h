@@ -10,11 +10,21 @@
 #include "Vertex.h"
 
 namespace Bearish { namespace Graphics {
+	class Shader;
+
 	enum class ShaderType : u32 {
 		Vertex = GL_VERTEX_SHADER,
 		Fragment = GL_FRAGMENT_SHADER,
 		Geometry = GL_GEOMETRY_SHADER,
 	};
+
+	struct ShaderLoadInformation {
+		std::vector<string> files;
+		std::vector<ShaderType> types;
+		std::vector<u32> timeStamps;
+		Shader* shader;
+	};
+
 
 	class ShaderUniform {
 	public:
@@ -72,11 +82,16 @@ namespace Bearish { namespace Graphics {
 
 		void SetName(string name) { _name = name; }
 		string GetName() { return _name; }
+
+		static void ReloadChanged();
 	private:
 		// Private types.
 		typedef std::pair<string, string>                           GLSLStructComponent;
 		typedef std::pair<string, std::vector<GLSLStructComponent>> GLSLStruct;
 		typedef std::map <string, std::vector<GLSLStructComponent>> GLSLStructList;
+
+		static std::vector<ShaderLoadInformation> _loaded;
+		i32 _loadID;
 
 		// Temp variables used for pre-compilation data.
 		GLSLStructList _structs;

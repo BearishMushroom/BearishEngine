@@ -21,7 +21,7 @@ void Font::InitFT() {
 	}
 }
 
-Font::Font(const string& filepath, i32 padding, f32 spread) {
+Font::Font(const string& filepath, i32 padding) {
 	InitFT();
 
 	FT_Face face;
@@ -82,7 +82,7 @@ Font::Font(const string& filepath, i32 padding, f32 spread) {
 		textureData[pos + 3] = alphaBuffer[alphaBufferSize - pos / 4];
 	}
 
-	_spread = spread;
+	//s_spread = spread;
 	_newline = (f32)(face->ascender - face->descender) / 64.f / 64.f + 0.15f;
 	//u8* sdf = GenerateDistanceField(textureData, FONT_TEXTURE_SIZE, FONT_TEXTURE_SIZE);
 

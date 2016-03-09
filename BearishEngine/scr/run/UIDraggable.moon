@@ -16,9 +16,10 @@ export class UIDraggable
     @isDragging = false
     @rect = vec4 0, 0, 0, 0
     @dragPos = vec2 0, 0
+    @id = "UIDraggable"
 
   FixedUpdate: =>
-    offset = if @actor\HasParent! then @actor\GetParent!\GetTransform!\GetTranslation! else vec3 0, 0, 0
+    offset = if @actor\HasParent! then @actor\GetParent!\GetTranslation! else vec3 0, 0, 0
     model = @actor\GetTransform!
     model\SetTranslation model\GetTranslation! + vec3 offset.x, offset.y, 0
 

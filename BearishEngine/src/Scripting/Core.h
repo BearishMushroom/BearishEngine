@@ -35,6 +35,7 @@ namespace Bearish { namespace Scripting {
 				.def("GetComponentsByID", &Actor::GetComponentsByID)
 				.def("GetTransform", &Actor::GetTransform)
 				.def("GetTransformation", &Actor::GetTransformation)
+				.def("GetTranslation", &Actor::GetTranslation)
 				.def("GetParent", &Actor::GetParent)
 				.def("HasParent", &Actor::HasParent)
 				.def("SetParent", &Actor::SetParent)

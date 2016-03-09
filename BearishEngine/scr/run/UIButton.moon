@@ -5,9 +5,10 @@ export class UIButton
 
   new: (@texture, @action) =>
     @mesh = Mesh.CreateQuad vec4 0, 0, 1, 1
+    @id = "UIButton"
 
   FixedUpdate: =>
-    offset = if @actor\HasParent! then @actor\GetParent!\GetTransform!\GetTranslation! else vec3 0, 0, 0
+    offset = if @actor\HasParent! then @actor\GetParent!\GetTranslation! else vec3 0, 0, 0
     model = Transform @actor\GetTransform!
 
     position = model\GetTranslation!.xy + vec2 offset.x, offset.y

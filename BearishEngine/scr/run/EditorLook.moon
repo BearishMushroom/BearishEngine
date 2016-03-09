@@ -1,5 +1,6 @@
 export class EditorLookComponent
   new: =>
+    @id = "EditorLook"
 
   FixedUpdate: =>
     if Keyboard.IsKeyDown Key.LeftAlt

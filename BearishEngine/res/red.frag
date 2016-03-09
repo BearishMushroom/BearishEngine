@@ -16,9 +16,10 @@ vec2 CalcTexCoord(vec2 screenSize) {
 void main() {
 	vec2 tc = CalcTexCoord(screen);
 	int mat = int(texture(gTexCoord, tc).z);
+  vec2 texCoord = texture(gTexCoord, tc).xy;
 
 	if (mat == matID) {
-    fragcolor = vec4(1, 0, 0, 1);
+    fragcolor = vec4(normalize(texCoord), 0, 1);
 	} else {
 		discard;
 	}

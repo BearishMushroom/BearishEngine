@@ -51,6 +51,9 @@ namespace Bearish { namespace Scripting {
 	static lua_State* L;
 	static luabind::adl::object moonToLua, moonDoFile;
 
+	static std::map<string, u32> _loadedMoons;
+	static std::map<string, u32> _loadedLuas;
+
 	static void InitLua() {
 		L = luaL_newstate();
 		luaL_openlibs(L);
@@ -63,6 +66,9 @@ namespace Bearish { namespace Scripting {
 	}
 
 	static void RunFile(string file) {
+		struct stat st;
+		stat(file.c_str(), &st);
+		_loadedLuas[file] = (u32)st.st_mtime;
 		if (luaL_dofile(L, file.c_str())) {
 			Core::Logger::Error("Error running script: %s\nLua: %s\n", file.c_str(), lua_tostring(L, -1));
 		}
@@ -92,6 +98,9 @@ namespace Bearish { namespace Scripting {
 
 	static void DoMoonFile(string filename) {
 		try {
+			struct stat st;
+			stat(filename.c_str(), &st);
+			_loadedMoons[filename] = (u32)st.st_mtime;
 			luabind::call_function<void>(moonDoFile, filename);
 		}
 		catch (luabind::error e) {
@@ -102,7 +111,13 @@ namespace Bearish { namespace Scripting {
 
 	template<typename... Args>
 	static LuaObject CreateInstance(string name, Args&&... args) {
-		return LuaObject(luabind::call_function<luabind::object>(Scripting::L, name.c_str(), args...));
+		try {
+			return LuaObject(luabind::call_function<luabind::object>(Scripting::L, name.c_str(), args...));
+		}
+		catch (luabind::error e) {
+			Core::Logger::Error("Lua: %s\n", lua_tostring(Scripting::L, -1));
+			Core::Logger::Error(e.what());
+		}
 	}
 
 	static LuaObject CreateInstance(string func) {
@@ -114,6 +129,24 @@ namespace Bearish { namespace Scripting {
 		catch (luabind::error e) {
 			Core::Logger::Error("Lua: %s\n", lua_tostring(Scripting::L, -1));
 			Core::Logger::Error(e.what());
+		}
+	}
+
+	static void UpdateScripts() {
+		for (auto&& it : _loadedLuas) {
+			struct stat st;
+			stat(it.first.c_str(), &st);
+			if (st.st_mtime > it.second) {
+				RunFile(it.first);
+			}
+		}
+
+		for (auto&& it : _loadedMoons) {
+			struct stat st;
+			stat(it.first.c_str(), &st);
+			if (st.st_mtime > it.second) {
+				DoMoonFile(it.first);
+			}
 		}
 	}
 } }

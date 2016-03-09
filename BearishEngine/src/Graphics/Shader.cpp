@@ -5,6 +5,29 @@ using namespace Bearish;
 using namespace Graphics;
 using namespace Core;
 
+std::vector<ShaderLoadInformation> Shader::_loaded;
+
+void Shader::ReloadChanged() {
+	for (auto&& it : _loaded) {
+		for (i32 file = 0; file < it.files.size(); ++file) {
+			struct stat st;
+			stat(it.files.at(file).c_str(), &st);
+			if (it.timeStamps.at(file) < st.st_mtime) {
+				Logger::Info("Swapping shader %s.", it.files.at(file).c_str());
+				Shader newSh = Shader();
+				for (i32 i = 0; i < it.files.size(); i++) {
+					stat(it.files.at(i).c_str(), &st);
+					it.timeStamps.at(i) = st.st_mtime;
+					newSh.AddShader(LoadShader(it.files.at(i)), it.types.at(i));
+				}
+				newSh.Compile();
+				*(it.shader) = newSh;
+				break;
+			}
+		}
+	}
+}
+
 string Shader::LoadShader(const string& filename) { // Recursive function that looks through a shader's source and includes any other files specified.
   //TODO: Profiling.
 	string content;
@@ -52,12 +75,27 @@ Shader::Shader(const string& vsPath, const string& fsPath) {
 	string vsSrc = LoadShader(vsPath.c_str());
 	string fsSrc = LoadShader(fsPath.c_str());
 
+	_loadID = _loaded.size();
+	_loaded.push_back(ShaderLoadInformation{});
+	_loaded.back().files.push_back(vsPath);
+	_loaded.back().files.push_back(fsPath);
+
+	struct stat st;
+	stat(vsPath.c_str(), &st);
+	_loaded.back().timeStamps.push_back(st.st_mtime);
+	stat(fsPath.c_str(), &st);
+	_loaded.back().timeStamps.push_back(st.st_mtime);
+
+	_loaded.back().types.push_back(ShaderType::Vertex);
+	_loaded.back().types.push_back(ShaderType::Fragment);
+
 	_vsPath = vsPath;
 	_fsPath = fsPath;
 
 	AddShader(vsSrc, ShaderType::Vertex);
 	AddShader(fsSrc, ShaderType::Fragment);
 	Compile();
+	_loaded.back().shader = this;
 }
 
 Shader::~Shader() {

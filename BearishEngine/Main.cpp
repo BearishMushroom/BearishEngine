@@ -90,61 +90,10 @@ using namespace Util;
 
 	0.160a
 		- Holy shit I did everything.
+
+	0.184a
+	    - Fuck.
 	\*-----------------------------------------------------*/
-
-	/*------------- MASSIVE TODO LIST OF DOOM --------------*\
-	O Wrapper class for IBO's.                          (100%)
-	O Intregrate lights into object system.             (100%)
-	O Transform class.                                  (100%)
-	O Expose math to Squirrel.                          (100%)
-	O Seperate VBOs for different attributes.           (100%)
-	O Move VBO state into VAO objects.                  (100%)
-	O Look into deferred rendering.                     (100%)
-	O Move logging away from preprocessor nightmare.    (100%)
-	O Get attributes rendered into seperate textures.   (100%)
-	- Texture class.                                    ( 80%)
-	- Framebuffer objects.                              ( 80%)
-	- Input. (KB, mouse, gamepad)                       ( 75%)
-	- Simple mesh structure.                            ( 70%)
-	- Automate shader loading.                          ( 70%)
-	- More generic lighting structure.                  ( 70%)
-	- Apply simple lighting.                            ( 70%)
-	- Simple shading pipeline.                          ( 70%)
-	- Move stuff into actual generic renderer.          ( 70%)
-	- Simple shadowmapping.                             ( 60%)
-	- Renderer class.                                   ( 60%)
-	- Material rendering.                               ( 50%)
-	- Particles. Yay.                                   ( 50%)
-	- Font rendering.                                   ( 50%)
-	- Start planning "scene" structure.                 ( 30%)
-	- Expose core to Squirrel.                          ( 30%)
-	- Model loading (AssIMP)                            ( 20%)
-	- GUI rendering.                                    ( 20%)
-	- Expose graphics to Squirrel.                      ( 15%)
-	- PCF shadows.                                      (  0%)
-	- Some sort of settings file loaded by the engine.  (  0%)
-	- Upgrade build system to MSVC15.					(  0%)
-	\*------------------------------------------------------*/
-
-	/*-------------------------BUGS-------------------------*\
-	- Mesh(Model) constructor returns an undefined mesh.
-	- IAllocatable doesn't work for polymorphic objects, 
-	  maybe re-think how it's done?
-	- Function overloads with same num of args is unsupported
-		in Sqrat, but can be worked around with SquirrelFunc,
-		use this to supply better operator support.
-	\*------------------------------------------------------*/
-
-
-// Chaiscript has proven to be waaaay too slow for our purpose.
-// The next langauge in line is Squirrel, most known for being used in Source.
-// The SQPlus library will be used to automate the binding of classes to Squirrel.
-// Edit: SQPlus has now been replaced by SQRat.
-// Build times are also a lot better than with chai, as chai rebuilt the entire
-//	scripting language each time you changed binding code.
-
-// Rethinking scripting again.
-// Perhaps we want a Lua-based model using meta tables as "classes" and components.
 
 #define UPDATE_TIME 1.0 / 60.0
 
@@ -170,7 +119,7 @@ void Update() {
 		if (actors.at(i)->IsDead()) {
 			Actor* todel = actors.at(i);
 
-			if (i < actors.size() - 1) {
+			if (i < (i32)actors.size() - 1) {
 				actors.insert(actors.begin() + i, actors.at(actors.size() - 1));
 			}
 
@@ -183,10 +132,6 @@ void Update() {
 	for (auto& a : actors) {
 		a->FixedUpdate();
 	}
-
-	//object1->GetTransform().Rotate(vec3(0, 1, 0), -100.f);
-	//object2->GetTransform().Rotate(vec3(1, 0, 0), -100.f);
-	//object3->GetTransform().Rotate(vec3(0, 0, 1), -100.f);
 
 	if (Keyboard::IsKeyPressed(Key::F1)) {
 		Renderer::SetFillMode(FillMode::Normal);
@@ -235,7 +180,8 @@ void Update() {
 				renderer.SetDebugMode(0);
 			}));
 			Actor* label1 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			label1->AddComponent(new UILabel(UI_FONT, "Full render", 48));
+			//label1->AddComponent(new UILabel(UI_FONT, "Full render", 48));
+			label1->AddComponent(new IActorComponent("UILabel", UI_FONT, "Full render", 48));
 			button1->AddChild(label1);
 			UI_PANEL->AddChild(button1);
 
@@ -244,7 +190,7 @@ void Update() {
 				renderer.SetDebugMode(1);
 			}));
 			Actor* label2 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			label2->AddComponent(new UILabel(UI_FONT, "World", 48));
+			label2->AddComponent(new IActorComponent("UILabel", UI_FONT, "World", 48));
 			button2->AddChild(label2);
 			UI_PANEL->AddChild(button2);
 
@@ -253,7 +199,7 @@ void Update() {
 				renderer.SetDebugMode(4);
 			}));
 			Actor* label3 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			label3->AddComponent(new UILabel(UI_FONT, "Tex + Mat", 48));
+			label3->AddComponent(new IActorComponent("UILabel", UI_FONT, "Tex + Mat", 48));
 			button3->AddChild(label3);
 			UI_PANEL->AddChild(button3);
 
@@ -262,7 +208,7 @@ void Update() {
 				renderer.SetDebugMode(3);
 			}));
 			Actor* label4 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			label4->AddComponent(new UILabel(UI_FONT, "Normal", 48));
+			label4->AddComponent(new IActorComponent("UILabel", UI_FONT, "Normal", 48));
 			button4->AddChild(label4);
 			UI_PANEL->AddChild(button4);
 
@@ -271,7 +217,7 @@ void Update() {
 				renderer.SetDebugMode(2);
 			}));
 			Actor* label5 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			label5->AddComponent(new UILabel(UI_FONT, "Tangent", 48));
+			label5->AddComponent(new IActorComponent("UILabel", UI_FONT, "Tangent", 48));
 			button5->AddChild(label5);
 			UI_PANEL->AddChild(button5);
 
@@ -280,7 +226,7 @@ void Update() {
 				renderer.SetDebugMode(5);
 			}));
 			Actor* label6 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			label6->AddComponent(new UILabel(UI_FONT, "Shadow", 48));
+			label6->AddComponent(new IActorComponent("UILabel", UI_FONT, "Shadow", 48));
 			button6->AddChild(label6);
 			UI_PANEL->AddChild(button6);
 
@@ -300,7 +246,7 @@ void Update() {
 i32 main(i32 argc, c8** argv) {
 	PANEL_OPEN = false;
 	SeedRandom();
-	Window window("Bearish Engine 0.160a", 1280, 720);
+	Window window("Bearish Engine 0.184a", 1280, 720);
 	
 	Timer timer;
 	timer.Start();
@@ -375,14 +321,11 @@ i32 main(i32 argc, c8** argv) {
 	Actor* player = new Actor;
 	player->AddComponent(new SkyboxComponent(new Texture(Assets::Get("right"), Assets::Get("left"), Assets::Get("top"), Assets::Get("bottom"), Assets::Get("front"), Assets::Get("back"))));
 
-	//player->AddComponent(new CameraComponent(new Camera(mat4().CreateProjection(AsRadians(70.f), 16.f / 9.f, 0.1f, 1000))));
 	player->AddComponent(new IActorComponent("CameraComponent"));
 
-	//player->AddComponent(new FreeMoveComponent(1.0f / 3.0f));
-	//player->AddComponent(new FreeLookComponent(0.2f));
-	player->AddComponent(new IActorComponent("EditorLookComponent"));
-	//player->AddComponent(new IActorComponent("FreeLookComponent", 0.2f));
-	//player->AddComponent(new IActorComponent("FreeMoveComponent", 1.0f / 3.0f));
+	//player->AddComponent(new IActorComponent("EditorLookComponent"));
+	player->AddComponent(new IActorComponent("FreeLookComponent", 0.2f));
+	player->AddComponent(new IActorComponent("FreeMoveComponent", 1.0f / 3.0f));
 	Mouse::FreeFromCentre();
 
 	Actor* plane = new Actor(Transform(vec3(0, -2.5f, 0), vec3(5, 1, 5)));
@@ -423,6 +366,7 @@ i32 main(i32 argc, c8** argv) {
 			Mouse::Update();
 			Update();
 			updateTimer -= UPDATE_TIME;
+			Shader::ReloadChanged();
 		}
 
 		for (auto& a : actors) {
@@ -442,6 +386,7 @@ i32 main(i32 argc, c8** argv) {
 			secondTimer = 0;
 			f32 d = (f32)(1.f / (f32)fps) * 1000.f;
 			fpsCounter->GetComponentsByType<UILabel>().at(0)->SetText("FPS: " + std::to_string(fps), 48);
+			Scripting::UpdateScripts();
 			Logger::Info("FPS: %d", fps);
 			Logger::Info("Drawtime: %.3fms", d);
 			fps = 0;
@@ -451,117 +396,3 @@ i32 main(i32 argc, c8** argv) {
 	//KillSquirrel();
 	return (i32)null;
 }
-
-///////
-// #SCREENSAVERJAM
-//////////
-/*
-std::vector<Actor*> actors;
-RenderingEngine renderer;
-bool fs = false;
-bool running = true;
-// Temporary update solution.
-void Update() {
-	for (i32 i = 0; i < actors.size(); i++) {
-		if (actors.at(i)->IsDead()) {
-			Actor* todel = actors.at(i);
-			actors.insert(actors.begin() + i, actors.at(actors.size() - 1));
-			actors.resize(actors.size() - 1);
-			delete todel;
-		}
-	}
-
-	for (auto& a : actors) {
-		a->FixedUpdate();
-	}
-
-	if (Keyboard::IsKeyPressed(Key::F1)) {
-		Renderer::SetFillMode(FillMode::Normal);
-	}
-
-	if (Keyboard::IsKeyPressed(Key::F2)) {
-		Renderer::SetFillMode(FillMode::Wireframe);
-	}
-
-	if (Keyboard::IsKeyPressed(Key::F3)) {
-		Renderer::SetFillMode(FillMode::Points);
-	}
-
-	if (Keyboard::IsKeyPressed(Key::F4)) {
-		renderer.SetDebugDeffered(false);
-	}
-
-	if (Keyboard::IsKeyPressed(Key::F5)) {
-		renderer.SetDebugDeffered(true);
-	}
-
-	if (Keyboard::IsKeyPressed(Key::Q)) {
-		running = false;
-	}
-
-	renderer.testPart->Emit(4, vec3(-12.5f, -6, 15));
-	renderer.testPart->Update(renderer.GetCamera(), 1.f / 60.f);
-}
-
-i32 main(i32 argc, c8** argv) {
-	bool fs = false;
-	if (argc > 1 && strcmp(argv[1], "-f") == 0) fs = true;
-	
-	Window window("Bearish Engine 0.160a", 640, 360, fs);
-	SeedRandom();
-
-	Timer timer;
-	timer.Start();
-
-	renderer.Load();
-
-	i64 fps = 0;
-	f32 secondTimer = 0;
-
-	Actor* player = new Actor;
-	player->AddComponent(new CameraComponent(new Camera(mat4().CreateProjection(AsRadians(24.f), 16.f / 9.f, 0.1f, 1000))));
-	actors.push_back(player);
-
-	renderer.SetActorReference(&actors);
-	renderer.SetWindow(&window);
-
-	window.SetVsync(1);
-	
-
-	i64 f = 0;
-	f64 updateTimer = 0;
-
-	Logger::Info("Initial loading took %.1fms.", timer.DeltaMS());
-
-	while (!window.ShouldClose() && running) {
-		while (updateTimer > UPDATE_TIME) {
-			Keyboard::Update();
-			Mouse::Update();
-			Update();
-			updateTimer -= UPDATE_TIME;
-		}
-
-		for (auto& a : actors) {
-			a->Update();
-		}
-
-		renderer.Draw();
-		window.Update();
-
-		fps++;
-
-		f32 delta = timer.LoopMS();
-		updateTimer += delta / 1000.f;
-		secondTimer += delta / 1000.f;
-
-		if (secondTimer >= 1) {
-			secondTimer = 0;
-			f32 d = (f32)(1.f / (f32)fps) * 1000.f;
-			Logger::Info("FPS: %d", fps);
-			Logger::Info("Drawtime: %.3fms", d);
-			fps = 0;
-		}
-	}
-
-	return (i32)null;
-}*/

@@ -176,7 +176,7 @@
     <ClInclude Include="src\Math\vec4.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Scripting\Core.h" />
-    <ClInclude Include="src\Scripting\Graphics.h" />
+    <ClInclude Include="src\Graphics.h" />
     <ClInclude Include="src\Scripting\Math.h" />
     <ClInclude Include="src\Scripting\ScriptingEngine.h" />
     <ClInclude Include="src\Utils.h" />

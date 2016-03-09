@@ -22,8 +22,8 @@ namespace Bearish { namespace Graphics {
 
 	class Font : public Core::IAllocatable<Font> {
 	public:
-		Font(const string& filepath, i32 padding = 1, f32 spread = 1.5f);
-		~Font();
+		Font(const string& filepath, i32 padding = 1);
+		~Font() {}
 
 		Mesh* GenerateMesh(const string& text, f32 glyphScale) const;
 		Texture* GetTexture() const { return _texture; }
