@@ -279,7 +279,7 @@ i32 main(i32 argc, c8** argv) {
 			Mouse::Update();
 			Update();
 			updateTimer -= UPDATE_TIME;
-			Shader::ReloadChanged();
+			//Shader::ReloadChanged();
 		}
 
 		for (auto& a : actors) {
@@ -299,7 +299,7 @@ i32 main(i32 argc, c8** argv) {
 			secondTimer = 0;
 			f32 d = (f32)(1.f / (f32)fps) * 1000.f;
 			fpsCounter->GetComponentsByType<UILabel>().at(0)->SetText("FPS: " + std::to_string(fps), 48);
-			Scripting::UpdateScripts();
+			//Scripting::UpdateScripts();
 			Logger::Info("FPS: %d", fps);
 			Logger::Info("Drawtime: %.3fms", d);
 			fps = 0;

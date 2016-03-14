@@ -7,6 +7,7 @@
 #include "../Buffer/VBO.h"
 #include "../Buffer/IBO.h"
 #include "../Buffer/VAO.h"
+#include "../Buffer/UBO.h"
 #include "../../Math/mat4.h"
 #include "../../Math/vec2.h"
 #include "../../Math/vec3.h"
@@ -16,11 +17,31 @@
 #include "MeshSkeleton.h"
 #include "MeshNode.h"
 
+/// TODO (14/03/16): Interfaceify Mesh.
+/// Refractor mesh into multiple mesh classes.
+/// StaticMesh: Uses AOS and no instancing <- 1 VBO, 1 IBO
+/// DynamicMesh: Uses SOA and no instancing <- 6 VBOs, 1 IBO
+/// InstancedMesh: Uses AOS and instancing <- 3 VBOs, 1 IBO
+
+/// Add support for UBO instance data.
+/// Also make materials use UBO's.
+
+/// These all share some methods: Submit, Flush, and Animation stuff.
+
+/// Meshes should have a VertexDescriptor which defines the vertex layout, if a user wishes to roll custom vertices.
+/// If no descriptor is found, the engine uses a default that matches the Vertex struct.
+
 namespace Bearish { 
-	namespace Graphics {		
+	namespace Graphics {	
 		class RenderingEngine;
+		class Shader;
 
 		class Mesh : public Core::IAllocatable<Mesh> {
+		private:
+			struct InstanceData {
+				Math::mat4 world;
+				Math::mat4 mvp;
+			};
 		public:
 			static Mesh* CreateQuad(Math::vec4 texCoords = Math::vec4(0, 0, 1, 1));
 
@@ -39,7 +60,7 @@ namespace Bearish {
 
 			void Submit(const Math::mat4& world, const Math::mat4& mvp);
 
-			void Flush();
+			void Flush(Shader* shader);
 			void CalculateNormals(std::vector<Vertex>& vertices, std::vector<u32>& indices) const;
 
 			u32 GetVAOID() { return _vao->GetID(); }
@@ -59,32 +80,50 @@ namespace Bearish {
 			void SetTangentData(Math::vec3* data, u32 size);
 			void SetBoneIDData(Math::vec4i* data, u32 size);
 			void SetBoneWeightData(Math::vec4* data, u32 size);
+			void SetVertexData(Vertex* vertices, u32 size);
 			void SetIndexData(u32* data, u32 size);
 		private:
 			void SetupBuffers();
 			void SetupInstanceData();
 
+			//union {
+			//	struct {
+			//		VBO* _positions;
+			//		VBO* _texCoords;
+			//		VBO* _normals;
+			//		VBO* _tangents;
+			//		VBO* _boneIDs;
+			//		VBO* _boneWeights;
+			//		VBO* _mvps;
+			//		VBO* _worlds;
+			//		IBO* _indices;
+			//	};
+
+			//	struct {
+			//		VBO* _attribs[6];
+			//		VBO* _instances[2];
+			//		IBO* _indices;
+			//	};
+			//};
+
 			union {
 				struct {
-					VBO* _positions;
-					VBO* _texCoords;
-					VBO* _normals;
-					VBO* _tangents;
-					VBO* _boneIDs;
-					VBO* _boneWeights;
+					VBO* _attribs;
 					VBO* _mvps;
 					VBO* _worlds;
 					IBO* _indices;
 				};
 
 				struct {
-					VBO* _attribs[6];
+					VBO* _attribs;
 					VBO* _instances[2];
 					IBO* _indices;
 				};
 			};
 
+
 			VAO* _vao;
+			UBO* _ubo;
 
 			std::vector<Math::mat4> _worldMatrices;
 			std::vector<Math::mat4> _mvpMatrices;

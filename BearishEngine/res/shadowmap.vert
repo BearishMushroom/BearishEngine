@@ -3,8 +3,11 @@
 layout (location = 0) in vec3 position;
 layout (location = 4) in ivec4 boneIDs;
 layout (location = 5) in vec4 boneWeights;
-layout (location = 6) in mat4 world;
-layout (location = 10) in mat4 MVP;
+
+layout(std140) uniform instance_data {
+	mat4 world;
+	mat4 MVP;
+};
 
 uniform mat4 bones[100];
 

@@ -175,6 +175,12 @@ void Shader::Compile() {
 	}
 	_uniformsToAdd.clear();
 
+	for (auto& str : _uniformBlocksToAdd) {
+		_uniformBlockLocations.emplace(str, glGetUniformBlockIndex(_programID, str.c_str()));
+		glUniformBlockBinding(_programID, _uniformBlockLocations.at(str), _uniformBlockLocations.at(str));
+	}
+	_uniformBlocksToAdd.clear();
+
 	for (auto& attribute : _attributesToAdd) {
 		SetAttribLocation(attribute.first.c_str(), attribute.second);
 	}
@@ -267,6 +273,10 @@ void Shader::SetUniform(const string& name, const Texture* const value) {
 	value->Bind(loc);
 }
 
+void Shader::SetUniformBlock(const string& name, UBO* const value) {
+	value->Bind(_uniformBlockLocations.at(name));
+}
+
 void Shader::Bind() const {
 	glUseProgram(_programID);
 }
@@ -329,6 +339,12 @@ void Shader::AddAllUniforms(const string& source) {
 		u32 nameEndPos = source.find("=", offset) < source.find("\n", offset) ? source.find("=", offset) - 1 : source.find(";", offset);
 		string name = source.substr(nameStartPos, nameEndPos - nameStartPos);
 		string type = source.substr(offset, nameStartPos - offset - 1);
+
+		if (*name.begin() == '{') {
+			_uniformBlocksToAdd.push_back(type);
+			continue;
+		}
+
 		AddUniform(name, type);
 	}
 }
@@ -337,7 +353,6 @@ void Shader::AddUniform(const string& name, const string& type) {
 	bool shouldAdd = true;
 
 	string nameToAdd(name);
-
 	std::vector<GLSLStructComponent> structComponents;
 
 	if (_structs.find(type) != _structs.end()) {

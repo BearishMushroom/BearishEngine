@@ -153,7 +153,7 @@ void RenderingEngine::Draw() {
 				for (auto& a : *_actors) {
 					a->Draw(this, _shadowShader, &scamera);
 				}
-				FlushMeshes(false);
+				FlushMeshes(_shadowShader, false);
 
 				glCullFace(GL_BACK);
 
@@ -171,7 +171,7 @@ void RenderingEngine::Draw() {
 	for (auto& a : *_actors) {
 		a->Draw(this, _geomShader, _camera);
 	}
-	FlushMeshes(true);
+	FlushMeshes(_geomShader, true);
 
 	// Prepare lighting pass.
 	glDepthMask(GL_FALSE);
@@ -215,12 +215,13 @@ void RenderingEngine::Draw() {
 					glFrontFace(GL_CCW);
 					PointLight* pl = static_cast<PointLight*>(l);
 					Transform t(pl->GetPosition(), PointLightSize(pl));
-					_sphere->Submit(t.GetTransformation(), _camera->GetViewMatrix() * t.GetTransformation());
+					t.LookAt(_camera->GetTransform().GetTranslation(), vec3(0, 1, 0));// _camera->GetTransform().GetRotation().Up());
+					_quad->Submit(t.GetTransformation(), _camera->GetViewMatrix() * t.GetTransformation());
 					if (shaderChanged) {
 						mat.first->GetShader()->SetUniform("pLight", *pl);
 						mat.first->GetShader()->SetUniform("light", 1);
 					}
-					_sphere->Flush();
+					_quad->Flush(mat.first->GetShader());
 					glFrontFace(GL_CW);
 					//glEnable(GL_CULL_FACE);
 				}
@@ -241,7 +242,7 @@ void RenderingEngine::Draw() {
 					}
 
 					_quad->Submit(mat4().CreateIdentity(), mat4().CreateIdentity());
-					_quad->Flush();
+					_quad->Flush(mat.first->GetShader());
 					
 				}
 				else if (l->GetType() == LightType::Spot) {
@@ -252,7 +253,7 @@ void RenderingEngine::Draw() {
 						mat.first->GetShader()->SetUniform("spotLight", *dl);
 						mat.first->GetShader()->SetUniform("light", 2);
 					}
-					_quad->Flush();
+					_quad->Flush(mat.first->GetShader());
 				}
 			}
 			_currentShader = 0;
@@ -320,13 +321,13 @@ void RenderingEngine::Draw() {
 
 }
 
-void RenderingEngine::FlushMeshes(bool bind) {
+void RenderingEngine::FlushMeshes(Shader* shader, bool bind) {
 	for (auto& a : _meshesToRender) {
 		if (bind) {
 			_geomShader->SetUniform("matID", _maxMaterial);
 			PushMaterial(a.material);
 		}
-		a.mesh->Flush();
+		a.mesh->Flush(shader);
 	}
 	_meshesToRender.clear();
 }
@@ -336,7 +337,7 @@ f32 RenderingEngine::PointLightSize(PointLight* pl) {
 
 	f32 ret = (-pl->GetAttenuation().GetLinear() + sqrtf(pl->GetAttenuation().GetLinear() * pl->GetAttenuation().GetLinear() -
 		4.f * pl->GetAttenuation().GetExponent() * (pl->GetAttenuation().GetExponent() - 256.f * MaxChannel * pl->GetDiffuseIntensity()))) /
-		2.f * pl->GetAttenuation().GetExponent() / 24.f;
+		2.f * pl->GetAttenuation().GetExponent() / 2;
 	return ret;
 }
 
@@ -347,7 +348,7 @@ void RenderingEngine::DrawGuiQuad(Transform t, Texture* tex, u32 subid) {
 	_guiShader->SetUniform("diffuse", 0);
 	tex->Bind(0, subid);
 	_quad->Submit(mat4().CreateIdentity(), mat4().CreateIdentity());
-	_quad->Flush();
+	_quad->Flush(_guiShader);
 	_guiShader->Unbind();
 }
 

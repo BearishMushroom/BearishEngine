@@ -61,5 +61,5 @@ void AnimatedMeshRendererComponent::Draw(Graphics::RenderingEngine* renderer, Gr
 		shader->SetUniform("matID", matID);
 	}
 
-	_mesh->Flush();
+	_mesh->Flush(shader);
 }

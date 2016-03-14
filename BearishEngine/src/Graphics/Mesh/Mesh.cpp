@@ -3,6 +3,7 @@
 #include "../../Math/vec3.h"
 #include "../../Math/mat4.h"
 #include "Mesh.h"
+#include "../Shader.h"
 
 using namespace Bearish;
 using namespace Graphics;
@@ -32,28 +33,30 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<u32>& indices, bool calcul
 
 	SetupBuffers();
 
-	std::vector<vec3> positions;
-	std::vector<vec2> texCoords;
-	std::vector<vec3> normals;
-	std::vector<vec3> tangents;
-	std::vector<vec4i> boneIDs;
-	std::vector<vec4> boneWeights;
+	//std::vector<vec3> positions;
+	//std::vector<vec2> texCoords;
+	//std::vector<vec3> normals;
+	//std::vector<vec3> tangents;
+	//std::vector<vec4i> boneIDs;
+	//std::vector<vec4> boneWeights;
+	//
+	//for (u32 i = 0; i < vertices.size(); i++) {
+	//	positions.push_back(vertices[i].position);
+	//	texCoords.push_back(vertices[i].texCoord);
+	//	normals.push_back(vertices[i].normal);
+	//	tangents.push_back(vertices[i].tangent);
+	//	boneIDs.push_back(vertices[i].boneIDs);
+	//	boneWeights.push_back(vertices[i].boneWeights);
+	//}
+	//
+	//SetPositionData(&positions[0], sizeof(vec3) * positions.size());
+	//SetTexCoordData(&texCoords[0], sizeof(vec2) * texCoords.size());
+	//SetNormalData(&normals[0], sizeof(vec3) * normals.size());
+	//SetTangentData(&tangents[0], sizeof(vec3) * tangents.size());
+	//SetBoneIDData(&boneIDs[0], sizeof(vec4i) * boneIDs.size());
+	//SetBoneWeightData(&boneWeights[0], sizeof(vec4) * boneWeights.size());
 
-	for (u32 i = 0; i < vertices.size(); i++) {
-		positions.push_back(vertices[i].position);
-		texCoords.push_back(vertices[i].texCoord);
-		normals.push_back(vertices[i].normal);
-		tangents.push_back(vertices[i].tangent);
-		boneIDs.push_back(vertices[i].boneIDs);
-		boneWeights.push_back(vertices[i].boneWeights);
-	}
-
-	SetPositionData(&positions[0], sizeof(vec3) * positions.size());
-	SetTexCoordData(&texCoords[0], sizeof(vec2) * texCoords.size());
-	SetNormalData(&normals[0], sizeof(vec3) * normals.size());
-	SetTangentData(&tangents[0], sizeof(vec3) * tangents.size());
-	SetBoneIDData(&boneIDs[0], sizeof(vec4i) * boneIDs.size());
-	SetBoneWeightData(&boneWeights[0], sizeof(vec4) * boneWeights.size());
+	SetVertexData(&vertices[0], sizeof(Vertex) * vertices.size());
 
 	SetIndexData(&indices[0], indices.size());
 	
@@ -67,10 +70,10 @@ Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::
 		   u32 numIndices, u32* indices) {
 	SetupBuffers();
 
-	SetPositionData(positions, sizeof(vec3) * numVertices);
-	SetTexCoordData(texCoords, sizeof(vec2) * numVertices);
-	SetNormalData(normals, sizeof(vec3) * numVertices);
-	SetTangentData(tangents, sizeof(vec3) * numVertices);
+	//SetPositionData(positions, sizeof(vec3) * numVertices);
+	//SetTexCoordData(texCoords, sizeof(vec2) * numVertices);
+	//SetNormalData(normals, sizeof(vec3) * numVertices);
+	//SetTangentData(tangents, sizeof(vec3) * numVertices);
 
 	if (boneids == 0) {
 		boneids = new vec4i[numVertices];
@@ -80,9 +83,15 @@ Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::
 		memset(boneweights, -1, sizeof(vec4) * numVertices);
 	}
 
-	SetBoneIDData(boneids, sizeof(vec4i) * numVertices);
-	SetBoneWeightData(boneweights, sizeof(vec4) * numVertices);
+	//SetBoneIDData(boneids, sizeof(vec4i) * numVertices);
+	//SetBoneWeightData(boneweights, sizeof(vec4) * numVertices);
 
+	std::vector<Vertex> vertices;
+	for (i32 i = 0; i < numVertices; i++) {
+		vertices.push_back(Vertex(positions[i], texCoords[i], normals[i], tangents[i], boneids[i], boneweights[i]));
+	}
+
+	SetVertexData(&vertices[0], sizeof(Vertex) * vertices.size());
 	SetIndexData(indices, numIndices);
 
 	SetupInstanceData();
@@ -102,17 +111,18 @@ void Mesh::SetupBuffers() {
 	_vao = new VAO;
 	_vao->Bind();
 
-	_positions = new VBO;
-	_texCoords = new VBO;
-	_normals = new VBO;
-	_tangents = new VBO;
-	_boneIDs = new VBO;
-	_boneWeights = new VBO;
+	//_positions = new VBO;
+	//_texCoords = new VBO;
+	//_normals = new VBO;
+	//_tangents = new VBO;
+	//_boneIDs = new VBO;
+	//_boneWeights = new VBO;
+	_attribs = new VBO;
 	_indices = new IBO;
 }
 
 void Mesh::SetupInstanceData() {
-	_worlds = new VBO;
+	/*_worlds = new VBO;
 	_mvps = new VBO;
 
 	_worlds->Bind();
@@ -127,47 +137,73 @@ void Mesh::SetupInstanceData() {
 		Renderer::EnableAttribArray(Renderer::MVP_ATTRIBUTE + i);
 		Renderer::SetAttribPointer(Renderer::MVP_ATTRIBUTE + i, 4, sizeof(mat4), sizeof(f32) * i * 4);
 		Renderer::SetAttribDivisor(Renderer::MVP_ATTRIBUTE + i, 1);
-	}
+	}*/
 }
 
 void Mesh::SetPositionData(vec3* data, u32 size) {
-	_positions->SetData(data, size);
-	Renderer::EnableAttribArray(Renderer::POSITION_ATTRIBUTE);
-	Renderer::SetAttribPointer(Renderer::POSITION_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(vec3), 0);
+	//_positions->SetData(data, size);
+	//Renderer::EnableAttribArray(Renderer::POSITION_ATTRIBUTE);
+	//Renderer::SetAttribPointer(Renderer::POSITION_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(vec3), 0);
 }
 
 void Mesh::SetTexCoordData(vec2* data, u32 size) {
-	_texCoords->SetData(data, size);
-	Renderer::EnableAttribArray(Renderer::TEXCOORD_ATTRIBUTE);
-	Renderer::SetAttribPointer(Renderer::TEXCOORD_ATTRIBUTE, sizeof(vec2) / sizeof(f32), sizeof(vec2), 0);
+	//_texCoords->SetData(data, size);
+	//Renderer::EnableAttribArray(Renderer::TEXCOORD_ATTRIBUTE);
+	//Renderer::SetAttribPointer(Renderer::TEXCOORD_ATTRIBUTE, sizeof(vec2) / sizeof(f32), sizeof(vec2), 0);
 }
 
 void Mesh::SetNormalData(vec3* data, u32 size) {
-	_normals->SetData(data, size);
-	Renderer::EnableAttribArray(Renderer::NORMAL_ATTRIBUTE);
-	Renderer::SetAttribPointer(Renderer::NORMAL_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(vec3), 0);
+	//_normals->SetData(data, size);
+	//Renderer::EnableAttribArray(Renderer::NORMAL_ATTRIBUTE);
+	//Renderer::SetAttribPointer(Renderer::NORMAL_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(vec3), 0);
 }
 
 void Mesh::SetTangentData(vec3* data, u32 size) {
-	_tangents->SetData(data, size);
-	Renderer::EnableAttribArray(Renderer::TANGENT_ATTRIBUTE);
-	Renderer::SetAttribPointer(Renderer::TANGENT_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(vec3), 0);
+	//_tangents->SetData(data, size);
+	//Renderer::EnableAttribArray(Renderer::TANGENT_ATTRIBUTE);
+	//Renderer::SetAttribPointer(Renderer::TANGENT_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(vec3), 0);
 }
 
-void Mesh::SetBoneIDData(vec4i* data, u32 size) {
+void Mesh::SetBoneIDData(vec4i* data, u32 size) {/*
 	_boneIDs->SetData(data, size);
 	Renderer::EnableAttribArray(Renderer::BONEID_ATTRIBUTE);
-	Renderer::SetAttribPointer(Renderer::BONEID_ATTRIBUTE, sizeof(vec4i) / sizeof(i32), sizeof(vec4i), 0, AttributeType::Int32);
+	Renderer::SetAttribPointer(Renderer::BONEID_ATTRIBUTE, sizeof(vec4i) / sizeof(i32), sizeof(vec4i), 0, AttributeType::Int32);*/
 }
 
-void Mesh::SetBoneWeightData(vec4* data, u32 size) {
+void Mesh::SetBoneWeightData(vec4* data, u32 size) {/*
 	_boneWeights->SetData(data, size);
 	Renderer::EnableAttribArray(Renderer::BONEWEIGHT_ATTRIBUTE);
-	Renderer::SetAttribPointer(Renderer::BONEWEIGHT_ATTRIBUTE, sizeof(vec4) / sizeof(f32), sizeof(vec4), 0);
+	Renderer::SetAttribPointer(Renderer::BONEWEIGHT_ATTRIBUTE, sizeof(vec4) / sizeof(f32), sizeof(vec4), 0);*/
 }
 
 void Mesh::SetIndexData(u32* data, u32 size) {
 	_indices->SetData(data, size);
+}
+
+void Mesh::SetVertexData(Vertex* data, u32 size) {
+	_attribs->SetData((void*)data, size);
+	Renderer::EnableAttribArray(Renderer::POSITION_ATTRIBUTE);
+	Renderer::SetAttribPointer(Renderer::POSITION_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(Vertex), 0);
+
+	Renderer::EnableAttribArray(Renderer::TEXCOORD_ATTRIBUTE);
+	Renderer::SetAttribPointer(Renderer::TEXCOORD_ATTRIBUTE, sizeof(vec2) / sizeof(f32), sizeof(Vertex), offsetof(Vertex, texCoord));
+
+	Renderer::EnableAttribArray(Renderer::NORMAL_ATTRIBUTE);
+	Renderer::SetAttribPointer(Renderer::NORMAL_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(Vertex), offsetof(Vertex, normal));
+
+	Renderer::EnableAttribArray(Renderer::TANGENT_ATTRIBUTE);
+	Renderer::SetAttribPointer(Renderer::TANGENT_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(Vertex), offsetof(Vertex, tangent));
+
+	Renderer::EnableAttribArray(Renderer::BONEID_ATTRIBUTE);
+	Renderer::SetAttribPointer(Renderer::BONEID_ATTRIBUTE, sizeof(vec4i) / sizeof(i32), sizeof(Vertex), offsetof(Vertex, boneIDs));
+
+	Renderer::EnableAttribArray(Renderer::BONEWEIGHT_ATTRIBUTE);
+	Renderer::SetAttribPointer(Renderer::BONEWEIGHT_ATTRIBUTE, sizeof(vec4) / sizeof(f32), sizeof(Vertex), offsetof(Vertex, boneWeights));
+
+	// This sets up our uniform buffer, so we can set the data without reallocating it.
+	_ubo = new UBO;
+	_ubo->SetData(0, sizeof(InstanceData));
+	_ubo->Unbind();
 }
 
 void Mesh::Submit(const mat4& world, const mat4& mvp) {
@@ -175,13 +211,25 @@ void Mesh::Submit(const mat4& world, const mat4& mvp) {
 	_mvpMatrices.push_back(mvp.Transpose());
 }
 
-void Mesh::Flush() {
+void Mesh::Flush(Shader* shader) {
 	_vao->Bind();
 
-	_worlds->SetData(&_worldMatrices[0], sizeof(mat4) * _worldMatrices.size());
-	_mvps->SetData(&_mvpMatrices[0], sizeof(mat4) * _mvpMatrices.size());
+	/*_worlds->SetData(&_worldMatrices[0], sizeof(mat4) * _worldMatrices.size());
+	_mvps->SetData(&_mvpMatrices[0], sizeof(mat4) * _mvpMatrices.size()); */
 
-	glDrawElementsInstanced(GL_TRIANGLES, _indices->GetSize(), GL_UNSIGNED_INT, 0, _worldMatrices.size());
+	i32 numInstances = _worldMatrices.size();
+	mat4* worlds = &_worldMatrices[0];
+	mat4* mvps = &_mvpMatrices[0];
+	InstanceData data;
+
+	for (i32 i = 0; i < numInstances; i++) {
+		data.mvp = mvps[i];
+		data.world = worlds[i];
+		_ubo->UpdateData(data);
+		shader->SetUniformBlock("instance_data", _ubo);
+		glDrawElements(GL_TRIANGLES, _indices->GetSize(), GL_UNSIGNED_INT, 0);
+	}
+
 	_vao->Unbind();
 
 	_worldMatrices.clear();

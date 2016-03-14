@@ -41,7 +41,7 @@ namespace Bearish { namespace Components {
 
 			_texture->Bind(0);
 			_mesh->Submit(t.GetTransformation(), mvp);
-			_mesh->Flush();
+			_mesh->Flush(_shader);
 
 			glCullFace(oldCullFaceMode);
 			glDepthFunc(oldDepthFuncMode);

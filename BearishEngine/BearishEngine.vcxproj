@@ -100,6 +100,7 @@
     <ClCompile Include="src\Core\Mouse.cpp" />
     <ClCompile Include="src\Core\Transform.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
+    <ClCompile Include="src\Graphics\Buffer\UBO.cpp" />
     <ClCompile Include="src\Graphics\Camera.cpp" />
     <ClCompile Include="src\Graphics\Buffer\IBO.cpp" />
     <ClCompile Include="src\Graphics\Font.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="src\Core\Mouse.h" />
     <ClInclude Include="src\Core\Transform.h" />
     <ClInclude Include="src\Graphics\BETFile.h" />
+    <ClInclude Include="src\Graphics\Buffer\UBO.h" />
     <ClInclude Include="src\Graphics\Camera.h" />
     <ClInclude Include="src\Graphics\Buffer\IBO.h" />
     <ClInclude Include="src\Graphics\Font.h" />

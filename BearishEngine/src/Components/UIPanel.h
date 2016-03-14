@@ -21,7 +21,7 @@ namespace Bearish { namespace Components {
 			_mesh->Submit(model.GetTransformation(), camera->GetViewMatrix() * model.GetTransformation());
 
 			_texture->Bind(0);
-			_mesh->Flush();
+			_mesh->Flush(shader);
 			_texture->Unbind(0);
 		}
 	private:

@@ -57,7 +57,7 @@ namespace Bearish {
 		void Submit(Mesh* mesh, Material* mat);
 
 		void Draw();
-		void FlushMeshes(bool bind);
+		void FlushMeshes(Shader* shader, bool bind);
 
 		void DrawGuiQuad(Core::Transform t, Texture* tex, u32 subid = 0);
 

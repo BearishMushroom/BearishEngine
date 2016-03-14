@@ -22,7 +22,7 @@ namespace Bearish { namespace Components {
 			_mesh->Submit(model.GetTransformation(), camera->GetViewMatrix() * model.GetTransformation());
 
 			_font->GetTexture()->Bind(0);
-			_mesh->Flush();
+			_mesh->Flush(shader);
 			_font->GetTexture()->Unbind(0);
 		}
 

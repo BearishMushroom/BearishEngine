@@ -6,8 +6,13 @@ layout (location = 2) in vec3 normal;
 layout (location = 3) in vec3 tangent;
 layout (location = 4) in ivec4 boneIDs;
 layout (location = 5) in vec4 boneWeights;
-layout (location = 6) in mat4 world;
-layout (location = 10) in mat4 MVP;
+//layout (location = 6) in mat4 world;
+//layout (location = 10) in mat4 MVP;
+
+layout(std140) uniform instance_data {
+	mat4 world;
+	mat4 MVP;
+};
 
 out vec3 worldPos0;
 out vec2 texCoord0;

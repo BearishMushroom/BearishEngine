@@ -8,6 +8,7 @@
 #include "Lights.h"
 #include "OpenGL.h"
 #include "Vertex.h"
+#include "Buffer\UBO.h"
 
 namespace Bearish { namespace Graphics {
 	class Shader;
@@ -70,6 +71,7 @@ namespace Bearish { namespace Graphics {
 		void SetUniform(const string& name, const PointLight& value);
 		void SetUniform(const string& name, const SpotLight& value);
 		void SetUniform(const string& name, const Texture* const value);
+		void SetUniformBlock(const string& name, UBO* const value);
 
 		void Bind() const;
 		void Unbind() const;
@@ -85,6 +87,7 @@ namespace Bearish { namespace Graphics {
 		void SetName(string name) { _name = name; }
 		string GetName() { return _name; }
 
+
 		static void ReloadChanged();
 	private:
 		// Private types.
@@ -97,12 +100,12 @@ namespace Bearish { namespace Graphics {
 
 		// Temp variables used for pre-compilation data.
 		GLSLStructList _structs;
-		std::vector<string> _uniformsToAdd;
+		std::vector<string> _uniformsToAdd, _uniformBlocksToAdd;
 		std::vector<std::pair<string, u32>> _attributesToAdd;
 		std::vector<string> _gsVaryings;
 
 		// Runtime variables.
-		std::unordered_map<string, ShaderUniform> _uniformLocations;
+		std::unordered_map<string, ShaderUniform> _uniformLocations, _uniformBlockLocations;
 		std::unordered_map<string, i32> _samplerLocations;
 		string _vsPath, _fsPath;
 		string _name;

@@ -10,7 +10,7 @@ export class UILabel
     @mesh\Submit model\GetTransformation!, camera\GetViewMatrix! * model\GetTransformation!
 
     @font\GetTexture!\Bind 0, 0
-    @mesh\Flush!
+    @mesh\Flush shader
     @font\GetTexture!\Unbind 0
 
   SetText: (text, scale) =>
