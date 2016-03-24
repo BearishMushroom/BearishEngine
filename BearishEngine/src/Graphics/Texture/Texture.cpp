@@ -1,7 +1,6 @@
 #include "Texture.h"
-#include "OpenGL.h"
-#include "../Core/Timer.h"
-#include "BETFile.h"
+#include "../../Core/Timer.h"
+#include "../BETFile.h"
 
 using namespace Bearish;
 using namespace Graphics;

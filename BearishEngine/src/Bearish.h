@@ -40,13 +40,15 @@
 #include "Graphics\Buffer\VBO.h"
 #include "Graphics\Buffer\IBO.h"
 
+#include "Graphics\Texture\Texture.h"
+#include "Graphics\Texture\Texture2D.h"
+
 #include "Graphics\RenderingEngine.h"
 #include "Graphics\ParticleSystem.h"
 #include "Graphics\ImageBuffer.h"
 #include "Graphics\Renderer.h"
 #include "Graphics\Material.h"
 #include "Graphics\Particle.h"
-#include "Graphics\Texture.h"
 #include "Graphics\OpenGL.h"
 #include "Graphics\Shader.h"
 #include "Graphics\Vertex.h"

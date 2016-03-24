@@ -4,7 +4,7 @@
 #include "../Core/IActorComponent.h"
 #include "../Core/IAllocatable.h"
 #include "../Core/Asset.h"
-#include "../Graphics/Texture.h"
+#include "../Graphics/Texture/Texture.h"
 #include "../Graphics/Mesh/Mesh.h"
 #include "../Types.h"
 #include "../Graphics/Material.h"

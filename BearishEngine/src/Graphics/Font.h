@@ -5,7 +5,7 @@
 #include "../Math/vec2.h"
 #include "Mesh\Mesh.h"
 #include "../Types.h"
-#include "Texture.h"
+#include "Texture/Texture.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H

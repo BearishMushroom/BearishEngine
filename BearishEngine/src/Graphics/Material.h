@@ -7,7 +7,7 @@
 #include "../Math/vec3.h"
 #include "../Math/vec4.h"
 #include "../Types.h"
-#include "Texture.h"
+#include "Texture/Texture.h"
 #include "Shader.h"
 
 namespace Bearish {namespace Graphics {

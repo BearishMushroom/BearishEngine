@@ -7,7 +7,7 @@
 #include "../Core/Model.h"
 
 #include "Renderer.h"
-#include "Texture.h"
+#include "Texture/Texture.h"
 #include "Camera.h"
 #include "Lights.h"
 #include "Shader.h"

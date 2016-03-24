@@ -6,7 +6,7 @@
 #include "Mesh\Mesh.h"
 #include "Particle.h"
 #include "../Types.h"
-#include "Texture.h"
+#include "Texture/Texture.h"
 #include "Shader.h"
 #include "Camera.h"
 

@@ -11,8 +11,8 @@ using namespace Util;
 
 #define UPDATE_TIME 1.0 / 60.0
 
-Actor* object1 = new Actor(Transform(vec3(0, 0, 0), vec3(0.1f)));
-Actor* object2 = new Actor(Transform(vec3(1.5f, 0, 0), vec3(0.1f)));
+Actor* object1 = new Actor(Transform(vec3( 0,    0, 0), vec3(0.1f)));
+Actor* object2 = new Actor(Transform(vec3( 1.5f, 0, 0), vec3(0.1f)));
 Actor* object3 = new Actor(Transform(vec3(-1.5f, 0, 0), vec3(0.1f)));
 
 Actor* fpsCounter = new Actor(Transform(vec3(10, 40, -2)));
@@ -40,10 +40,8 @@ void Update() {
 			delete todel;
 			todel = nullptr;
 		}
-	}
 
-	for (auto& a : actors) {
-		a->FixedUpdate();
+		actors.at(i)->FixedUpdate();
 	}
 
 	if (Keyboard::IsKeyPressed(Key::F1)) {
@@ -86,10 +84,10 @@ void Update() {
 		// DEBUG MENU CREATION!!!?!
 		if (!PANEL_OPEN) {
 			UI_PANEL = new Actor(Transform(vec3(150, 540, -1), vec3(300, 1080, 1)));
-			UI_PANEL->AddComponent(new UIPanel(new Texture(vec4(0.2, 0.2, 0.2, 0.5))));
+			UI_PANEL->AddComponent(new UIPanel(new Texture2D(vec4(0.2, 0.2, 0.2, 0.5))));
 
 			Actor* button1 = new Actor(Transform(vec3(0, -440, 1), vec3(260, 75, 1)));
-			button1->AddComponent(new UIButton(new Texture(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			button1->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
 				renderer.SetDebugMode(0);
 			}));
 			Actor* label1 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
@@ -99,7 +97,7 @@ void Update() {
 			UI_PANEL->AddChild(button1);
 
 			Actor* button2 = new Actor(Transform(vec3(0, -340, 1), vec3(260, 75, 1)));
-			button2->AddComponent(new UIButton(new Texture(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			button2->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
 				renderer.SetDebugMode(1);
 			}));
 			Actor* label2 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
@@ -108,7 +106,7 @@ void Update() {
 			UI_PANEL->AddChild(button2);
 
 			Actor* button3 = new Actor(Transform(vec3(0, -240, 1), vec3(260, 75, 1)));
-			button3->AddComponent(new UIButton(new Texture(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			button3->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
 				renderer.SetDebugMode(4);
 			}));
 			Actor* label3 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
@@ -117,7 +115,7 @@ void Update() {
 			UI_PANEL->AddChild(button3);
 
 			Actor* button4 = new Actor(Transform(vec3(0, -140, 1), vec3(260, 75, 1)));
-			button4->AddComponent(new UIButton(new Texture(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			button4->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
 				renderer.SetDebugMode(3);
 			}));
 			Actor* label4 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
@@ -126,7 +124,7 @@ void Update() {
 			UI_PANEL->AddChild(button4);
 
 			Actor* button5 = new Actor(Transform(vec3(0, -40, 1), vec3(260, 75, 1)));
-			button5->AddComponent(new UIButton(new Texture(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			button5->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
 				renderer.SetDebugMode(2);
 			}));
 			Actor* label5 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
@@ -135,7 +133,7 @@ void Update() {
 			UI_PANEL->AddChild(button5);
 
 			Actor* button6 = new Actor(Transform(vec3(0, 60, 1), vec3(260, 75, 1)));
-			button6->AddComponent(new UIButton(new Texture(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			button6->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
 				renderer.SetDebugMode(5);
 			}));
 			Actor* label6 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
@@ -197,10 +195,10 @@ i32 main(i32 argc, c8** argv) {
 	Mesh mesh = Model(Asset::Get("man")).ToMesh();
 	Mesh mesh2 = Model(Asset::Get("plane")).ToMesh();
 	
-	Texture texture(Asset::Get("bricks"));
-	Texture normalMap(Asset::Get("bricksNormal"));
+	Texture2D texture(Asset::Get("bricks"));
+	Texture2D normalMap(Asset::Get("bricksNormal"));
 
-	Texture texture2(Asset::Get("defaultNormal"));
+	Texture2D texture2(Asset::Get("defaultNormal"));
 
 	Mesh cp1(mesh);
 	Mesh cp2(mesh);
@@ -306,6 +304,6 @@ i32 main(i32 argc, c8** argv) {
 		}
 	}
 
-	Scripting::KillLua();
+	//Scripting::KillLua();
 	return (i32)null;
 }

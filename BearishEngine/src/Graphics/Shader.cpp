@@ -1,5 +1,5 @@
 #include "Shader.h"
-#include "Texture.h"
+#include "Texture/Texture.h"
 #include "../Core/Timer.h"
 
 using namespace Bearish;

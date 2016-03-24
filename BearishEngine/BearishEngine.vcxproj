@@ -115,7 +115,7 @@
     <ClCompile Include="src\Graphics\RenderingEngine.cpp" />
     <ClCompile Include="src\Graphics\Shader.cpp" />
     <ClCompile Include="src\Core\Timer.cpp" />
-    <ClCompile Include="src\Graphics\Texture.cpp" />
+    <ClCompile Include="src\Graphics\Texture\Texture.cpp" />
     <ClCompile Include="src\Graphics\Buffer\VAO.cpp" />
     <ClCompile Include="src\Graphics\Buffer\VBO.cpp" />
     <ClCompile Include="src\pch.cpp">
@@ -168,9 +168,10 @@
     <ClInclude Include="src\Graphics\Renderer.h" />
     <ClInclude Include="src\Graphics\RenderingEngine.h" />
     <ClInclude Include="src\Graphics\Shader.h" />
-    <ClInclude Include="src\Graphics\Texture.h" />
+    <ClInclude Include="src\Graphics\Texture\Texture.h" />
     <ClInclude Include="src\Graphics\Buffer\VAO.h" />
     <ClInclude Include="src\Graphics\Buffer\VBO.h" />
+    <ClInclude Include="src\Graphics\Texture\Texture2D.h" />
     <ClInclude Include="src\Graphics\Vertex.h" />
     <ClInclude Include="src\Math\mat4.h" />
     <ClInclude Include="src\Math\Math.h" />

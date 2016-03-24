@@ -3,7 +3,7 @@
 
 #include "../Core/IActorComponent.h"
 #include "../Core/IAllocatable.h"
-#include "../Graphics/Texture.h"
+#include "../Graphics/Texture/Texture.h"
 #include "../Graphics/Mesh/Mesh.h"
 #include "../Core/Actor.h"
 #include "../Types.h"

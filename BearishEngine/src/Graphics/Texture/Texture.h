@@ -1,11 +1,11 @@
 #ifndef _BEARISH_GRAPHICS_TEXTURE_H_
 #define _BEARISH_GRAPHICS_TEXTURE_H_
 
-#include "../Core/IAllocatable.h"
-#include "../Math/vec2.h"
-#include "../Math/vec4.h"
-#include "../Types.h"
-#include "OpenGL.h"
+#include "../../Core/IAllocatable.h"
+#include "../../Math/vec2.h"
+#include "../../Math/vec4.h"
+#include "../../Types.h"
+#include "../OpenGL.h"
 #include <SOIL.h>
 
 namespace Bearish { namespace Graphics {
@@ -97,7 +97,7 @@ namespace Bearish { namespace Graphics {
 		void SetReadBuffer(u32 buffer) const;
 
 		string GetName() { return _filename; }
-	private:
+	protected:
 		string _filename;
 		Math::vec2 _size;
 		u32* _ids;
