@@ -70,6 +70,8 @@ void RenderingEngine::Load() {
 
 	_debugMode = 0;
 
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 	testFont = new Font("res/Roboto.ttf");
 
 	testPart = new ParticleSystem(new Texture(Asset::Get("particle")),

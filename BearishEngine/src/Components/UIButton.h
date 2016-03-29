@@ -10,7 +10,10 @@ namespace Bearish { namespace Components {
 		class UIButton : public Core::IActorComponent, public Core::IAllocatable<UIButton> {
 		public:
 			UIButton(Graphics::Texture* texture, std::function<void(UIButton*)> action) : _mesh(Graphics::Mesh::CreateQuad()), _texture(texture), _action(action) {}
-			~UIButton() {}
+			~UIButton() {
+				delete _mesh;
+				delete _texture;
+			}
 
 			void FixedUpdate() override {
 				Math::vec3 offset = _actor->GetParent() ? _actor->GetParent()->GetTranslation() : Math::vec3(0);

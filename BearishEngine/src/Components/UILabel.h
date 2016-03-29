@@ -12,7 +12,9 @@ namespace Bearish { namespace Components {
 	class UILabel : public Core::IActorComponent, public Core::IAllocatable<UILabel> {
 	public:
 		UILabel(Graphics::Font* font, std::string text, f32 scale) : _font(font), _text(text), _mesh(font->GenerateMesh(text, scale)), _scale(scale) {}
-		~UILabel() {}
+		~UILabel() {
+			delete _mesh;
+		}
 
 		virtual void Draw2D(Graphics::RenderingEngine* engine, Graphics::Shader* shader, Graphics::Camera* camera) override {
 			Math::vec3 offset = _actor->GetParent() ? _actor->GetParent()->GetTranslation() : Math::vec3(0);

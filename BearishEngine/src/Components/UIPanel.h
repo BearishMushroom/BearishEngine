@@ -12,7 +12,10 @@ namespace Bearish { namespace Components {
 	class UIPanel : public Core::IActorComponent, public Core::IAllocatable<UIPanel> {
 	public:
 		UIPanel(Graphics::Texture* texture) : _texture(texture), _mesh(Graphics::Mesh::CreateQuad()) {}
-		~UIPanel() {}
+		~UIPanel() {
+			delete _mesh;
+			delete _texture;
+		}
 
 		virtual void Draw2D(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) override {
 			Math::vec3 offset = _actor->GetParent() ? _actor->GetParent()->GetTranslation() : Math::vec3(0);

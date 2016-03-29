@@ -39,6 +39,8 @@ void Update() {
 			actors.resize(actors.size() - 1);
 			delete todel;
 			todel = nullptr;
+			i--;
+			continue;
 		}
 
 		actors.at(i)->FixedUpdate();
@@ -91,7 +93,6 @@ void Update() {
 				renderer.SetDebugMode(0);
 			}));
 			Actor* label1 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			//label1->AddComponent(new UILabel(UI_FONT, "Full render", 48));
 			label1->AddComponent(new IActorComponent("UILabel", UI_FONT, "Full render", 48));
 			button1->AddChild(label1);
 			UI_PANEL->AddChild(button1);
@@ -230,7 +231,7 @@ i32 main(i32 argc, c8** argv) {
 	actors.push_back(fpsCounter);
 	
 	Actor* player = new Actor;
-	player->AddComponent(new SkyboxComponent(new Texture(Asset::Get("right"), Asset::Get("left"), Asset::Get("top"), Asset::Get("bottom"), Asset::Get("front"), Asset::Get("back"))));
+	player->AddComponent(new SkyboxComponent(new TextureCubeMap(Asset::Get("right"), Asset::Get("left"), Asset::Get("top"), Asset::Get("bottom"), Asset::Get("front"), Asset::Get("back"))));
 
 	player->AddComponent(new IActorComponent("CameraComponent"));
 

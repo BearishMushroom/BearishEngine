@@ -41,7 +41,10 @@
 #include "Graphics\Buffer\IBO.h"
 
 #include "Graphics\Texture\Texture.h"
+#include "Graphics\Texture\Texture1D.h"
 #include "Graphics\Texture\Texture2D.h"
+#include "Graphics\Texture\Texture3D.h"
+#include "Graphics\Texture\TextureCubeMap.h"
 
 #include "Graphics\RenderingEngine.h"
 #include "Graphics\ParticleSystem.h"
