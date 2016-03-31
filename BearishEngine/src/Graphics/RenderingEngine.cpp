@@ -136,6 +136,9 @@ void RenderingEngine::Draw() {
 	for (auto& a : *_actors) {
 		a->PreDraw(this, _camera);
 	}
+	
+	vec3 cameraLightTrans = _camera->GetTransform().GetTranslation();
+	cameraLightTrans.y = 5;
 
 	// Prepare geometry pass.
 	glEnable(GL_DEPTH_TEST);
@@ -145,9 +148,10 @@ void RenderingEngine::Draw() {
 		for (Light* light : _lights) {
 			if (light->GetType() == LightType::Directional) {
 				_shadowMap->BindAsRenderTarget();
+				glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 				_shadowMap->Clear();
 				_shadowShader->Bind();
-				Camera scamera = Camera(mat4().CreateOrthographic(-15, 15, -15, 15, -40, 40), Transform(vec3(0, 5, -5),
+				Camera scamera = Camera(mat4().CreateOrthographic(-20, 20, -20, 20, -40, 40), Transform(cameraLightTrans,
 					vec3(1), ((DirectionalLight*)light)->GetDirection()));
 
 				glCullFace(GL_FRONT);
@@ -229,7 +233,7 @@ void RenderingEngine::Draw() {
 				}
 				else if (l->GetType() == LightType::Directional) {
 					DirectionalLight* dl = static_cast<DirectionalLight*>(l);
-					Camera scamera = Camera(mat4().CreateOrthographic(-15, 15, -15, 15, -30, 30), Transform(vec3(0, 5, -5),
+					Camera scamera = Camera(mat4().CreateOrthographic(-20, 20, -20, 20, -40, 40), Transform(cameraLightTrans,
 						vec3(1), dl->GetDirection()));
 
 					if (shaderChanged) {

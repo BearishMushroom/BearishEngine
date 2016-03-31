@@ -21,19 +21,15 @@ std::unordered_map<string, BEMFile*> Model::_dataMap;
 Model::Model(const string& filename) {
 	_filename = filename;
 
-	if (_dataMap.count(filename) == 0) {
-		Timer timer;
-		timer.Start();
-		_data = new BEMFile();
-		_data->ReadFromFile(filename);
-		Logger::Info("Model %s loaded in %.3f ms", filename.c_str(), timer.DeltaMS());
-	} else {
-		_data = _dataMap.at(filename);
-	}
+	Timer timer;
+	timer.Start();
+	_data = new BEMFile();
+	_data->ReadFromFile(filename);
+	Logger::Info("Model %s loaded in %.3f ms", filename.c_str(), timer.DeltaMS());
 }
 
 Model::~Model() {
-
+	delete _data;
 }
 
 Mesh Model::ToMesh() {

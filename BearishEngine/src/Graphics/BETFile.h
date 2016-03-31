@@ -48,6 +48,9 @@ namespace Bearish { namespace Graphics {
 			header[3] = 1;
 		}
 
+		~BETFile() {
+		}
+
 		u8* ConvertToBET() {
 			numColors = 0;
 			if (data == 0) {

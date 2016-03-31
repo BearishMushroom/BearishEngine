@@ -75,7 +75,9 @@ Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::
 	//SetNormalData(normals, sizeof(vec3) * numVertices);
 	//SetTangentData(tangents, sizeof(vec3) * numVertices);
 
+	bool alloc = false;
 	if (boneids == 0) {
+		alloc = true;
 		boneids = new vec4i[numVertices];
 		memset(boneids, -1, sizeof(vec4i) * numVertices);
 
@@ -98,6 +100,11 @@ Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::
 
 	_vao->Unbind();
 	_firstAnim = true;
+
+	if (alloc) {
+		delete[] boneids;
+		delete[] boneweights;
+	}
 }
 
 Mesh::Mesh(Core::Model model) {

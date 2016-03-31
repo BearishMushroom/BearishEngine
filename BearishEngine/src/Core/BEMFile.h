@@ -141,15 +141,15 @@ namespace Bearish {
 		}
 
 		~BEMFile() {
-			//	delete[] indices;
-			//	delete[] positionData;
-			//	delete[] uvData;
-			//	delete[] normalData;
-			//	delete[] tangentData;
-			//	if (skinned) {
-			//		delete[] boneIDData;
-			//		delete[] boneWeightData;
-			//	}
+			delete[] indices;
+			delete[] positionData;
+			delete[] uvData;
+			delete[] normalData;
+			delete[] tangentData;
+			if (skinned) {
+				free(boneIDData);
+				free(boneWeightData);
+			}
 		}
 
 		void AllocateVertexData(bool skinned) {

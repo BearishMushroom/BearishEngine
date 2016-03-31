@@ -174,7 +174,7 @@
     <ClInclude Include="src\Graphics\Texture\Texture1D.h" />
     <ClInclude Include="src\Graphics\Texture\Texture2D.h" />
     <ClInclude Include="src\Graphics\Texture\Texture3D.h" />
-    <ClInclude Include="src\Graphics\Texture\TextureCubeMap.h" />
+    <ClInclude Include="src\Graphics\Texture\TextureCube.h" />
     <ClInclude Include="src\Graphics\Vertex.h" />
     <ClInclude Include="src\Math\mat4.h" />
     <ClInclude Include="src\Math\Math.h" />

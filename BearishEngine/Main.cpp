@@ -231,7 +231,7 @@ i32 main(i32 argc, c8** argv) {
 	actors.push_back(fpsCounter);
 	
 	Actor* player = new Actor;
-	player->AddComponent(new SkyboxComponent(new TextureCubeMap(Asset::Get("right"), Asset::Get("left"), Asset::Get("top"), Asset::Get("bottom"), Asset::Get("front"), Asset::Get("back"))));
+	player->AddComponent(new SkyboxComponent(new TextureCube(Asset::Get("right"), Asset::Get("left"), Asset::Get("top"), Asset::Get("bottom"), Asset::Get("front"), Asset::Get("back"))));
 
 	player->AddComponent(new IActorComponent("CameraComponent"));
 
@@ -240,8 +240,12 @@ i32 main(i32 argc, c8** argv) {
 	player->AddComponent(new IActorComponent("FreeMoveComponent", 1.0f / 3.0f));
 	Mouse::FreeFromCentre();
 
-	Actor* plane = new Actor(Transform(vec3(0, -2.5f, 0), vec3(5, 1, 5)));
-	plane->AddComponent(new MeshRendererComponent(&mesh2, &texture, &normalMap));
+	for (auto x = 0; x < 10; x++)
+		for (auto y = 0; y < 10; y++) {
+			Actor* plane = new Actor(Transform(vec3(x * 10, -2.5f, y * 10), vec3(5, 1, 5)));
+			plane->AddComponent(new MeshRendererComponent(&mesh2, &texture, &normalMap));
+			actors.push_back(plane);
+		}
 
 	Actor* dir = new Actor(Transform(vec3(0), vec3(1), quat().CreateRotation(vec3(1, 0, 0), AsRadians(45.f))));
 	dir->AddComponent(new DirectionalLightComponent(vec3(1), 0.1f, 0.2f));
@@ -253,7 +257,6 @@ i32 main(i32 argc, c8** argv) {
 	point2->AddComponent(new PointLightComponent(vec3(1, 0, 0), 0, Attenuation(0, 0, 0.85f), 5));
 
 	actors.push_back(player);
-	actors.push_back(plane);
 	actors.push_back(object1);
 
 	actors.push_back(object2);

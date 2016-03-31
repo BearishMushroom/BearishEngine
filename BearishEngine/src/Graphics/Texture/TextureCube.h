@@ -5,13 +5,13 @@
 #include "Texture.h"
 
 namespace Bearish { namespace Graphics {
-	class TextureCubeMap : public Texture {
+	class TextureCube : public Texture {
 	public:
-		TextureCubeMap(string right, string left, string top, string bottom, string front, string back, TextureFilter filter = TextureFilter::Linear)
+		TextureCube(string right, string left, string top, string bottom, string front, string back, TextureFilter filter = TextureFilter::Linear)
 		: Texture(right, left, top, bottom, front, back, TextureFormat::RGBA, filter) {
 		}
 
-		TextureCubeMap(std::vector<string> names, TextureFilter filter = TextureFilter::Linear) 
+		TextureCube(std::vector<string> names, TextureFilter filter = TextureFilter::Linear) 
 		: Texture(names[0], names[0], names[0], names[0], names[0], names[0], TextureFormat::RGBA, filter) {
 			if (names.size() < 6) {
 				Core::Logger::Error("Supples too few filenames to cubemap!");
