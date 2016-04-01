@@ -12,20 +12,18 @@
 namespace Bearish { namespace Components {
 	class MeshRendererComponent : public Core::IActorComponent, public Core::IAllocatable<MeshRendererComponent> {
 	public:
-		MeshRendererComponent(Graphics::Mesh* mesh, Graphics::Texture* texture, Graphics::Texture* normalMap = new Graphics::Texture(Core::Asset::Get("defaultNormal")));
+		MeshRendererComponent(Graphics::Mesh* mesh, Graphics::Material* material);
 		~MeshRendererComponent();
 
 		virtual void Draw(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) override;
 	private:
 		Graphics::Mesh* _mesh;		
-		Graphics::Texture* _texture;
-		Graphics::Texture* _normalMap;
 		Graphics::Material* _material;
 	};
 
 	class AnimatedMeshRendererComponent : public Core::IActorComponent, public Core::IAllocatable<AnimatedMeshRendererComponent> {
 	public:
-		AnimatedMeshRendererComponent(string name, f32 speed, Graphics::Mesh* mesh, Graphics::Texture* texture, Graphics::Texture* normalMap = new Graphics::Texture(Core::Asset::Get("defaultNormal")));
+		AnimatedMeshRendererComponent(string name, f32 speed, Graphics::Mesh* mesh, Graphics::Material* material);
 		~AnimatedMeshRendererComponent();
 
 		virtual void FixedUpdate() override;
@@ -36,8 +34,6 @@ namespace Bearish { namespace Components {
 	private:
 		Graphics::MeshAnimation* _anim;
 		Graphics::Mesh* _mesh;
-		Graphics::Texture* _texture;
-		Graphics::Texture* _normalMap;
 		Graphics::Material* _material;
 	};
 } }

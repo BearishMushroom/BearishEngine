@@ -175,7 +175,6 @@ i32 main(i32 argc, c8** argv) {
 	Scripting::RunFile("scr/lib/class.lua");
 	Scripting::InitMoonScript();
 
-
 	for (auto& file : Util::GetFilesInFolder("./scr/run/", "lua")) {
 		Logger::Info("Running %s", file.c_str());
 		Scripting::RunFile(file);
@@ -201,14 +200,41 @@ i32 main(i32 argc, c8** argv) {
 
 	Texture2D texture2(Asset::Get("defaultNormal"));
 
+	TextureCube* skybox = new TextureCube(Asset::Get("right"), Asset::Get("left"), Asset::Get("top"),
+											Asset::Get("bottom"), Asset::Get("front"), Asset::Get("back"));
+
 	Mesh cp1(mesh);
 	Mesh cp2(mesh);
 	Mesh cp3(mesh);
 	
-	Shader* red = new Shader("res/phong.vert", "res/red.frag");
-	object1->AddComponent(new AnimatedMeshRendererComponent("animation", 0.5f, &cp1, &texture2))->SetMaterial(new Material("red", red));
-	object2->AddComponent(new AnimatedMeshRendererComponent("animation", 1.0f, &cp2, &texture2));
-	object3->AddComponent(new AnimatedMeshRendererComponent("animation", 2.0f, &cp3, &texture2));
+	Material dude("Dude", new Shader("res/phong.vert", "res/phong.frag"));
+	dude.Set("diffuse", &texture2, 5);
+	dude.Set("normalMap", &texture2, 6);
+
+	Material red("red", new Shader("res/phong.vert", "res/red.frag"));
+
+	Material brickMaterial("Bricks", new Shader("res/phong.vert", "res/phong.frag"));
+	brickMaterial.Set("diffuse", &texture, 5);
+	brickMaterial.Set("normalMap", &normalMap, 6);
+
+	Material pbrTest("PBR", new Shader("res/PBR.vert", "res/PBR.frag"));
+	pbrTest.Set("PreintegratedFG", new Texture2D(Asset::Get("PreFG")), 5);
+	pbrTest.Set("EnvironmentMap", skybox, 6);
+	pbrTest.Set("AlbedoColor", vec4(0, 0, 0, 1.0f));
+	pbrTest.Set("SpecularColor", vec3(1.0f));
+	pbrTest.Set("GlossColor", 0.7f);
+	pbrTest.Set("AlbedoMap", &texture2, 7);
+	pbrTest.Set("SpecularMap", &texture2, 8);
+	pbrTest.Set("GlossMap", &texture2, 9);
+	pbrTest.Set("NormalMap", &texture2, 10);
+	pbrTest.Set("UsingAlbedoMap", 0.f);
+	pbrTest.Set("UsingSpecularMap", 0.f);
+	pbrTest.Set("UsingGlossMap", 0.f);
+
+
+	object1->AddComponent(new AnimatedMeshRendererComponent("animation", 0.5f, &cp1, &pbrTest));
+	object2->AddComponent(new AnimatedMeshRendererComponent("animation", 1.0f, &cp2, &pbrTest));
+	object3->AddComponent(new AnimatedMeshRendererComponent("animation", 2.0f, &cp3, &pbrTest));
 		   
 	object3->GetTransform().Rotate(vec3(1, 0, 0), AsRadians(-90.f));
 	object1->GetTransform().Rotate(vec3(1, 0, 0), AsRadians(-90.f));
@@ -231,7 +257,7 @@ i32 main(i32 argc, c8** argv) {
 	actors.push_back(fpsCounter);
 	
 	Actor* player = new Actor;
-	player->AddComponent(new SkyboxComponent(new TextureCube(Asset::Get("right"), Asset::Get("left"), Asset::Get("top"), Asset::Get("bottom"), Asset::Get("front"), Asset::Get("back"))));
+	player->AddComponent(new SkyboxComponent(skybox));
 
 	player->AddComponent(new IActorComponent("CameraComponent"));
 
@@ -240,12 +266,25 @@ i32 main(i32 argc, c8** argv) {
 	player->AddComponent(new IActorComponent("FreeMoveComponent", 1.0f / 3.0f));
 	Mouse::FreeFromCentre();
 
-	for (auto x = 0; x < 10; x++)
+	for (auto x = 0; x < 10; x++) {
+		Material* mat = new Material(pbrTest);
+		f32 xx = x * 10.0f;
+
+		f32 roughness = x / 10.0f;
+		vec3 spec(1.0f);
+		vec4 diffuse(0.0f, 0.0f, 0.0f, 1.0f);
+
+		mat->Set("AlbedoColor", diffuse);
+		mat->Set("SpecularColor", spec);
+		mat->Set("GlossColor", 1.0f - roughness);
+
 		for (auto y = 0; y < 10; y++) {
 			Actor* plane = new Actor(Transform(vec3(x * 10, -2.5f, y * 10), vec3(5, 1, 5)));
-			plane->AddComponent(new MeshRendererComponent(&mesh2, &texture, &normalMap));
+
+			plane->AddComponent(new MeshRendererComponent(&mesh2, &brickMaterial));
 			actors.push_back(plane);
 		}
+	}
 
 	Actor* dir = new Actor(Transform(vec3(0), vec3(1), quat().CreateRotation(vec3(1, 0, 0), AsRadians(45.f))));
 	dir->AddComponent(new DirectionalLightComponent(vec3(1), 0.1f, 0.2f));

@@ -36,8 +36,8 @@ namespace Bearish {
 		Mesh* mesh;
 		Material* material;
 
-		bool operator==(MeshEntry o) {
-			return o.mesh->GetVAOID() == mesh->GetVAOID();
+		bool operator==(const MeshEntry& o) {
+			return o.mesh->GetVAOID() == mesh->GetVAOID() && material == o.material;
 		}
 	};
 

@@ -157,7 +157,7 @@ void Shader::Compile() {
 	if (programStatus == GL_FALSE) {
 		c8 log[1024];
 		glGetProgramInfoLog(_programID, 1024, NULL, log);
-		Logger::Error("Shader program failed to compile: %s", &log);
+		Logger::Error("Shader program failed to compile(%s, %s): %s", _vsPath.c_str(), _fsPath.c_str(), &log);
 	}
 
 	glValidateProgram(_programID);
@@ -167,7 +167,7 @@ void Shader::Compile() {
 	if (programStatus == GL_FALSE) {
 		c8 log[1024];
 		glGetProgramInfoLog(_programID, 1024, NULL, log);
-		Logger::Error("Shader program failed to validate: %s", &log);
+		Logger::Error("Shader program failed to compile(%s, %s): %s", _vsPath.c_str(), _fsPath.c_str(), &log);
 	}
 
 	for (auto& str : _uniformsToAdd) {

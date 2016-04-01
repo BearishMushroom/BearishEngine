@@ -16,9 +16,21 @@ namespace Bearish {namespace Graphics {
 		Material(string name, Shader* shader) : _shader(shader), _name(name) {
 			Set("specularIntensity", 0.35f);
 			Set("specularPower", 1.0f);
-			Set("screen", Math::vec2(1280, 720));
+			_copies = 0;
 		}
+
 		~Material() {}
+
+		Material(Material& other) {
+			_name = other._name + std::to_string(other._copies++);
+			_shader = other._shader;
+			_floatMap = other._floatMap;
+			_intMap = other._intMap;
+			_vec2Map = other._vec2Map;
+			_vec3Map = other._vec3Map;
+			_vec4Map = other._vec4Map;
+			_textureMap = other._textureMap;
+		}
 
 		void Set(string name, f32 value) { _floatMap[name] = value; }
 		void Set(string name, i32 value) { _intMap[name] = value; }
@@ -61,15 +73,21 @@ namespace Bearish {namespace Graphics {
 		string GetName() {
 			return _name;
 		}
+
+		bool operator==(const Material& other) {
+			return _name == other._name;
+		}
+
 	private:
-		std::map<string, f32> _floatMap;
-		std::map<string, i32> _intMap;
-		std::map<string, Math::vec2> _vec2Map;
-		std::map<string, Math::vec3> _vec3Map;
-		std::map<string, Math::vec4> _vec4Map;
+		std::map<string, f32>                      _floatMap;
+		std::map<string, i32>                      _intMap;
+		std::map<string, Math::vec2>			   _vec2Map;
+		std::map<string, Math::vec3>			   _vec3Map;
+		std::map<string, Math::vec4>			   _vec4Map;
 		std::map<string, std::pair<Texture*, i32>> _textureMap;
 		string _name;
 		Shader* _shader;
+		i32 _copies;
 	};
 } }
 

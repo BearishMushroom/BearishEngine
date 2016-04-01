@@ -103,8 +103,9 @@ void Texture::Load(const string posX, const string negX, const string posY, cons
 		free(file.data);
 	}
 
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 	glTexParameteri((GLenum)_type, GL_TEXTURE_MAG_FILTER, (GLenum)_filter);
-	glTexParameteri((GLenum)_type, GL_TEXTURE_MIN_FILTER, (GLenum)_filter);
+	glTexParameteri((GLenum)_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
 	glTexParameteri((GLenum)_type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri((GLenum)_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

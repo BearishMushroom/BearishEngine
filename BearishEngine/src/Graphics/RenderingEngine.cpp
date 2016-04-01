@@ -203,6 +203,7 @@ void RenderingEngine::Draw() {
 
 				if (_currentShader != mat.first->GetShader()) {
 					mat.first->GetShader()->Bind();
+					mat.first->GetShader()->SetUniform("screen", vec2(1280, 720));
 					mat.first->GetShader()->SetUniform("eyePos", GetCamera()->GetTransform().GetTranslation());
 					mat.first->GetShader()->SetUniform("gWorld", 0);
 					mat.first->GetShader()->SetUniform("gTangent", 1);
