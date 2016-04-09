@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
 	string outputPath = string(argv[2]);
 
 	i32 width, height;
-	u8* image = SOIL_load_image(inputPath.c_str(), &width, &height, 0, 0);
+	u8* image = SOIL_load_image(inputPath.c_str(), &width, &height, 0, SOIL_LOAD_RGBA | SOIL_FLAG_INVERT_Y);
 
 	BETFile output;
 	output.data = image;

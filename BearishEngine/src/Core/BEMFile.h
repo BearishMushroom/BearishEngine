@@ -104,13 +104,13 @@ namespace Bearish {
 		u32 numChannels;
 		std::vector<BEMAnimationChannel> channels;
 	};
-
 	class BEMFile {
 	public:
 		u8 header[4];
-		u32 numVertices = 0;
-		u32 numIndices = 0;
+		i32 numVertices = 0;
+		i32 numIndices = 0;
 		u8 skinned = false;
+		std::string name;
 
 		u32* indices;
 
@@ -123,12 +123,12 @@ namespace Bearish {
 		vec4* boneWeightData;
 
 		mat4 boneTransform;
-		u32 numBones;
+		i32 numBones;
 		std::unordered_map<string, i32> boneMap;
 		std::vector<mat4> boneOffsets;
 		BEMNode rootNode;
 
-		u32 numAnimations;
+		i32 numAnimations;
 		std::vector<BEMAnimation> animations;
 
 		u32 bytesWritten;
@@ -137,15 +137,15 @@ namespace Bearish {
 			header[0] = 'B';
 			header[1] = 'E';
 			header[2] = 'M';
-			header[3] = 1;
+			header[3] = 2;
 		}
 
 		~BEMFile() {
-			delete[] indices;
-			delete[] positionData;
-			delete[] uvData;
-			delete[] normalData;
-			delete[] tangentData;
+			free(indices);
+			free(positionData);
+			free(uvData);
+			free(normalData);
+			free(tangentData);
 			if (skinned) {
 				free(boneIDData);
 				free(boneWeightData);
@@ -179,12 +179,12 @@ namespace Bearish {
 
 		void WriteNode(FILE* file, BEMNode node) {
 			u8 len = (u8)node.name.length();
-			u32 num = node.children.size();
+			i32 num = (i32)node.children.size();
 			WriteBytes(file, &len, 1, sizeof(u8));
 			WriteBytes(file, (u8*)node.name.c_str(), len, sizeof(u8));
 			WriteBytes(file, (u8*)&node.transform, 1, sizeof(mat4));
 			WriteBytes(file, (u8*)&num, 1, sizeof(i32));
-			for (i32 i = 0; i < (i32)num; i++) {
+			for (i32 i = 0; i < num; i++) {
 				WriteNode(file, node.children[i]);
 			}
 		}
@@ -194,8 +194,8 @@ namespace Bearish {
 			u8 len = *ReadBytes(file, 1, sizeof(u8));
 			res.name = string((char*)ReadBytes(file, len, sizeof(u8)), len);
 			res.transform = *(mat4*)ReadBytes(file, 1, sizeof(mat4));
-			u32 num = *(u32*)ReadBytes(file, 1, sizeof(u32));
-			for (i32 i = 0; i < (i32)num; i++) {
+			i32 num = *(i32*)ReadBytes(file, 1, sizeof(i32));
+			for (i32 i = 0; i < num; i++) {
 				res.children.push_back(ReadNode(file));
 			}
 			return res;
@@ -213,6 +213,9 @@ namespace Bearish {
 			WriteBytes(output, (u8*)&numVertices, 1, sizeof(u32));
 			WriteBytes(output, (u8*)&numIndices, 1, sizeof(u32));
 			WriteBytes(output, (u8*)&skinned, 1, sizeof(u8));
+			u8 nameLength = name.length();
+			WriteBytes(output, &nameLength, 1, sizeof(u8));
+			WriteBytes(output, (u8*)name.c_str(), 1, sizeof(u8) * nameLength);
 			printf("%d\n", bytesWritten);
 
 			u32 preBytes = bytesWritten;
@@ -258,7 +261,7 @@ namespace Bearish {
 				printf("Writing animation data...         ");
 				WriteBytes(output, (u8*)&numAnimations, 1, sizeof(u32));
 
-				for (i32 i = 0; i < (i32)numAnimations; i++) {
+				for (i32 i = 0; i < numAnimations; i++) {
 					u8 len = (u8)animations[i].name.length();
 					WriteBytes(output, &len, 1, sizeof(u8));
 					WriteBytes(output, (u8*)animations[i].name.c_str(), len, sizeof(u8));
@@ -295,12 +298,18 @@ namespace Bearish {
 			fopen_s(&file, filename.c_str(), "rb");
 
 			u8* header = ReadBytes(file, 4, 1);
-			assert(memcmp(header, this->header, 4) == 0);
+			assert(memcmp(header, this->header, 3) == 0);
 
 			numVertices = *(u32*)ReadBytes(file, 4, 1);
 			numIndices = *(u32*)ReadBytes(file, 4, 1);
 
 			skinned = *(bool*)ReadBytes(file, 1, 1);
+
+			if (header[3] > 1) {
+				u8 nameLength = *ReadBytes(file, 1, 1);
+				name = std::string((const char*)ReadBytes(file, nameLength, 1), nameLength);
+			}
+
 			indices = (u32*)ReadBytes(file, numIndices, sizeof(u32));
 
 			positionData = (vec3*)ReadBytes(file, numVertices * 3, 4);
@@ -317,7 +326,7 @@ namespace Bearish {
 				numBones = *(u32*)ReadBytes(file, 1, sizeof(u32));
 				boneOffsets.resize(numBones);
 
-				for (i32 i = 0; i < (i32)numBones; i++) {
+				for (i32 i = 0; i < numBones; i++) {
 					u8 len = *ReadBytes(file, 1, sizeof(u8));
 					string name = string((char*)ReadBytes(file, len, sizeof(u8)), len);
 					u32 id = *(u32*)ReadBytes(file, 1, sizeof(u32));
@@ -329,7 +338,7 @@ namespace Bearish {
 				rootNode = ReadNode(file);
 
 				numAnimations = *(u32*)ReadBytes(file, 1, sizeof(u32));
-				for (i32 i = 0; i < (i32)numAnimations; i++) {
+				for (i32 i = 0; i < numAnimations; i++) {
 					BEMAnimation anim;
 					u8 len = *ReadBytes(file, 1, sizeof(u8));
 					anim.name = string((char*)ReadBytes(file, len, sizeof(u8)), len);

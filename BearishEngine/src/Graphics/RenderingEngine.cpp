@@ -5,6 +5,7 @@
 #include "../Core/Asset.h"
 #include "../Core/Actor.h"
 #include "../Core/Model.h"
+#include "../Core/Timer.h"
 
 #include "Renderer.h"
 #include "Texture/Texture.h"
@@ -24,7 +25,7 @@ using namespace Math;
 f32 timef = 0;
 
 RenderingEngine::RenderingEngine() {
-
+	_timer.Start();
 }
 
 RenderingEngine::~RenderingEngine() {
@@ -48,17 +49,38 @@ void RenderingEngine::Load() {
 		TextureAttachment::Color3,
 	};
 
+	// Old Gbuffer size at 720p:
+	/*
+		Position buffer : 1280 * 720 * (RGB32)12 = 10.5MB
+		UV buffer       : 1280 * 720 * (RGB32)12 = 10.5MB
+		Normal buffer   : 1280 * 720 * (RGB32)12 = 10.5MB
+		Tangent buffer  : 1280 * 720 * (RGB32)12 = 10.5MB
+		Total           : 10.5 * 4 = 42MB of VRAM
+		Total BPP       : 48 * 8 = 384 BPP
+	*/
+
+	// New Gbuffer at 720p:
+	/*
+		Position buffer     : 1280 * 720 * (RGB16)6 = 5.3MB
+		Normal buffer       : 1280 * 720 * (RG16) 4 = 3.5MB
+		Diffuse buffer      : 1280 * 720 * (RGB8) 3 = 2.6MB
+		Spec + gloss buffer : 1280 * 720 * (RGBA8)4 = 3.5MB
+		Total               : 5.3 + 3.5 + 2.6 + 3.5 = 14.9MB of VRAM
+		Total BPP           : 17 * 8 = 136 BPP
+	*/
+
 	std::vector<TextureFormat> fmt {
-		TextureFormat::RGB32,
-		TextureFormat::RGB32,
-		TextureFormat::RGB32,
-		TextureFormat::RGB32,
+		TextureFormat::RGB16, // Position
+		TextureFormat::RG16,  // Normal XY
+		TextureFormat::RGB,   // Diffuse
+		TextureFormat::RGBA,  // Spec + gloss
 	};
 
 	_gbuffer = new Texture(vec2(1280, 720), TextureType::Texture2D, att, fmt, 4);
 
 	_geomShader = new Shader("res/geometrypass.vert", "res/geometrypass.frag");
 	_geomShader->SetName("geom");
+	_pbrShader = new Shader("res/PBR.vert", "res/PBR.frag");
 	_sphere = new Mesh(Model(Asset::Get("sphere")).ToMesh());
 
 	_quad = new Mesh(std::vector<Vertex> {
@@ -126,8 +148,9 @@ void RenderingEngine::Submit(Mesh* mesh, Material* mat) {
 }
 
 void RenderingEngine::Draw() {
-	_materialsToRender.clear();
-	_maxMaterial = 0;
+	Timer frameTimer;
+	frameTimer.Start();
+
 	_lights.clear();
 
 	glDepthFunc(GL_LESS);
@@ -136,8 +159,12 @@ void RenderingEngine::Draw() {
 	for (auto& a : *_actors) {
 		a->PreDraw(this, _camera);
 	}
+
+	//glFinish();
+	_preTime += frameTimer.LoopMS();
 	
-	vec3 cameraLightTrans = _camera->GetTransform().GetTranslation();
+	vec3 cameraLightTrans = _camera->GetTransform().GetTranslation();// +
+		//vec3(_camera->GetTransform().GetRotation().Forward().x, 0, _camera->GetTransform().GetRotation().Forward().z) * 10;
 	cameraLightTrans.y = 5;
 
 	// Prepare geometry pass.
@@ -151,7 +178,7 @@ void RenderingEngine::Draw() {
 				glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 				_shadowMap->Clear();
 				_shadowShader->Bind();
-				Camera scamera = Camera(mat4().CreateOrthographic(-20, 20, -20, 20, -40, 40), Transform(cameraLightTrans,
+				Camera scamera = Camera(mat4().CreateOrthographic(-30, 30, -30, 30, -20, 10), Transform(cameraLightTrans,
 					vec3(1), ((DirectionalLight*)light)->GetDirection()));
 
 				glCullFace(GL_FRONT);
@@ -168,6 +195,9 @@ void RenderingEngine::Draw() {
 		}
 	}
 
+	//glFinish();
+	_shadowTime += frameTimer.LoopMS();
+
 	_gbuffer->BindForWriting();
 	_gbuffer->BindAsRenderTarget();
 	_renderer->Clear();
@@ -178,6 +208,9 @@ void RenderingEngine::Draw() {
 		a->Draw(this, _geomShader, _camera);
 	}
 	FlushMeshes(_geomShader, true);
+
+	//glFinish();
+	_geomTime += frameTimer.LoopMS();
 
 	// Prepare lighting pass.
 	glDepthMask(GL_FALSE);
@@ -197,75 +230,70 @@ void RenderingEngine::Draw() {
 		_gbuffer->Bind(3, 3);
 
 			// Disable backface culling so we can render the light while inside its radius.
-		for (Light* l : _lights) {
-			for (auto& mat : _materialsToRender) {
-				bool shaderChanged = false;
+		_pbrShader->Bind();
+		_pbrShader->SetUniform("screen", vec2(1280, 720));
+		_pbrShader->SetUniform("eyePos", GetCamera()->GetTransform().GetTranslation());
+		_pbrShader->SetUniform("gPosition", 0);
+		_pbrShader->SetUniform("gNormal", 1);
+		_pbrShader->SetUniform("gDiffuse", 2);
+		_pbrShader->SetUniform("gSpecRoughness", 3);
+		_pbrShader->SetUniform("pcfSize", (i32)_shadowPcfSize);
+		_pbrShader->SetUniform("shadowSize", _shadowMap == nullptr ? 0 : (i32)_shadowMap->GetSize().x);
 
-				if (_currentShader != mat.first->GetShader()) {
-					mat.first->GetShader()->Bind();
-					mat.first->GetShader()->SetUniform("screen", vec2(1280, 720));
-					mat.first->GetShader()->SetUniform("eyePos", GetCamera()->GetTransform().GetTranslation());
-					mat.first->GetShader()->SetUniform("gWorld", 0);
-					mat.first->GetShader()->SetUniform("gTangent", 1);
-					mat.first->GetShader()->SetUniform("gNormal", 2);
-					mat.first->GetShader()->SetUniform("gTexCoord", 3);
-					mat.first->GetShader()->SetUniform("pcfSize", (i32)_shadowPcfSize);
-					mat.first->GetShader()->SetUniform("shadowSize", _shadowMap == nullptr ? 0 : (i32)_shadowMap->GetSize().x);
-					_currentShader = mat.first->GetShader();
-					shaderChanged = true;
-				}
-				mat.first->Bind(this);
-				mat.first->GetShader()->SetUniform("matID", mat.second);
+		_pbrShader->SetUniform("PreintegratedFG", 5);
+		_pbrShader->SetUniform("EnvironmentMap", 6);
+		_environmentMap->Bind(6);
+		_preFG->Bind(5);
 
-				if (l->GetType() == LightType::Point) {
-					//glDisable(GL_CULL_FACE);
-					glFrontFace(GL_CCW);
-					PointLight* pl = static_cast<PointLight*>(l);
-					Transform t(pl->GetPosition(), PointLightSize(pl));
-					t.LookAt(_camera->GetTransform().GetTranslation(), vec3(0, 1, 0));// _camera->GetTransform().GetRotation().Up());
-					_quad->Submit(t.GetTransformation(), _camera->GetViewMatrix() * t.GetTransformation());
-					if (shaderChanged) {
-						mat.first->GetShader()->SetUniform("pLight", *pl);
-						mat.first->GetShader()->SetUniform("light", 1);
-					}
-					_quad->Flush(mat.first->GetShader());
-					glFrontFace(GL_CW);
-					//glEnable(GL_CULL_FACE);
-				}
-				else if (l->GetType() == LightType::Directional) {
-					DirectionalLight* dl = static_cast<DirectionalLight*>(l);
-					Camera scamera = Camera(mat4().CreateOrthographic(-20, 20, -20, 20, -40, 40), Transform(cameraLightTrans,
-						vec3(1), dl->GetDirection()));
-
-					if (shaderChanged) {
-						if (_shadowMap) {
-							mat.first->GetShader()->SetUniform("shadowMap", 4);
-							_shadowMap->Bind(4);
-						}
-
-						mat.first->GetShader()->SetUniform("lightMVP", scamera.GetViewMatrix());
-						mat.first->GetShader()->SetUniform("dLight", *dl);
-						mat.first->GetShader()->SetUniform("light", 0);
-					}
-
-					_quad->Submit(mat4().CreateIdentity(), mat4().CreateIdentity());
-					_quad->Flush(mat.first->GetShader());
-					
-				}
-				else if (l->GetType() == LightType::Spot) {
-					SpotLight* dl = static_cast<SpotLight*>(l);
-
-					_quad->Submit(mat4().CreateIdentity(), mat4().CreateIdentity());
-					if (shaderChanged) {
-						mat.first->GetShader()->SetUniform("spotLight", *dl);
-						mat.first->GetShader()->SetUniform("light", 2);
-					}
-					_quad->Flush(mat.first->GetShader());
-				}
+		for (Light* l : _lights) {		
+			if (l->GetType() == LightType::Point) {
+				//glDisable(GL_CULL_FACE);
+				//glFrontFace(GL_CCW);
+				PointLight* pl = static_cast<PointLight*>(l);
+				//Transform t(pl->GetPosition(), PointLightSize(pl));
+				//
+				//_sphere->Submit(t.GetTransformation(), _camera->GetViewMatrix() * t.GetTransformation());
+				_pbrShader->SetUniform("pLight", *pl);
+				_pbrShader->SetUniform("light", 1);
+				_quad->Submit(mat4().CreateIdentity(), mat4().CreateIdentity());
+				_quad->Flush(_pbrShader);
+				//_sphere->Flush(mat.first->GetShader());
+				//glFrontFace(GL_CW);
+				//glEnable(GL_CULL_FACE);
 			}
-			_currentShader = 0;
+			else if (l->GetType() == LightType::Directional) {
+				DirectionalLight* dl = static_cast<DirectionalLight*>(l);
+				Camera scamera = Camera(mat4().CreateOrthographic(-30, 30, -30, 30, -20, 10), Transform(cameraLightTrans,
+					vec3(1), dl->GetDirection()));
+
+				if (_shadowMap) {
+					_pbrShader->SetUniform("shadowMap", 4);
+					_shadowMap->Bind(4);
+				}
+
+				_pbrShader->SetUniform("lightMVP", scamera.GetViewMatrix());
+				_pbrShader->SetUniform("dLight", *dl);
+				_pbrShader->SetUniform("light", 0);
+					
+
+				_quad->Submit(mat4().CreateIdentity(), mat4().CreateIdentity());
+				_quad->Flush(_pbrShader);
+					
+			}
+			else if (l->GetType() == LightType::Spot) {
+				SpotLight* dl = static_cast<SpotLight*>(l);
+
+				_quad->Submit(mat4().CreateIdentity(), mat4().CreateIdentity());
+				_pbrShader->SetUniform("spotLight", *dl);
+				_pbrShader->SetUniform("light", 2);
+				_quad->Flush(_pbrShader);
+			}
 		}
+		_currentShader = 0;
 	}
+
+	//glFinish();
+	_accTime += frameTimer.LoopMS();
 
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
@@ -279,11 +307,15 @@ void RenderingEngine::Draw() {
 		}
 	}
 
+	//glFinish();
+	_postTime += frameTimer.LoopMS();
+
+
 	glEnable(GL_BLEND);
 	Renderer::SetBlendState(BlendState::Additive);
 	glDepthMask(GL_FALSE);
 
-	testPart->Draw(_camera);
+	//testPart->Draw(_camera);
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glDepthFunc(GL_ALWAYS);
@@ -326,16 +358,60 @@ void RenderingEngine::Draw() {
 		a->PostDraw2D(this, &guiCamera);
 	}
 
+	//glFinish();
+	_2dTime += frameTimer.LoopMS();
+	 
+	_time += _timer.LoopMS();
+	_framesRendered++;
+
+	if (_time >= 1000) {
+		_preTimeFrame = _preTime / _framesRendered;
+		_shadowTimeFrame = _shadowTime / _framesRendered;
+		_geomTimeFrame = _geomTime / _framesRendered;
+		_accTimeFrame = _accTime / _framesRendered;
+		_postTimeFrame = _postTime / _framesRendered;
+		_2dTimeFrame = _2dTime / _framesRendered;
+		_frameTime = _time / _framesRendered;
+
+		_preTime = 0;
+		_shadowTime = 0;
+		_geomTime = 0;
+		_accTime = 0;
+		_postTime = 0;
+		_2dTime = 0;
+
+		Logger::Info(
+R"(
+-------- FRAME STATS --------
+Pre pass:          %.3fms
+Shadow pass:       %.3fms
+Geometry pass:     %.3fms
+Accumulation pass: %.3fms
+Post pass:         %.3fms
+2D pass:           %.3fms
+Frame time:        %.3fms
+FPS:               %d
+-----------------------------)", _preTimeFrame, _shadowTimeFrame, _geomTimeFrame, _accTimeFrame, _postTimeFrame, _2dTimeFrame, _frameTime, _framesRendered);
+
+		_framesRendered = 0;
+		_time = 0;
+	}
 }
 
-void RenderingEngine::FlushMeshes(Shader* shader, bool bind) {
+void RenderingEngine::FlushMeshes(Shader* shader, bool materialize) {
+	Material* current = 0;
+	if (materialize) std::sort(_meshesToRender.begin(), _meshesToRender.end());
+
 	for (auto& a : _meshesToRender) {
-		if (bind) {
-			_geomShader->SetUniform("matID", _maxMaterial);
-			PushMaterial(a.material);
+		if (materialize) {
+			if (current != a.material) {
+				current = a.material;
+				current->Bind(shader);
+			}
 		}
 		a.mesh->Flush(shader);
 	}
+
 	_meshesToRender.clear();
 }
 
@@ -345,7 +421,7 @@ f32 RenderingEngine::PointLightSize(PointLight* pl) {
 	f32 ret = (-pl->GetAttenuation().GetLinear() + sqrtf(pl->GetAttenuation().GetLinear() * pl->GetAttenuation().GetLinear() -
 		4.f * pl->GetAttenuation().GetExponent() * (pl->GetAttenuation().GetExponent() - 256.f * MaxChannel * pl->GetDiffuseIntensity()))) /
 		2.f * pl->GetAttenuation().GetExponent() / 2;
-	return ret;
+	return ret * 10;
 }
 
 void RenderingEngine::DrawGuiQuad(Transform t, Texture* tex, u32 subid) {
@@ -360,15 +436,15 @@ void RenderingEngine::DrawGuiQuad(Transform t, Texture* tex, u32 subid) {
 }
 
 i32 RenderingEngine::PushMaterial(Material* material) {
-	for (auto& mat : _materialsToRender) {
-		if (mat.first->GetName() == material->GetName()) {
-			return mat.second;
-		}
-	}
+	//for (auto& mat : _materialsToRender) {
+	//	if (mat.first->GetName() == material->GetName()) {
+	//		return mat.second;
+	//	}
+	//}
 
-	_materialsToRender.push_back(std::make_pair(material, _maxMaterial));
-	_maxMaterial++;
-	return _maxMaterial - 1;
+	//_materialsToRender.push_back(std::make_pair(material, _maxMaterial));
+	//_maxMaterial++;
+	//return _maxMaterial - 1;
 }
 
 void RenderingEngine::SetShadowQuality(ShadowQuality quality) {

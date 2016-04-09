@@ -138,11 +138,12 @@ void Texture::InitTextures(const TextureType type, std::vector<TextureFormat> fo
 		if (datas) d = datas[i];
 
 		glTexImage2D((GLenum)type, 0, (GLint)formats[i], static_cast<i32>(_size.x), static_cast<i32>(_size.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, d);
+		glGenerateMipmap((GLenum)type);
 		glTexParameteri((GLenum)type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri((GLenum)type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-		glTexParameteri((GLenum)type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri((GLenum)type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri((GLenum)type, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri((GLenum)type, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		if (type == TextureType::CubeMap || type == TextureType::Texture3D) {
 			glTexParameteri((GLenum)type, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);

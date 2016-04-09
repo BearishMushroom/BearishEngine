@@ -25,12 +25,12 @@ void UBO::Unbind(i32 base) {
 
 void UBO::SetData(void* data, u32 size) {
 	Bind();
-	glBufferData(GL_UNIFORM_BUFFER, size, data, GL_DYNAMIC_DRAW);
-	Unbind();
+	glBufferData(GL_UNIFORM_BUFFER, size, data, GL_STREAM_DRAW);
+	//Unbind();
 }
 
 void UBO::UpdateData(void* data, u32 size) {
 	Bind();
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
-	Unbind();
+	//Unbind();
 }

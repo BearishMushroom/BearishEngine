@@ -7,6 +7,7 @@ layout (location = 5) in vec4 boneWeights;
 layout(std140) uniform instance_data {
 	mat4 world;
 	mat4 MVP;
+	float rigged;
 };
 
 uniform mat4 bones[100];
@@ -18,11 +19,11 @@ void main() {
 		0, 0, 1, 0,
 		0, 0, 0, 1);
 
-	if(boneIDs[0] != -1) {
-		boneTransform = bones[boneIDs[0]] * boneWeights[0];
-		boneTransform += bones[boneIDs[1]] * boneWeights[1];
-		boneTransform += bones[boneIDs[2]] * boneWeights[2];
-		boneTransform += bones[boneIDs[3]] * boneWeights[3];
+	if(rigged > 0) {
+			boneTransform = bones[boneIDs[0]] * boneWeights[0];
+			boneTransform += bones[boneIDs[1]] * boneWeights[1];
+			boneTransform += bones[boneIDs[2]] * boneWeights[2];
+			boneTransform += bones[boneIDs[3]] * boneWeights[3];
 	}
 
 	vec4 bonePos = boneTransform * vec4(position, 1);

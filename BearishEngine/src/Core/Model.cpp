@@ -25,11 +25,12 @@ Model::Model(const string& filename) {
 	timer.Start();
 	_data = new BEMFile();
 	_data->ReadFromFile(filename);
+	name = _data->name;
 	Logger::Info("Model %s loaded in %.3f ms", filename.c_str(), timer.DeltaMS());
 }
 
 Model::~Model() {
-	delete _data;
+	//delete _data;
 }
 
 Mesh Model::ToMesh() {

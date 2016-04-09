@@ -23,6 +23,8 @@ namespace Bearish {
 
 		Graphics::Mesh ToMesh();
 		Graphics::MeshNode* BEMToBENode(BEMNode root);
+		
+		string name;
 	private:
 		BEMFile* _data;
 		string _filename;

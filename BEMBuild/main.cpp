@@ -36,7 +36,9 @@ i32 main(i32 argc, cstring* argv) {
 	if (scene) {
 		const aiVector3D zero(0, 0, 0);
 		
-		for (i32 i = 0; i < (i32)scene->mNumMeshes; i++) {
+		auto root = scene->mRootNode;
+
+		for (i32 i = 0; i < (i32)root->mNumChildren; i++) {
 			string path = outputPath;
 			if (scene->mNumMeshes > 1) {
 				string name = path.substr(0, path.find_last_of('.'));
@@ -53,8 +55,9 @@ i32 main(i32 argc, cstring* argv) {
 				}
 			}
 
-			const aiMesh* mesh = scene->mMeshes[i];
-
+			const aiMesh* mesh = scene->mMeshes[root->mChildren[i]->mMeshes[0]];
+			printf("Processing mesh: %s\n", root->mChildren[i]->mName.C_Str());
+			output.name = std::string(root->mChildren[i]->mName.C_Str(), root->mChildren[i]->mName.length);
 			output.numVertices = mesh->mNumVertices;
 			output.AllocateVertexData(mesh->HasBones());
 

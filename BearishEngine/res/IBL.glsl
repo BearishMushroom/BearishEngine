@@ -4,18 +4,11 @@ vec3 RadianceIBLIntegration(sampler2D fg, float NdotV, float roughness, vec3 spe
 }
 
 vec3 IBL(sampler2D fg, samplerCube envionment, vec4 albedo, vec3 specular, float roughness, vec3 normal, vec3 eye) {
-	float NdotV = max(dot(normal, eye), 0.0);
-
-	vec3 reflectionVector = normalize(reflect(-eye, normal));
 	float smoothness = 1.0f - roughness;
-	float mipLevel = (1.0 - smoothness * smoothness) * 10.0;
-	vec4 cs = textureLod(envionment, reflectionVector, mipLevel);
-	vec3 result = pow(cs.xyz, vec3(GAMMA)) * RadianceIBLIntegration(fg, NdotV, roughness, specular);
+	vec3 result = pow(textureLod(envionment, normalize(reflect(-eye, normal)), (1.0 - smoothness * smoothness) * 10.0).xyz,
+										vec3(GAMMA)) * RadianceIBLIntegration(fg, max(dot(normal, eye), 0.0), roughness, specular);
 
-	vec3 diffuseDominantDirection = normal;
-	float diffuseLowMip = 9.6;
-	vec3 diffuseImageLighting = textureLod(envionment, diffuseDominantDirection, diffuseLowMip).rgb;
-	diffuseImageLighting = pow(diffuseImageLighting, vec3(GAMMA));
+	vec3 diffuseImageLighting = pow(textureLod(envionment, normal, 9.6).rgb, vec3(GAMMA));
 
 	return result + diffuseImageLighting * albedo.rgb;
 }

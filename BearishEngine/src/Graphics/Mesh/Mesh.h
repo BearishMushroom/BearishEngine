@@ -41,6 +41,7 @@ namespace Bearish {
 			struct InstanceData {
 				Math::mat4 world;
 				Math::mat4 mvp;
+				f32 rigged;
 			};
 		public:
 			static Mesh* CreateQuad(Math::vec4 texCoords = Math::vec4(0, 0, 1, 1));
@@ -72,53 +73,18 @@ namespace Bearish {
 				_skeleton = new MeshSkeleton(*_skeleton);
 			}
 
+			MeshSkeleton* GetSkeleton() { return _skeleton; }
+
 			std::vector<Math::mat4>& GetBones() { if (_boneTransforms.size() == 0) Animate(0); return _boneTransforms; }
 
-			void SetPositionData(Math::vec3* data, u32 size);
-			void SetTexCoordData(Math::vec2* data, u32 size);
-			void SetNormalData(Math::vec3* data, u32 size);
-			void SetTangentData(Math::vec3* data, u32 size);
-			void SetBoneIDData(Math::vec4i* data, u32 size);
-			void SetBoneWeightData(Math::vec4* data, u32 size);
 			void SetVertexData(Vertex* vertices, u32 size);
 			void SetIndexData(u32* data, u32 size);
 		private:
 			void SetupBuffers();
-			void SetupInstanceData();
-
-			//union {
-			//	struct {
-			//		VBO* _positions;
-			//		VBO* _texCoords;
-			//		VBO* _normals;
-			//		VBO* _tangents;
-			//		VBO* _boneIDs;
-			//		VBO* _boneWeights;
-			//		VBO* _mvps;
-			//		VBO* _worlds;
-			//		IBO* _indices;
-			//	};
-
-			//	struct {
-			//		VBO* _attribs[6];
-			//		VBO* _instances[2];
-			//		IBO* _indices;
-			//	};
-			//};
-
-			union {
-				struct {
-					VBO* _attribs;
-					VBO* _mvps;
-					VBO* _worlds;
-					IBO* _indices;
-				};
-
-				struct {
-					VBO* _attribs;
-					VBO* _instances[2];
-					IBO* _indices;
-				};
+			
+			struct {
+				VBO* _attribs;
+				IBO* _indices;
 			};
 
 
@@ -133,7 +99,7 @@ namespace Bearish {
 			std::vector<MeshAnimation> _animations;
 			Math::mat4 _transform;
 			std::vector<Math::mat4> _boneTransforms;
-			bool _firstAnim;
+			bool _firstAnim, _rigged;
 		};
 } }
 

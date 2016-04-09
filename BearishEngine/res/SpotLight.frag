@@ -16,6 +16,8 @@ uniform sampler2D shadowMap;
 uniform SpotLight spotLight = {0};
 uniform PointLight pointLight = {0};
 
+// x = -(b/a)/2 +- sqrt(((b/a)/2)^2-((c-1)/a)) 
+
 uniform vec3 eyePos;
 uniform float specularIntensity;
 uniform float specularPower;

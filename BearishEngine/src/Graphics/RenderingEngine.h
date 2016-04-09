@@ -2,6 +2,7 @@
 #define _BEARISH_GRAPHICS_RENDERINGENGINE_H_
 
 #include "../Core/IAllocatable.h"
+#include "../Core/Timer.h"
 #include "../Types.h"
 #include "Mesh/Mesh.h"
 #include "ParticleSystem.h"
@@ -39,6 +40,10 @@ namespace Bearish {
 		bool operator==(const MeshEntry& o) {
 			return o.mesh->GetVAOID() == mesh->GetVAOID() && material == o.material;
 		}
+
+		bool operator<(const MeshEntry& o) {
+			return material < o.material;
+		}
 	};
 
 	class RenderingEngine : public Core::IAllocatable<RenderingEngine> {
@@ -68,6 +73,9 @@ namespace Bearish {
 		void SetShadowQuality(ShadowQuality quality);
 
 		void SetDebugMode(i32 mode) { _debugMode = mode; }
+
+		void SetEnvironmentMap(Texture* tex) { _environmentMap = tex; }
+		void SetPreFG(Texture* tex) { _preFG = tex; }
 	private:
 		std::vector<Light*> _lights;
 		Texture* _gbuffer;
@@ -82,8 +90,9 @@ namespace Bearish {
 		i32 _debugMode;
 
 		std::vector<MeshEntry> _meshesToRender;
-		std::vector<std::pair<Material*, i32>> _materialsToRender;
-		i32 _maxMaterial;
+
+		Texture* _environmentMap;
+		Texture* _preFG;
 
 		Texture* _shadowMap;
 		f32 _shadowPcfSize;
@@ -92,8 +101,14 @@ namespace Bearish {
 		f32 PointLightSize(PointLight* pl);
 
 		Font* testFont;
+
+		Core::Timer _timer;
+
+		i32 _framesRendered;
+		f32 _time, _shadowTime, _geomTime, _accTime, _preTime, _postTime, _2dTime, _frameTime,
+			_shadowTimeFrame, _geomTimeFrame, _accTimeFrame, _preTimeFrame, _postTimeFrame, _2dTimeFrame;
 	public:
-		Shader* _phongShader, *_shadowShader, *_geomShader, *_guiShader;
+		Shader* _phongShader, *_shadowShader, *_geomShader, *_guiShader, *_pbrShader;
 		ParticleSystem* testPart;
 	};
 } }

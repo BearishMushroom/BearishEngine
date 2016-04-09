@@ -17,13 +17,7 @@ MeshRendererComponent::~MeshRendererComponent() { }
 void MeshRendererComponent::Draw(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) {
 	auto trans = _actor->GetTransform().GetTransformation();
 	_mesh->Submit(trans, camera->GetViewMatrix() * trans);
-	//renderer->Submit(_mesh, _material);
-
-	i32 matID = renderer->PushMaterial(_material);
-
-	shader->SetUniform("matID", matID);
-
-	_mesh->Flush(shader);
+	renderer->Submit(_mesh, _material);
 }
 
 AnimatedMeshRendererComponent::AnimatedMeshRendererComponent(string name, f32 speed, Graphics::Mesh* mesh, Graphics::Material* material) {
@@ -46,10 +40,7 @@ void AnimatedMeshRendererComponent::Draw(Graphics::RenderingEngine* renderer, Gr
 	auto trans = _actor->GetTransform().GetTransformation();
 	_mesh->Submit(trans, camera->GetViewMatrix() * trans);
 
-	i32 matID = renderer->PushMaterial(_material);
-
 	shader->SetUniform("bones", _mesh->GetBones());
-	shader->SetUniform("matID", matID);
 
 	_mesh->Flush(shader);
 }

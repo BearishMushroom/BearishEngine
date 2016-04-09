@@ -26,8 +26,8 @@ uniform float specularIntensity;
 uniform float specularPower;
 uniform int matID;
 
-uniform sampler2D diffuse;
-uniform sampler2D normalMap;
+uniform sampler2D AlbedoMap;
+uniform sampler2D NormalMap;
 
 #include "res/LightCalcs.glsl"
 
@@ -47,8 +47,8 @@ void main() {
 		vec3 biTangent = cross(tangent, n);
 		mat3 tbn = mat3(tangent, biTangent, n);
 
-		n = normalize(tbn * (255.0/128.0 * texture(normalMap, texCoord).xyz - 1));
-		vec4 diff = texture(diffuse, texCoord);
+		n = normalize(tbn * (255.0/128.0 * texture(NormalMap, texCoord).xyz - 1));
+		vec4 diff = texture(AlbedoMap, texCoord);
 
 		if (light == LIGHT_DIRECTIONAL) {
 			vec4 lp = (lightMat * vec4(w, 1));

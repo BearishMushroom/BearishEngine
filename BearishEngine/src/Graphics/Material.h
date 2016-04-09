@@ -14,8 +14,6 @@ namespace Bearish {namespace Graphics {
 	class Material : public Core::IAllocatable<Material> {
 	public:
 		Material(string name, Shader* shader) : _shader(shader), _name(name) {
-			Set("specularIntensity", 0.35f);
-			Set("specularPower", 1.0f);
 			_copies = 0;
 		}
 
@@ -39,25 +37,25 @@ namespace Bearish {namespace Graphics {
 		void Set(string name, Math::vec4 value) { _vec4Map[name] = value; }
 		void Set(string name, Texture* value, i32 slot) { _textureMap[name] = std::make_pair(value, slot); }
 
-		void Bind(RenderingEngine* engine) {
+		void Bind(Shader* shader) {
 			for (auto& i : _floatMap) {
-				_shader->SetUniform(i.first, i.second);
+				shader->SetUniform(i.first, i.second);
 			}
 			for (auto& i : _intMap) {
-				_shader->SetUniform(i.first, i.second);
+				shader->SetUniform(i.first, i.second);
 			}
 			for (auto& i : _vec2Map) {
-				_shader->SetUniform(i.first, i.second);
+				shader->SetUniform(i.first, i.second);
 			}
 			for (auto& i : _vec3Map) {
-				_shader->SetUniform(i.first, i.second);
+				shader->SetUniform(i.first, i.second);
 			}
 			for (auto& i : _vec4Map) {
-				_shader->SetUniform(i.first, i.second);
+				shader->SetUniform(i.first, i.second);
 			}
 
 			for (auto& i : _textureMap) {
-				_shader->SetUniform(i.first, i.second.second);
+				shader->SetUniform(i.first, i.second.second);
 				i.second.first->Bind(i.second.second);
 			}
 		}

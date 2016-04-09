@@ -59,8 +59,6 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<u32>& indices, bool calcul
 	SetVertexData(&vertices[0], sizeof(Vertex) * vertices.size());
 
 	SetIndexData(&indices[0], indices.size());
-	
-	SetupInstanceData();
 
 	_vao->Unbind();
 	_firstAnim = true;
@@ -69,11 +67,6 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<u32>& indices, bool calcul
 Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::vec3* normals, Math::vec3* tangents, Math::vec4i* boneids, Math::vec4* boneweights,
 		   u32 numIndices, u32* indices) {
 	SetupBuffers();
-
-	//SetPositionData(positions, sizeof(vec3) * numVertices);
-	//SetTexCoordData(texCoords, sizeof(vec2) * numVertices);
-	//SetNormalData(normals, sizeof(vec3) * numVertices);
-	//SetTangentData(tangents, sizeof(vec3) * numVertices);
 
 	bool alloc = false;
 	if (boneids == 0) {
@@ -85,9 +78,6 @@ Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::
 		memset(boneweights, -1, sizeof(vec4) * numVertices);
 	}
 
-	//SetBoneIDData(boneids, sizeof(vec4i) * numVertices);
-	//SetBoneWeightData(boneweights, sizeof(vec4) * numVertices);
-
 	std::vector<Vertex> vertices;
 	for (i32 i = 0; i < numVertices; i++) {
 		vertices.push_back(Vertex(positions[i], texCoords[i], normals[i], tangents[i], boneids[i], boneweights[i]));
@@ -95,8 +85,6 @@ Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::
 
 	SetVertexData(&vertices[0], sizeof(Vertex) * vertices.size());
 	SetIndexData(indices, numIndices);
-
-	SetupInstanceData();
 
 	_vao->Unbind();
 	_firstAnim = true;
@@ -118,69 +106,8 @@ void Mesh::SetupBuffers() {
 	_vao = new VAO;
 	_vao->Bind();
 
-	//_positions = new VBO;
-	//_texCoords = new VBO;
-	//_normals = new VBO;
-	//_tangents = new VBO;
-	//_boneIDs = new VBO;
-	//_boneWeights = new VBO;
 	_attribs = new VBO;
 	_indices = new IBO;
-}
-
-void Mesh::SetupInstanceData() {
-	/*_worlds = new VBO;
-	_mvps = new VBO;
-
-	_worlds->Bind();
-	for (i32 i = 0; i < 4; i++) {
-		Renderer::EnableAttribArray(Renderer::WORLD_ATTRIBUTE + i);
-		Renderer::SetAttribPointer(Renderer::WORLD_ATTRIBUTE + i, 4, sizeof(mat4), sizeof(f32) * i * 4);
-		Renderer::SetAttribDivisor(Renderer::WORLD_ATTRIBUTE + i, 1);
-	}
-
-	_mvps->Bind();
-	for (i32 i = 0; i < 4; i++) {
-		Renderer::EnableAttribArray(Renderer::MVP_ATTRIBUTE + i);
-		Renderer::SetAttribPointer(Renderer::MVP_ATTRIBUTE + i, 4, sizeof(mat4), sizeof(f32) * i * 4);
-		Renderer::SetAttribDivisor(Renderer::MVP_ATTRIBUTE + i, 1);
-	}*/
-}
-
-void Mesh::SetPositionData(vec3* data, u32 size) {
-	//_positions->SetData(data, size);
-	//Renderer::EnableAttribArray(Renderer::POSITION_ATTRIBUTE);
-	//Renderer::SetAttribPointer(Renderer::POSITION_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(vec3), 0);
-}
-
-void Mesh::SetTexCoordData(vec2* data, u32 size) {
-	//_texCoords->SetData(data, size);
-	//Renderer::EnableAttribArray(Renderer::TEXCOORD_ATTRIBUTE);
-	//Renderer::SetAttribPointer(Renderer::TEXCOORD_ATTRIBUTE, sizeof(vec2) / sizeof(f32), sizeof(vec2), 0);
-}
-
-void Mesh::SetNormalData(vec3* data, u32 size) {
-	//_normals->SetData(data, size);
-	//Renderer::EnableAttribArray(Renderer::NORMAL_ATTRIBUTE);
-	//Renderer::SetAttribPointer(Renderer::NORMAL_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(vec3), 0);
-}
-
-void Mesh::SetTangentData(vec3* data, u32 size) {
-	//_tangents->SetData(data, size);
-	//Renderer::EnableAttribArray(Renderer::TANGENT_ATTRIBUTE);
-	//Renderer::SetAttribPointer(Renderer::TANGENT_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(vec3), 0);
-}
-
-void Mesh::SetBoneIDData(vec4i* data, u32 size) {/*
-	_boneIDs->SetData(data, size);
-	Renderer::EnableAttribArray(Renderer::BONEID_ATTRIBUTE);
-	Renderer::SetAttribPointer(Renderer::BONEID_ATTRIBUTE, sizeof(vec4i) / sizeof(i32), sizeof(vec4i), 0, AttributeType::Int32);*/
-}
-
-void Mesh::SetBoneWeightData(vec4* data, u32 size) {/*
-	_boneWeights->SetData(data, size);
-	Renderer::EnableAttribArray(Renderer::BONEWEIGHT_ATTRIBUTE);
-	Renderer::SetAttribPointer(Renderer::BONEWEIGHT_ATTRIBUTE, sizeof(vec4) / sizeof(f32), sizeof(vec4), 0);*/
 }
 
 void Mesh::SetIndexData(u32* data, u32 size) {
@@ -201,11 +128,15 @@ void Mesh::SetVertexData(Vertex* data, u32 size) {
 	Renderer::EnableAttribArray(Renderer::TANGENT_ATTRIBUTE);
 	Renderer::SetAttribPointer(Renderer::TANGENT_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(Vertex), offsetof(Vertex, tangent));
 
-	Renderer::EnableAttribArray(Renderer::BONEID_ATTRIBUTE);
-	Renderer::SetAttribPointer(Renderer::BONEID_ATTRIBUTE, sizeof(vec4i) / sizeof(i32), sizeof(Vertex), offsetof(Vertex, boneIDs));
+	_rigged = false;
+	if (data[0].boneIDs.x != -1) {
+		_rigged = true;
+		Renderer::EnableAttribArray(Renderer::BONEID_ATTRIBUTE);
+		Renderer::SetAttribPointer(Renderer::BONEID_ATTRIBUTE, sizeof(vec4i) / sizeof(i32), sizeof(Vertex), offsetof(Vertex, boneIDs));
 
-	Renderer::EnableAttribArray(Renderer::BONEWEIGHT_ATTRIBUTE);
-	Renderer::SetAttribPointer(Renderer::BONEWEIGHT_ATTRIBUTE, sizeof(vec4) / sizeof(f32), sizeof(Vertex), offsetof(Vertex, boneWeights));
+		Renderer::EnableAttribArray(Renderer::BONEWEIGHT_ATTRIBUTE);
+		Renderer::SetAttribPointer(Renderer::BONEWEIGHT_ATTRIBUTE, sizeof(vec4) / sizeof(f32), sizeof(Vertex), offsetof(Vertex, boneWeights));
+	}
 
 	// This sets up our uniform buffer, so we can set the data without reallocating it.
 	_ubo = new UBO;
@@ -221,13 +152,11 @@ void Mesh::Submit(const mat4& world, const mat4& mvp) {
 void Mesh::Flush(Shader* shader) {
 	_vao->Bind();
 
-	/*_worlds->SetData(&_worldMatrices[0], sizeof(mat4) * _worldMatrices.size());
-	_mvps->SetData(&_mvpMatrices[0], sizeof(mat4) * _mvpMatrices.size()); */
-
 	i32 numInstances = _worldMatrices.size();
 	mat4* worlds = &_worldMatrices[0];
 	mat4* mvps = &_mvpMatrices[0];
 	InstanceData data;
+	data.rigged = _rigged == true ? 1 : 0;	
 
 	for (i32 i = 0; i < numInstances; i++) {
 		data.mvp = mvps[i];

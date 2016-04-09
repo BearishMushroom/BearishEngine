@@ -17,6 +17,9 @@ Number of vertices: 4 bytes
 Number of indices: 4 bytes
 Is skinned: 1 byte
 
+Name length: 1 byte
+Name: name length bytes
+
 Index data: number of indices * sizeof(i32)
 
 Position data: number of vertices * sizeof(f32) * 3
@@ -104,6 +107,7 @@ public:
 	i32 numVertices = 0;
 	i32 numIndices = 0;
 	u8 skinned = false;
+	std::string name;
 
 	u32* indices;
 
@@ -130,7 +134,7 @@ public:
 		header[0] = 'B';
 		header[1] = 'E';
 		header[2] = 'M';
-		header[3] = 1;
+		header[3] = 2;
 	}
 
 	~BEMFile() {
@@ -206,6 +210,9 @@ public:
 		WriteBytes(output, (u8*)&numVertices,  1, sizeof(u32));
 		WriteBytes(output, (u8*)&numIndices,   1, sizeof(u32));
 		WriteBytes(output, (u8*)&skinned,      1, sizeof(u8)); 
+		u8 nameLength = name.length();
+		WriteBytes(output, &nameLength, 1, sizeof(u8));
+		WriteBytes(output, (u8*)name.c_str(), 1, sizeof(u8) * nameLength);
 		printf("%d\n", bytesWritten);
 
 		u32 preBytes = bytesWritten;
@@ -288,12 +295,18 @@ public:
 		fopen_s(&file, filename.c_str(), "rb");
 
 		u8* header = ReadBytes(file, 4, 1);
-		assert(memcmp(header, this->header, 4) == 0);
+		assert(memcmp(header, this->header, 3) == 0);
 
 		numVertices = *(u32*)ReadBytes(file, 4, 1);
 		numIndices = *(u32*)ReadBytes(file, 4, 1);
 
 		skinned = *(bool*)ReadBytes(file, 1, 1);
+
+		if (header[3] > 1) {
+			u8 nameLength = *ReadBytes(file, 1, 1);
+			name = std::string((const char*)ReadBytes(file, nameLength, 1), nameLength);
+		}
+
 		indices = (u32*)ReadBytes(file, numIndices, sizeof(u32));
 
 		positionData = (vec3*)ReadBytes(file, numVertices * 3, 4);
@@ -352,7 +365,7 @@ public:
 				animations.push_back(anim);
 			}
 		}
-
+		//JohanWAsHERE
 		fclose(file);
 	}
 };
