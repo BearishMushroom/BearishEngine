@@ -11,10 +11,24 @@
 #include "Shader.h"
 
 namespace Bearish {namespace Graphics {
+
+	struct PBRData {
+		vec4 AlbedoColor;
+		vec3 SpecularColor;
+		f32 GlossColor;
+		f32 UsingAlbedoMap;
+		f32 UsingSpecularMap;
+		f32 UsingGlossMap;
+
+		PBRData() : UsingAlbedoMap(0), UsingSpecularMap(0), UsingGlossMap(0) {}
+	};
+
 	class Material : public Core::IAllocatable<Material> {
 	public:
 		Material(string name, Shader* shader) : _shader(shader), _name(name) {
 			_copies = 0;
+			_ubo = new UBO();
+			_ubo->SetData(0, sizeof(PBRData));
 		}
 
 		~Material() {}
@@ -28,6 +42,8 @@ namespace Bearish {namespace Graphics {
 			_vec3Map = other._vec3Map;
 			_vec4Map = other._vec4Map;
 			_textureMap = other._textureMap;
+			_ubo = other._ubo;
+			_pbrData = other._pbrData;
 		}
 
 		void Set(string name, f32 value) { _floatMap[name] = value; }
@@ -55,9 +71,12 @@ namespace Bearish {namespace Graphics {
 			}
 
 			for (auto& i : _textureMap) {
-				shader->SetUniform(i.first, i.second.second);
+				shader->SetUniform(i.first, i.second.first);
 				i.second.first->Bind(i.second.second);
 			}
+
+			_ubo->UpdateData(_pbrData);
+			shader->SetUniformBlock("pbr_data", _ubo);
 		}
 
 		Shader* GetShader() {
@@ -76,6 +95,7 @@ namespace Bearish {namespace Graphics {
 			return _name == other._name;
 		}
 
+		PBRData& Data() { return _pbrData; }
 	private:
 		std::map<string, f32>                      _floatMap;
 		std::map<string, i32>                      _intMap;
@@ -86,7 +106,11 @@ namespace Bearish {namespace Graphics {
 		string _name;
 		Shader* _shader;
 		i32 _copies;
+
+		UBO* _ubo;
+		PBRData _pbrData;
 	};
+
 } }
 
 #endif // _BEARISH_GRAPHICS_MATERIAL_H_

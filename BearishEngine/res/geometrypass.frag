@@ -18,25 +18,17 @@ uniform sampler2D SpecularMap;
 uniform sampler2D GlossMap;
 uniform sampler2D NormalMap;
 
-// PBR Static Inputs
-uniform vec4 AlbedoColor;
-uniform vec3 SpecularColor;
-uniform float GlossColor;
+layout(std140) uniform pbr_data {
+	// PBR Static Inputs
+ 	vec4 AlbedoColor;
+ 	vec3 SpecularColor;
+ 	float GlossColor;
 
-// PBR Modes
-uniform float UsingAlbedoMap;
-uniform float UsingSpecularMap;
-uniform float UsingGlossMap;
-
-vec4 GammaCorrectTexture(sampler2D tex, vec2 uv) {
-	vec4 samp = texture(tex, uv);
-	return vec4(pow(samp.rgb, vec3(GAMMA)), samp.a);
-}
-
-vec3 GammaCorrectTextureRGB(sampler2D tex, vec2 uv) {
-	vec4 samp = texture(tex, uv);
-	return vec3(pow(samp.rgb, vec3(GAMMA)));
-}
+	// PBR Modes
+ 	float UsingAlbedoMap;
+	float UsingSpecularMap;
+	float UsingGlossMap;
+};
 
 vec4 GetAlbedo(vec2 uv) {
 	return (1.0 - UsingAlbedoMap) * AlbedoColor + UsingAlbedoMap * texture(AlbedoMap, uv).rgba;
