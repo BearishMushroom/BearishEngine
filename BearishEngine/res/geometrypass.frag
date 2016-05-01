@@ -18,17 +18,15 @@ uniform sampler2D SpecularMap;
 uniform sampler2D GlossMap;
 uniform sampler2D NormalMap;
 
-layout(std140) uniform pbr_data {
 	// PBR Static Inputs
- 	vec4 AlbedoColor;
- 	vec3 SpecularColor;
- 	float GlossColor;
+uniform vec4 AlbedoColor;
+uniform vec3 SpecularColor;
+uniform float GlossColor;
 
 	// PBR Modes
- 	float UsingAlbedoMap;
-	float UsingSpecularMap;
-	float UsingGlossMap;
-};
+uniform float UsingAlbedoMap;
+uniform float UsingSpecularMap;
+uniform float UsingGlossMap;
 
 vec4 GetAlbedo(vec2 uv) {
 	return (1.0 - UsingAlbedoMap) * AlbedoColor + UsingAlbedoMap * texture(AlbedoMap, uv).rgba;
@@ -61,7 +59,6 @@ void main() {
 
   Out_Normal = EncodeNormal(normal);
   vec4 albedo = GetAlbedo(texCoord0);
-  if(albedo.a < 1) albedo.rgb = vec3(0);
   Out_Diffuse = albedo.rgb;
   Out_SpecRoughness = vec4(GetSpecular(texCoord0), GetRoughness(texCoord0));
 }

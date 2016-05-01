@@ -15,6 +15,7 @@ namespace Bearish { namespace Graphics {
 		Triangles = GL_TRIANGLES,
 		Lines     = GL_LINES,
 		Points    = GL_POINTS,
+		LineStrip = GL_LINE_STRIP,
 	};
 
 	enum class DrawStyle : u32 {
@@ -78,6 +79,9 @@ namespace Bearish { namespace Graphics {
 		static FillMode GetFillMode() { return _renderMode; }
 		static BlendState GetBlendState() { return _blendState; }
 
+		static PrimitiveMode GetPrimitiveMode() { return _primitiveMode; }
+		static void SetPrimitiveMode(const PrimitiveMode priMode);
+
 		Renderer();
 		~Renderer();
 		
@@ -87,6 +91,7 @@ namespace Bearish { namespace Graphics {
 	private:
 		static BlendState _blendState;
 		static FillMode _renderMode;
+		static PrimitiveMode _primitiveMode;
 	};
 } }
 

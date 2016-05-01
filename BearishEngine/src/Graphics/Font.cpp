@@ -16,7 +16,7 @@ void Font::InitFT() {
 	if (!_Freetype) {
 		i32 error = FT_Init_FreeType(&_Freetype);
 		if (error) {
-			Logger::Instance().Error("Font: Failed to initialize Freetype.");
+			Logger::Error("Font: Failed to initialize Freetype.");
 		}
 	}
 }
@@ -27,7 +27,7 @@ Font::Font(const string& filepath, i32 padding) {
 	FT_Face face;
 	i32 error = FT_New_Face(_Freetype, filepath.c_str(), 0, &face);
 	if (error) {
-		Logger::Instance().Error("Font: Failed to load face from %s.", filepath.c_str());
+		Logger::Error("Font: Failed to load face from %s.", filepath.c_str());
 	}
 
 	FT_Set_Pixel_Sizes(face, 0, 64);
@@ -44,7 +44,7 @@ Font::Font(const string& filepath, i32 padding) {
 
 	for (i32 i = FONT_CHAR_MIN; penPositionY < FONT_TEXTURE_SIZE - padding - 64; i++) {
 		if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
-			Logger::Instance().Error("Font: Can't get char %d from %s.", i, filepath.c_str());
+			Logger::Error("Font: Can't get char %d from %s.", i, filepath.c_str());
 			continue;
 		}
 
@@ -101,6 +101,8 @@ Mesh* Font::GenerateMesh(const string& text, f32 glyphScale) const {
 	Mesh* res;
 	std::vector<Vertex> vertices;
 	std::vector<u32> indices;
+	vertices.reserve(text.length() * 4);
+	indices.reserve(text.length() * 6);
 
 	f32 xpos = 0;
 	f32 ypos = 0;

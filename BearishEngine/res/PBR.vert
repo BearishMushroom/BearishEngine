@@ -2,11 +2,8 @@
 
 layout (location = 0) in vec3 position;
 
-layout(std140) uniform instance_data {
-	mat4 world;
-	mat4 MVP;
-	float rigged;
-};
+uniform	mat4 world;
+uniform	mat4 MVP;
 
 uniform mat4 lightMVP;
 

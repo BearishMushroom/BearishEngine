@@ -76,6 +76,8 @@ namespace Bearish {
 
 		void SetEnvironmentMap(Texture* tex) { _environmentMap = tex; }
 		void SetPreFG(Texture* tex) { _preFG = tex; }
+
+		Renderer* GetRenderer();
 	private:
 		std::vector<Light*> _lights;
 		Texture* _gbuffer;

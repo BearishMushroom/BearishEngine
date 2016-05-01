@@ -8,7 +8,6 @@ out vec4 fragcolor;
 
 const int LIGHT_DIRECTIONAL = 0;
 const int LIGHT_POINT = 1;
-const int LIGHT_SPOT = 2;
 
 // Engine uniforms.
 uniform sampler2D gPosition;
@@ -20,7 +19,6 @@ uniform sampler2D shadowMap;
 
 uniform DirectionalLight dLight = { { {0, 0, 0}, 0, 0}, {0, 0, 0}};
 uniform PointLight pLight = { { {0, 0, 0}, 0, 0}, {0, 0, 0}, {0, 0, 0}};
-uniform SpotLight spotLight = { { { {0, 0, 0}, 0, 0}, {0, 0, 0}, {0, 0, 0}}, {0, 0, 0}, 0};
 uniform int light;
 
 uniform vec2 screen;
@@ -103,10 +101,5 @@ void main() {
 
 		vec4 final = color * attenuation;
 		fragcolor = final;
-	}
-
-	if (light == LIGHT_SPOT) {
-		//fragcolor = diff * vec4(spotLight.base.base.color, 1.0) * CalculateSpotLight(spotLight, n, w);
-    discard;
 	}
 }

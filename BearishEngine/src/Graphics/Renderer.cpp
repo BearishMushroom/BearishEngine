@@ -9,6 +9,7 @@ const BlendState BlendState::Additive = { BlendMode::SourceAlpha, BlendMode::One
 
 BlendState Renderer::_blendState = BlendState::AlphaBlend;
 FillMode Renderer::_renderMode = FillMode::Normal;
+PrimitiveMode Renderer::_primitiveMode = PrimitiveMode::Triangles;
 
 Renderer::Renderer() {
 	Init();
@@ -80,4 +81,8 @@ void Renderer::SetFillMode(const FillMode mode) {
 		glPolygonMode(GL_FRONT_AND_BACK, (GLenum)mode);
 		_renderMode = mode;
 	}
+}
+
+void Renderer::SetPrimitiveMode(const PrimitiveMode priMode) {
+	_primitiveMode = priMode;
 }

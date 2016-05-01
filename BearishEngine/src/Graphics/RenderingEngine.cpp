@@ -445,6 +445,7 @@ i32 RenderingEngine::PushMaterial(Material* material) {
 	//_materialsToRender.push_back(std::make_pair(material, _maxMaterial));
 	//_maxMaterial++;
 	//return _maxMaterial - 1;
+	return 0;
 }
 
 void RenderingEngine::SetShadowQuality(ShadowQuality quality) {
@@ -483,4 +484,8 @@ void RenderingEngine::SetShadowQuality(ShadowQuality quality) {
 			break;
 		}
 	}
+}
+
+Renderer* RenderingEngine::GetRenderer() {
+	return _renderer;
 }

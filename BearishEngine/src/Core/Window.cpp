@@ -56,7 +56,7 @@ bool Window::ShouldClose() {
 }
 
 void Window::SetVsync(i32 frames) {
-	//glfwSwapInterval(frames);
+	glfwSwapInterval(frames);
 }
 
 void Window::BindAsRenderTarget() {

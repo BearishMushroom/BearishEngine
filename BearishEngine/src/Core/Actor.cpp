@@ -13,13 +13,13 @@ Actor::Actor(Transform transform) {
 Actor::~Actor() {
 	for (i32 i = 0; i < (i32)_children.size(); i++) {
 		delete _children.at(i);
-		_children.clear();
 	}
+	_children.clear();
 
 	for (i32 i = 0; i < (i32)_components.size(); i++) {
 		delete _components.at(i);
-		_components.clear();
 	}
+	_components.clear();
 }
 
 void Actor::Trigger(string id, void* data) {

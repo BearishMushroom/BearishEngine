@@ -12,6 +12,12 @@ namespace Bearish { namespace Util {
 		return (f32)rand() / (f32)RAND_MAX + 1.f;
 	}
 
+	static f32 Clamp(f32 value, f32 min, f32 max) {
+		if (value < min) return min;
+		if (value > max) return max;
+		return value;
+	}
+
 	static std::vector<string> SplitString(const string &text, const string& delim) {
 		std::vector<string> result;
 		u32 pos = text.find(delim);

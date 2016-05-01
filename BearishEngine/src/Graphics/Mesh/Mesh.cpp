@@ -99,7 +99,12 @@ Mesh::Mesh(Core::Model model) {
 	*this = model.ToMesh();
 }
 
-Mesh::~Mesh() {}
+Mesh::~Mesh() {
+	//if(_ubo)     delete _ubo;
+	//if(_attribs) delete _attribs;
+	//if(_indices) delete _indices;
+	//if (_vao)	 delete _vao;
+}
 
 
 void Mesh::SetupBuffers() {
@@ -128,25 +133,21 @@ void Mesh::SetVertexData(Vertex* data, u32 size) {
 	Renderer::EnableAttribArray(Renderer::TANGENT_ATTRIBUTE);
 	Renderer::SetAttribPointer(Renderer::TANGENT_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(Vertex), offsetof(Vertex, tangent));
 
-	_rigged = false;
-	if (data[0].boneIDs.x != -1) {
-		_rigged = true;
-		Renderer::EnableAttribArray(Renderer::BONEID_ATTRIBUTE);
-		Renderer::SetAttribPointer(Renderer::BONEID_ATTRIBUTE, sizeof(vec4i) / sizeof(i32), sizeof(Vertex), offsetof(Vertex, boneIDs));
+	Renderer::EnableAttribArray(Renderer::BONEID_ATTRIBUTE);
+	Renderer::SetAttribPointer(Renderer::BONEID_ATTRIBUTE, sizeof(vec4i) / sizeof(i32), sizeof(Vertex), offsetof(Vertex, boneIDs));
 
-		Renderer::EnableAttribArray(Renderer::BONEWEIGHT_ATTRIBUTE);
-		Renderer::SetAttribPointer(Renderer::BONEWEIGHT_ATTRIBUTE, sizeof(vec4) / sizeof(f32), sizeof(Vertex), offsetof(Vertex, boneWeights));
-	}
+	Renderer::EnableAttribArray(Renderer::BONEWEIGHT_ATTRIBUTE);
+	Renderer::SetAttribPointer(Renderer::BONEWEIGHT_ATTRIBUTE, sizeof(vec4) / sizeof(f32), sizeof(Vertex), offsetof(Vertex, boneWeights));
 
 	// This sets up our uniform buffer, so we can set the data without reallocating it.
-	_ubo = new UBO;
-	_ubo->SetData(0, sizeof(InstanceData));
-	_ubo->Unbind();
+	//_ubo = new UBO;
+	//_ubo->SetData(0, sizeof(InstanceData));
+	//_ubo->Unbind();
 }
 
 void Mesh::Submit(const mat4& world, const mat4& mvp) {
-	_worldMatrices.push_back(world.Transpose());
-	_mvpMatrices.push_back(mvp.Transpose());
+	_worldMatrices.push_back(world);
+	_mvpMatrices.push_back(mvp);
 }
 
 void Mesh::Flush(Shader* shader) {
@@ -155,15 +156,15 @@ void Mesh::Flush(Shader* shader) {
 	i32 numInstances = _worldMatrices.size();
 	mat4* worlds = &_worldMatrices[0];
 	mat4* mvps = &_mvpMatrices[0];
-	InstanceData data;
-	data.rigged = _rigged == true ? 1 : 0;	
 
 	for (i32 i = 0; i < numInstances; i++) {
-		data.mvp = mvps[i];
-		data.world = worlds[i];
-		_ubo->UpdateData(data);
-		shader->SetUniformBlock("instance_data", _ubo);
-		glDrawElements(GL_TRIANGLES, _indices->GetSize(), GL_UNSIGNED_INT, 0);
+		//data.mvp = mvps[i];
+		//data.world = worlds[i];
+		//_ubo->UpdateData(data);
+		//shader->SetUniformBlock("instance_data", _ubo);
+		shader->SetUniform("world", worlds[i]);
+		shader->SetUniform("MVP", mvps[i]);
+		glDrawElements((GLenum)Renderer::GetPrimitiveMode(), _indices->GetSize(), GL_UNSIGNED_INT, 0);
 	}
 
 	_vao->Unbind();

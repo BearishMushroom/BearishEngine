@@ -45,6 +45,7 @@ namespace Bearish { namespace Core {
 		}
 
 		std::vector<IActorComponent*> GetComponentsByID(string id);
+		std::vector<Actor*> GetChildren() { return _children; }
 
 		void Trigger(string id, void* data);
 
