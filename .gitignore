@@ -11,17 +11,27 @@
 
 *.ttf
 
-*/Release/
-*/Debug/
+*/Release/*
+*/Debug/*
+
+WorkingCopy/*
+
+
+/Release/*
+/Debug/*
 
 *.exe
 *.dll
-deps/
 
 *.user
 *.filters
 
-VertexLayout.txt
-BearishEngineLog.txt
 *.smproj
 *.db
+*.vspx
+*.vsp
+*.txt
+*sdf*
+*.suo
+*.opendb
+*.psess
