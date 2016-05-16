@@ -69,3 +69,10 @@
 #include "Components\UIButton.h"
 #include "Components\UIPanel.h"
 #include "Components\UILabel.h"
+
+#include "GUI\Win32WindowGLVIewport.h"
+#include "GUI\Win32WindowComponent.h"
+#include "GUI\Win32WindowMenuBar.h"
+#include "GUI\Win32WindowSubMenu.h"
+#include "GUI\Win32WindowButton.h"
+#include "GUI\Win32Window.h"

@@ -94,28 +94,56 @@ void Update() {
 	if (Keyboard::IsKeyPressed(Key::L)) {
 		// DEBUG MENU CREATION!!!?!
 		if (!PANEL_OPEN) {
-			UI_GRAPH = new Actor(Transform(vec3(1920 - 150, 100, -1), vec3(300, 200, 1)));
+			UI_GRAPH = new Actor(Transform(vec3(1920 - 150, 400, -1), vec3(300, 800, 1)));
 			UI_GRAPH->AddComponent(new UIPanel(new Texture2D(vec4(0.2, 0.2, 0.2, 0.65))));
 
-			Actor* graph = new Actor(Transform(vec3(0), vec3(300, 200, 1)));
-			graph->AddComponent(new UILineGraph(0, 16, 60));
+			Actor* graph = new Actor(Transform(vec3(0, -300, 0), vec3(1, 0.25, 1)));
+			graph->AddComponent(new UILineGraph(0, 60, 60));
 			UI_GRAPH->AddChild(graph);
 
-			Actor* graph2 = new Actor(Transform(vec3(0), vec3(300, 200, 1)));
-			graph2->AddComponent(new UILineGraph(0, 16, 60, vec4(1, 0.4, 0.4, 1)));
+			Actor* graph2 = new Actor(Transform(vec3(0, -100, 0), vec3(1, 0.25, 1)));
+			graph2->AddComponent(new UILineGraph(0, 60, 60, vec4(1, 0.4, 0.4, 1)));
 			UI_GRAPH->AddChild(graph2);
 
-			Actor* graph3 = new Actor(Transform(vec3(0), vec3(300, 200, 1)));
-			graph3->AddComponent(new UILineGraph(0, 16, 60, vec4(0.4, 0.4, 1, 1)));
+			Actor* graph3 = new Actor(Transform(vec3(0, 100, 0), vec3(1, 0.25, 1)));
+			graph3->AddComponent(new UILineGraph(0, 60, 60, vec4(0.4, 0.4, 1, 1)));
 			UI_GRAPH->AddChild(graph3);
 
-			Actor* glb1 = new Actor(Transform(vec3(-150, -86, 0)));
-			glb1->AddComponent(new IActorComponent("UILabel", UI_FONT, "16ms", 18));
+			Actor* graph4 = new Actor(Transform(vec3(0, 300, 0), vec3(1, 0.25, 1)));
+			graph4->AddComponent(new UILineGraph(0, 60, 60, vec4(1, 0.4, 1, 1)));
+			UI_GRAPH->AddChild(graph4);
+
+			Actor* glb1 = new Actor(Transform(vec3(-150, -386, 0)));
+			glb1->AddComponent(new IActorComponent("UILabel", UI_FONT, "60ms", 18));
 			UI_GRAPH->AddChild(glb1);
 
-			Actor* glb2 = new Actor(Transform(vec3(-150, 100, 0)));
+			Actor* glb2 = new Actor(Transform(vec3(-150, -200, 0)));
 			glb2->AddComponent(new IActorComponent("UILabel", UI_FONT, "0ms", 18));
 			UI_GRAPH->AddChild(glb2);
+
+			Actor* glb3 = new Actor(Transform(vec3(-150, -186, 0)));
+			glb3->AddComponent(new IActorComponent("UILabel", UI_FONT, "60ms", 18));
+			UI_GRAPH->AddChild(glb3);
+
+			Actor* glb4 = new Actor(Transform(vec3(-150, 0, 0)));
+			glb4->AddComponent(new IActorComponent("UILabel", UI_FONT, "0ms", 18));
+			UI_GRAPH->AddChild(glb4);
+
+			Actor* glb5 = new Actor(Transform(vec3(-150, 14, 0)));
+			glb5->AddComponent(new IActorComponent("UILabel", UI_FONT, "60ms", 18));
+			UI_GRAPH->AddChild(glb5);
+
+			Actor* glb6 = new Actor(Transform(vec3(-150, 200, 0)));
+			glb6->AddComponent(new IActorComponent("UILabel", UI_FONT, "0ms", 18));
+			UI_GRAPH->AddChild(glb6);
+
+			Actor* glb7 = new Actor(Transform(vec3(-150, 214, 0)));
+			glb7->AddComponent(new IActorComponent("UILabel", UI_FONT, "60ms", 18));
+			UI_GRAPH->AddChild(glb7);
+
+			Actor* glb8 = new Actor(Transform(vec3(-150, 400, 0)));
+			glb8->AddComponent(new IActorComponent("UILabel", UI_FONT, "0ms", 18));
+			UI_GRAPH->AddChild(glb8);
 
 			UI_PANEL = new Actor(Transform(vec3(150, 540, -1), vec3(300, 1080, 1)));
 			UI_PANEL->AddComponent(new UIPanel(new Texture2D(vec4(0.2, 0.2, 0.2, 0.5))));
@@ -190,9 +218,27 @@ void Update() {
 }
 
 i32 main(i32 argc, c8** argv) {
+	GUI::Win32Window testwin("TEST", 1280, 720);
+	
+	GUI::Win32WindowMenuBar menu;
+	
+	GUI::Win32WindowSubMenu file("&File");
+	file.AddChild(new GUI::Win32WindowSubMenuItem("&Do nothing", []() {}));
+	file.AddChild(new GUI::Win32WindowSubMenuItem("&Close", [&testwin]() { testwin.Close(); }));
+	menu.AddChild(&file);
+
+	GUI::Win32WindowSubMenu edit("&Edit");
+	edit.AddChild(new GUI::Win32WindowSubMenuItem("&This is an option", []() {}));
+	edit.AddChild(new GUI::Win32WindowSubMenuItem("&Olle suger", []() {}));
+	menu.AddChild(&edit);
+
+	testwin.AddComponent(&menu);
+
+	testwin.AddComponent(new GUI::Win32WindowGLViewport(0, 0, 1280, 720));
+	testwin.Open();
+
 	PANEL_OPEN = false;
 	SeedRandom();
-	Window window("Bearish Engine 0.184a", 1280, 720);
 	
 	Timer timer;
 	timer.Start();
@@ -285,6 +331,7 @@ i32 main(i32 argc, c8** argv) {
 	actors.push_back(fpsCounter);
 	
 	player = new Actor;
+	player->GetTransform().Rotate(vec3(1, 1, 0), 0.4);
 	player->AddComponent(new SkyboxComponent(skybox));
 
 	player->AddComponent(new IActorComponent("CameraComponent"));
@@ -420,7 +467,7 @@ i32 main(i32 argc, c8** argv) {
 
 	Material* curtRedMaterial = new Material(pbrTest);
 	curtRedMaterial->Set("UsingAlbedoMap", 1.f);
-	curtRedMaterial->Set("AlbedoMap", new Texture("asset/sponza2/curtain.bet"), 7);
+	curtRedMaterial->Set("AlbedoMap", new Texture("asset/miko.bet"/*"asset/sponza2/curtain.bet"*/), 7);
 
 	Material* curtBlueMaterial = new Material(pbrTest);
 	curtBlueMaterial->Set("UsingAlbedoMap", 1.f);
@@ -516,9 +563,9 @@ for (i32 i = 0; i < 41; i++) {
 #endif
 
 	renderer.SetActorReference(&actors);
-	renderer.SetWindow(&window);
+	//renderer.SetWindow(&window);
 
-	window.SetVsync(0);
+	//window.SetVsync(0);
 
 	i64 f = 0;
 	f64 updateTimer = 0;
@@ -536,7 +583,7 @@ for (i32 i = 0; i < 41; i++) {
 	f32 lastUpdateTime = 0;
 	bool updated = false;
 
-	while (!window.ShouldClose()) {
+	while (testwin.IsOpen()) {
 		updated = false;
 		lastFrameTimer.LoopMS();
 		while (updateTimer > UPDATE_TIME) {
@@ -549,6 +596,7 @@ for (i32 i = 0; i < 41; i++) {
 				UI_GRAPH->GetChildren()[0]->GetComponentsByType<UILineGraph>()[0]->AddDataPoint(lastFrameTime);
 				UI_GRAPH->GetChildren()[1]->GetComponentsByType<UILineGraph>()[0]->AddDataPoint(lastUpdateTime);
 				UI_GRAPH->GetChildren()[2]->GetComponentsByType<UILineGraph>()[0]->AddDataPoint(lastDrawTime);
+				UI_GRAPH->GetChildren()[3]->GetComponentsByType<UILineGraph>()[0]->AddDataPoint(renderer.GetCPUTime());
 			}
 		
 			updated = true;
@@ -574,7 +622,7 @@ for (i32 i = 0; i < 41; i++) {
 			lastDrawTime = lastDrawTimer.LoopMS();
 		}
 
-		window.Update();
+		testwin.Update();
 
 
 		fps++;

@@ -64,6 +64,7 @@ namespace Bearish { namespace Core {
 		Math::mat4 GetTransformation() const;
 
 		Math::vec3 GetTranslation();
+		Math::vec3 GetScale();
 
 		Actor* const GetParent() const;
 

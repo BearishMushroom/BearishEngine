@@ -81,7 +81,7 @@ void RenderingEngine::Load() {
 	_geomShader = new Shader("res/geometrypass.vert", "res/geometrypass.frag");
 	_geomShader->SetName("geom");
 	_pbrShader = new Shader("res/PBR.vert", "res/PBR.frag");
-	_sphere = new Mesh(Model(Asset::Get("sphere")).ToMesh());
+	_sphere = new Mesh(Model("asset/sphere.bem").ToMesh());
 
 	_quad = new Mesh(std::vector<Vertex> {
 		Vertex(vec3(-1, -1, 0), vec2(0, 0)),
@@ -96,7 +96,7 @@ void RenderingEngine::Load() {
 
 	testFont = new Font("res/Roboto.ttf");
 
-	testPart = new ParticleSystem(new Texture(Asset::Get("particle")),
+	testPart = new ParticleSystem(new Texture("asset/particle.bet"),
 	[](const vec3& pos) -> Particle {
 		timef += 1.f / 60.f / 16.f;
 		Particle ret;
@@ -190,7 +190,7 @@ void RenderingEngine::Draw() {
 
 				glCullFace(GL_BACK);
 
-				_window->BindAsRenderTarget();
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			}
 		}
 	}
@@ -219,7 +219,7 @@ void RenderingEngine::Draw() {
 	glEnable(GL_BLEND);
 	Renderer::SetBlendState(BlendState::Additive);
 
-	_window->BindAsRenderTarget();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	_gbuffer->BindForReading();
 	if (_debugMode == 0) {
 		_renderer->Clear();
@@ -361,9 +361,12 @@ void RenderingEngine::Draw() {
 	//glFinish();
 	_2dTime += frameTimer.LoopMS();
 	 
-	_time += _timer.LoopMS();
+	f32 cputime = _timer.LoopMS();
+	_time += cputime;
 	_framesRendered++;
 
+	_cpuRenderTime = cputime;
+	
 	if (_time >= 1000) {
 		_preTimeFrame = _preTime / _framesRendered;
 		_shadowTimeFrame = _shadowTime / _framesRendered;
@@ -372,6 +375,7 @@ void RenderingEngine::Draw() {
 		_postTimeFrame = _postTime / _framesRendered;
 		_2dTimeFrame = _2dTime / _framesRendered;
 		_frameTime = _time / _framesRendered;
+
 
 		_preTime = 0;
 		_shadowTime = 0;
@@ -389,9 +393,11 @@ Geometry pass:     %.3fms
 Accumulation pass: %.3fms
 Post pass:         %.3fms
 2D pass:           %.3fms
+CPU time:          %.3fms
 Frame time:        %.3fms
 FPS:               %d
------------------------------)", _preTimeFrame, _shadowTimeFrame, _geomTimeFrame, _accTimeFrame, _postTimeFrame, _2dTimeFrame, _frameTime, _framesRendered);
+-----------------------------)", _preTimeFrame, _shadowTimeFrame, _geomTimeFrame, _accTimeFrame, _postTimeFrame, 
+								 _2dTimeFrame, _cpuRenderTime, _frameTime, _framesRendered);
 
 		_framesRendered = 0;
 		_time = 0;

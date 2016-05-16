@@ -5,7 +5,6 @@
 #include "BEMFile.h"
 #include "../Graphics/Vertex.h"
 #include "IAllocatable.h"
-#include <assimp\scene.h>
 #include "../Types.h"
 
 namespace Bearish { 

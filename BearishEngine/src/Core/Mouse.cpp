@@ -1,8 +1,10 @@
 #include "../Graphics/Renderer.h"
 #include "Mouse.h"
+#include "../Math/vec2.h"
 
 using namespace Bearish;
 using namespace Core;
+using namespace Math;
 
 Window* Mouse::_window;
 ButtonState Mouse::_buttons[(u32)MouseButton::Num];
@@ -10,20 +12,19 @@ Math::vec2 Mouse::_mousePosition;
 Math::vec2 Mouse::_mouseDelta;
 
 void Mouse::Update() {
-	f64 x, y;
-	glfwGetCursorPos(_window->GetWindow(), &x, &y);
-	i32 width, height;
-	glfwGetWindowSize(_window->GetWindow(), &width, &height);
+	/*vec2 pos = _window->GetMousePosition();
+	
+	i32 width = _window->GetWidth(), height = _window->GetHeight();
 
-	Math::vec2 currentPos((f32)x * ((f32)Graphics::Renderer::UI_RESOLUTION_X / (f32)width), (f32)y * ((f32)Graphics::Renderer::UI_RESOLUTION_Y / (f32)height));
+	Math::vec2 currentPos(pos.x * ((f32)Graphics::Renderer::UI_RESOLUTION_X / (f32)width), pos.y * ((f32)Graphics::Renderer::UI_RESOLUTION_Y / (f32)height));
 
 	_mouseDelta = currentPos - _mousePosition;
 	_mousePosition = currentPos;
 
 	for (i32 i = 0; i < (i32)MouseButton::Num; i++) {
-		i32 result = glfwGetMouseButton(_window->GetWindow(), i);
+		ButtonState result = _window->GetMouseButton(i);
 
-		if (result == GLFW_PRESS) {
+		if (result == ButtonState::Down) {
 			if (_buttons[i] == ButtonState::Up || _buttons[i] == ButtonState::Released) {
 				_buttons[i] = ButtonState::Pressed;
 			}
@@ -32,7 +33,7 @@ void Mouse::Update() {
 			}
 		}
 
-		if (result == GLFW_RELEASE) {
+		if (result == ButtonState::Up) {
 			if (_buttons[i] == ButtonState::Down || _buttons[i] == ButtonState::Pressed) {
 				_buttons[i] = ButtonState::Released;
 			}
@@ -40,7 +41,7 @@ void Mouse::Update() {
 				_buttons[i] = ButtonState::Up;
 			}
 		}
-	}
+	}*/
 }
 
 const ButtonState Mouse::GetButtonState(const MouseButton key) {
@@ -77,9 +78,9 @@ void Mouse::SetWindow(Window* window) {
 }
 
 void Mouse::LockToCentre() {
-	glfwSetInputMode(_window->GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	_window->LockCursor();
 }
 
 void Mouse::FreeFromCentre() {
-	glfwSetInputMode(_window->GetWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	_window->FreeCursor();
 }

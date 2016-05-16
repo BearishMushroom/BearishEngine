@@ -4,18 +4,18 @@
 using namespace Bearish;
 using namespace Core;
 
-ButtonState Keyboard::_keys[(u32)Key::Num];
-GLFWwindow* Keyboard::_window;
+ButtonState Keyboard::_keys[(u32)Key::Max];
+Window* Keyboard::_window;
 
-void Keyboard::SetWindow(GLFWwindow* window) {
+void Keyboard::SetWindow(Window* window) {
 	_window = window;
 }
 
 void Keyboard::Update() {
-	for (i32 i = 0; i < (i32)Key::Num; i++) {
-		i32 result = glfwGetKey(_window, i);
+	for (i32 i = 0; i < (i32)Key::Max; i++) {
+		ButtonState result = _window->GetKeyboardKey(i);
 
-		if (result == GLFW_PRESS) {
+		if (result == ButtonState::Down) {
 			if (_keys[i] == ButtonState::Up || _keys[i] == ButtonState::Released) {
 				_keys[i] = ButtonState::Pressed;
 			} else {
@@ -23,7 +23,7 @@ void Keyboard::Update() {
 			}
 		}
 
-		if (result == GLFW_RELEASE) {
+		if (result == ButtonState::Up) {
 			if (_keys[i] == ButtonState::Down || _keys[i] == ButtonState::Pressed) {
 				_keys[i] = ButtonState::Released;
 			} else {

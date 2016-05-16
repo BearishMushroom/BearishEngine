@@ -1,35 +1,39 @@
 #include "Timer.h"
+#include <chrono>
 
 using namespace Bearish;
 using namespace Core;
 
 Timer::Timer() {
-	_lastTime = 0;
+	LARGE_INTEGER frequency;
+	QueryPerformanceFrequency(&frequency);
+	_freq = 1.0 / frequency.QuadPart;
 }
 
 Timer::~Timer() {
 }
 
 void Timer::Start() {
-	_lastTime = (f32)glfwGetTime();
+	QueryPerformanceCounter(&_start);
 }
 
 const f32 Timer::Loop() {
-	const f32 res = (f32)glfwGetTime() - _lastTime;
-	_lastTime = (f32)glfwGetTime();
+	const f32 res = Delta();
+	Start();
 	return res;
 }
 
 const f32 Timer::LoopMS() {
-	const f32 res = (f32)(glfwGetTime() - _lastTime) * 1000.f;
-	_lastTime = (f32)glfwGetTime();
-	return res;
+	return Loop() * 1000;
 }
 
 const f32 Timer::Delta() const {
-	return (f32)(glfwGetTime() - _lastTime);
+	LARGE_INTEGER current;
+	QueryPerformanceCounter(&current);
+	u64 cycles = current.QuadPart - _start.QuadPart;
+	return (float)(cycles * _freq);
 }
 
 const f32 Timer::DeltaMS() const {
-	return (f32)((glfwGetTime() - _lastTime) * 1000.f);
+	return Delta() * 1000;
 }

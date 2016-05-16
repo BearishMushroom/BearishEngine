@@ -5,6 +5,26 @@ using namespace Core;
 using namespace Math;
 
 Transform::Transform(vec3 translation, vec3 scale, quat rotation) : _translation(translation), _scale(scale), _rotation(rotation) {}
+
+Transform::Transform(mat4 transformation) {
+	_translation = vec3(transformation[0][3], transformation[1][3], transformation[2][3]);
+	
+	f32 x = vec3(transformation[0][0], transformation[0][1], transformation[0][2]).Length();
+	f32 y = vec3(transformation[1][0], transformation[1][1], transformation[1][2]).Length();
+	f32 z = vec3(transformation[2][0], transformation[2][1], transformation[2][2]).Length();
+	
+	vec3 neg = vec3(transformation[0][0], transformation[0][1], transformation[0][2])
+		.Cross(vec3(transformation[1][0], transformation[1][1], transformation[1][2]));
+
+	if (neg.Dot(vec3(transformation[2][0], transformation[2][1], transformation[2][2])) < 0) {
+		x = -x;
+	}
+
+	_scale = vec3(x, y, z);
+
+	_rotation = quat(transformation);
+}
+
 Transform::~Transform() {}
 
 vec3& Transform::GetTranslation() {

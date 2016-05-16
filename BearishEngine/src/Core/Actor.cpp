@@ -158,6 +158,14 @@ vec3 Actor::GetTranslation() {
 	return _transform.GetTranslation();
 }
 
+vec3 Actor::GetScale() {
+	if (_parent) {
+		return _parent->GetScale() * _transform.GetScale();
+	}
+
+	return _transform.GetScale();
+}
+
 std::vector<IActorComponent*> Actor::GetComponentsByID(string id) {
 	std::vector<IActorComponent*> result;
 

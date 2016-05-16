@@ -6,7 +6,6 @@
 #include "../../Math/vec4.h"
 #include "../../Types.h"
 #include "../OpenGL.h"
-#include <SOIL.h>
 
 namespace Bearish { namespace Graphics {
 	static std::vector<i32> CubeMapFaces {

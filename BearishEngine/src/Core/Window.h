@@ -1,9 +1,12 @@
 #ifndef _BEARISH_CORE_WINDOW_H_
 #define _BEARISH_CORE_WINDOW_H_
 
-#include <glfw3.h>
 #include "../Types.h"
 #include "IAllocatable.h"
+#include "ButtonState.h"
+#include "../Math/vec2.h"
+
+class GLFWwindow;
 
 namespace Bearish { namespace Core {
 	class Window : public IAllocatable<Window> {
@@ -23,7 +26,14 @@ namespace Bearish { namespace Core {
 		void SetFullscreen(bool yes);
 		void BindAsRenderTarget();
 
-		GLFWwindow* GetWindow() const { return _window; }
+		void LockCursor();
+		void FreeCursor();
+
+		ButtonState GetMouseButton(i32 index);
+		Math::vec2 GetMousePosition();
+
+		ButtonState GetKeyboardKey(i32 index);
+
 		u32 GetWidth() const { return _width; }
 		u32 GetHeight() const { return _height; }
 	};

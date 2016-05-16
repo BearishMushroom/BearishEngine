@@ -7,13 +7,12 @@
 #include "../Types.h"
 #include "Texture/Texture.h"
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
+class FT_LibraryRec_;
 namespace Bearish { namespace Graphics {
 	class Glyph : public Core::IAllocatable<Glyph> {
 	public:
-		Glyph(f32 x, f32 y, Math::vec2 m, Math::vec2 ma, f32 sx, f32 sy, f32 ox, f32 oy) : sizeX(x), sizeY(y), texMin(m), texMax(ma), spaceX(sx), spaceY(sy), offsetX(ox), offsetY(oy) {}
+		Glyph(f32 x, f32 y, Math::vec2 m, Math::vec2 ma, f32 sx, f32 sy, f32 ox, f32 oy) : 
+			sizeX(x), sizeY(y), texMin(m), texMax(ma), spaceX(sx), spaceY(sy), offsetX(ox), offsetY(oy) {}
 		f32 sizeX, sizeY;
 		Math::vec2 texMin, texMax;
 		f32 spaceX, spaceY;
@@ -32,7 +31,7 @@ namespace Bearish { namespace Graphics {
 		static i32 FONT_CHAR_MAX;
 		static i32 FONT_TEXTURE_SIZE;
 
-		static FT_Library _Freetype;
+		static FT_LibraryRec_* _Freetype;
 		static void InitFT();
 
 		i32 SquareDist(i32 x1, i32 y1, i32 x2, i32 y2);

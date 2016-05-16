@@ -37,7 +37,7 @@ void main() {
 
 	gl_Position = MVP * bonePos;
 	worldPos0 = (world * bonePos).xyz;
-	texCoord0 = texCoord;
+	texCoord0 = vec2(texCoord.x, 1.0 - texCoord.y);
 	normal0 = normalize((world * boneNormal).xyz);
 
 	tangent0 = normalize((world * boneTang).xyz);

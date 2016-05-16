@@ -31,8 +31,7 @@ namespace Bearish { namespace Components {
 		}
 
 		void UpdateMesh() {
-			Math::vec3 pos = _actor->GetTranslation();
-			Math::vec3 scale = _actor->GetTransform().GetScale();
+			Math::vec3 scale = _actor->GetScale();
 
 			f32 minX = -scale.x / 2;
 			f32 maxX = scale.x / 2;

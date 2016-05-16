@@ -11,6 +11,7 @@ namespace Bearish {	namespace Core {
 	class Transform : public IAllocatable<Transform> {
 	public:
 		Transform(Math::vec3 translation = Math::vec3(0, 0, 0), Math::vec3 scale = Math::vec3(1, 1, 1), Math::quat rotation = Math::quat(0, 0, 0, 1));
+		Transform(Math::mat4 transformation);
 		~Transform();
 
 		Math::vec3& GetTranslation();

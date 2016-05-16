@@ -2,6 +2,7 @@
 #include "../Core/Logger.h"
 #include "../Utils.h"
 #include <glfw3.h>
+#include <glad.h>
 
 void APIENTRY gl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid *userParam) {
 	switch (type) {
@@ -42,8 +43,20 @@ using namespace Core;
 bool OpenGL::_isOGLLoaded = false;
 std::vector<string> OpenGL::_extensions;
 
+void* OpenGL::GetFn(const char* name) {
+	void *p = (void *)wglGetProcAddress(name);
+	if (p == 0 ||
+		(p == (void*)0x1) || (p == (void*)0x2) || (p == (void*)0x3) ||
+		(p == (void*)-1)) {
+		HMODULE module = LoadLibraryA("opengl32.dll");
+		p = (void *)GetProcAddress(module, name);
+	}
+
+	return p;
+}
+
 void OpenGL::Init() {
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+	if (!gladLoadGLLoader((GLADloadproc)&GetFn)) {
 		Logger::Fatal("Failed to load OpenGL functions!");
 	}
 

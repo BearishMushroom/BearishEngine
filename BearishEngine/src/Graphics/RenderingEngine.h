@@ -77,6 +77,8 @@ namespace Bearish {
 		void SetEnvironmentMap(Texture* tex) { _environmentMap = tex; }
 		void SetPreFG(Texture* tex) { _preFG = tex; }
 
+		f32 GetCPUTime() const { return _cpuRenderTime; }
+
 		Renderer* GetRenderer();
 	private:
 		std::vector<Light*> _lights;
@@ -108,7 +110,8 @@ namespace Bearish {
 
 		i32 _framesRendered;
 		f32 _time, _shadowTime, _geomTime, _accTime, _preTime, _postTime, _2dTime, _frameTime,
-			_shadowTimeFrame, _geomTimeFrame, _accTimeFrame, _preTimeFrame, _postTimeFrame, _2dTimeFrame;
+			_shadowTimeFrame, _geomTimeFrame, _accTimeFrame, _preTimeFrame, _postTimeFrame, _2dTimeFrame,
+			_cpuRenderTime;
 	public:
 		Shader* _phongShader, *_shadowShader, *_geomShader, *_guiShader, *_pbrShader;
 		ParticleSystem* testPart;

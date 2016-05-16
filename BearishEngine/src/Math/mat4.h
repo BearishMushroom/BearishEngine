@@ -4,7 +4,6 @@
 #include "..\Core\IAllocatable.h"
 #include "..\Types.h"
 #include "..\Utils.h"
-#include <assimp\postprocess.h>
 
 namespace Bearish { namespace Math {
 	template<class T>
@@ -26,14 +25,6 @@ namespace Bearish { namespace Math {
 
 		mat4_t() {}
 		~mat4_t() {}
-
-		mat4_t(aiMatrix4x4 mat) {
-			for (i32 i = 0; i < 4; i++) {
-				for (i32 j = 0; j < 4; j++) {
-					_v[i][j] = mat[i][j];
-				}
-			}
-		}
 
 		inline mat4_t<T> CreateIdentity() {
 			_v[0][0] = 1;	_v[0][1] = 0;	_v[0][2] = 0;	_v[0][3] = 0;
@@ -69,19 +60,19 @@ namespace Bearish { namespace Math {
 			y = y * (f32)RADIANS;
 			z = z * (f32)RADIANS;
 
-			rz[0][0] = static_cast<T>(cos(z));	rz[0][1] = -static_cast<T>(sin(z));	rz[0][2] = 0;	rz[0][3] = 0;
-			rz[1][0] = static_cast<T>(sin(z));	rz[1][1] = static_cast<T>(cos(z));	rz[1][2] = 0;	rz[1][3] = 0;
+			rz[0][0] = static_cast<T>(cos(z));	      rz[0][1] = -static_cast<T>(sin(z));	  rz[0][2] = 0;	rz[0][3] = 0;
+			rz[1][0] = static_cast<T>(sin(z));	      rz[1][1] = static_cast<T>(cos(z));	  rz[1][2] = 0;	rz[1][3] = 0;
 			rz[2][0] = 0;						      rz[2][1] = 0;						      rz[2][2] = 1;	rz[2][3] = 0;
 			rz[3][0] = 0;						      rz[3][1] = 0;						      rz[3][2] = 0;	rz[3][3] = 1;
 
 			rx[0][0] = 1;	rx[0][1] = 0;					 	      rx[0][2] = 0;						      rx[0][3] = 0;
-			rx[1][0] = 0;	rx[1][1] = static_cast<T>(cos(x));	rx[1][2] = -static_cast<T>(sin(x));	rx[1][3] = 0;
-			rx[2][0] = 0;	rx[2][1] = static_cast<T>(sin(x));	rx[2][2] = static_cast<T>(cos(x));	rx[2][3] = 0;
+			rx[1][0] = 0;	rx[1][1] = static_cast<T>(cos(x));	      rx[1][2] = -static_cast<T>(sin(x));	  rx[1][3] = 0;
+			rx[2][0] = 0;	rx[2][1] = static_cast<T>(sin(x));	      rx[2][2] = static_cast<T>(cos(x));	  rx[2][3] = 0;
 			rx[3][0] = 0;	rx[3][1] = 0;						      rx[3][2] = 0;						      rx[3][3] = 1;
 				
-			ry[0][0] = static_cast<T>(cos(y));	ry[0][1] = 0;	ry[0][2] = -static_cast<T>(sin(y));	ry[0][3] = 0;
+			ry[0][0] = static_cast<T>(cos(y));	      ry[0][1] = 0;	ry[0][2] = -static_cast<T>(sin(y));	ry[0][3] = 0;
 			ry[1][0] = 0;						      ry[1][1] = 1;	ry[1][2] = 0;						      ry[1][3] = 0;
-			ry[2][0] = static_cast<T>(sin(y));	ry[2][1] = 0;	ry[2][2] = static_cast<T>(cos(y));	ry[2][3] = 0;
+			ry[2][0] = static_cast<T>(sin(y));	      ry[2][1] = 0;	ry[2][2] = static_cast<T>(cos(y));	ry[2][3] = 0;
 			ry[3][0] = 0;						      ry[3][1] = 0;	ry[3][2] = 0;						      ry[3][3] = 1;
 
 			*this = rz * (ry * rx);
@@ -192,134 +183,6 @@ namespace Bearish { namespace Math {
 
 			return result;
 		}
-
-		/*inline mat4_t<T> Inverse() const {
-			mat4_t<T> inv, invOut;
-			
-			f32 det;
-			i32 i;
-
-			inv._v[0] = _v[5] * _v[10] * _v[15] -
-				_v[5] * _v[11] * _v[14] -
-				_v[9] * _v[6] * _v[15] +
-				_v[9] * _v[7] * _v[14] +
-				_v[13] * _v[6] * _v[11] -
-				_v[13] * _v[7] * _v[10];
-
-			inv._v[4] = -_v[4] * _v[10] * _v[15] +
-				_v[4] * _v[11] * _v[14] +
-				_v[8] * _v[6] * _v[15] -
-				_v[8] * _v[7] * _v[14] -
-				_v[12] * _v[6] * _v[11] +
-				_v[12] * _v[7] * _v[10];
-
-			inv._v[8] = _v[4] * _v[9] * _v[15] -
-				_v[4] * _v[11] * _v[13] -
-				_v[8] * _v[5] * _v[15] +
-				_v[8] * _v[7] * _v[13] +
-				_v[12] * _v[5] * _v[11] -
-				_v[12] * _v[7] * _v[9];
-
-			inv._v[12] = -_v[4] * _v[9] * _v[14] +
-				_v[4] * _v[10] * _v[13] +
-				_v[8] * _v[5] * _v[14] -
-				_v[8] * _v[6] * _v[13] -
-				_v[12] * _v[5] * _v[10] +
-				_v[12] * _v[6] * _v[9];
-
-			inv._v[1] = -_v[1] * _v[10] * _v[15] +
-				_v[1] * _v[11] * _v[14] +
-				_v[9] * _v[2] * _v[15] -
-				_v[9] * _v[3] * _v[14] -
-				_v[13] * _v[2] * _v[11] +
-				_v[13] * _v[3] * _v[10];
-
-			inv._v[5] = _v[0] * _v[10] * _v[15] -
-				_v[0] * _v[11] * _v[14] -
-				_v[8] * _v[2] * _v[15] +
-				_v[8] * _v[3] * _v[14] +
-				_v[12] * _v[2] * _v[11] -
-				_v[12] * _v[3] * _v[10];
-
-			inv._v[9] = -_v[0] * _v[9] * _v[15] +
-				_v[0] * _v[11] * _v[13] +
-				_v[8] * _v[1] * _v[15] -
-				_v[8] * _v[3] * _v[13] -
-				_v[12] * _v[1] * _v[11] +
-				_v[12] * _v[3] * _v[9];
-
-			inv._v[13] = _v[0] * _v[9] * _v[14] -
-				_v[0] * _v[10] * _v[13] -
-				_v[8] * _v[1] * _v[14] +
-				_v[8] * _v[2] * _v[13] +
-				_v[12] * _v[1] * _v[10] -
-				_v[12] * _v[2] * _v[9];
-
-			inv._v[2] = _v[1] * _v[6] * _v[15] -
-				_v[1] * _v[7] * _v[14] -
-				_v[5] * _v[2] * _v[15] +
-				_v[5] * _v[3] * _v[14] +
-				_v[13] * _v[2] * _v[7] -
-				_v[13] * _v[3] * _v[6];
-
-			inv._v[6] = -_v[0] * _v[6] * _v[15] +
-				_v[0] * _v[7] * _v[14] +
-				_v[4] * _v[2] * _v[15] -
-				_v[4] * _v[3] * _v[14] -
-				_v[12] * _v[2] * _v[7] +
-				_v[12] * _v[3] * _v[6];
-
-			inv._v[10] = _v[0] * _v[5] * _v[15] -
-				_v[0] * _v[7] * _v[13] -
-				_v[4] * _v[1] * _v[15] +
-				_v[4] * _v[3] * _v[13] +
-				_v[12] * _v[1] * _v[7] -
-				_v[12] * _v[3] * _v[5];
-
-			inv._v[14] = -_v[0] * _v[5] * _v[14] +
-				_v[0] * _v[6] * _v[13] +
-				_v[4] * _v[1] * _v[14] -
-				_v[4] * _v[2] * _v[13] -
-				_v[12] * _v[1] * _v[6] +
-				_v[12] * _v[2] * _v[5];
-
-			inv._v[3] = -_v[1] * _v[6] * _v[11] +
-				_v[1] * _v[7] * _v[10] +
-				_v[5] * _v[2] * _v[11] -
-				_v[5] * _v[3] * _v[10] -
-				_v[9] * _v[2] * _v[7] +
-				_v[9] * _v[3] * _v[6];
-
-			inv._v[7] = _v[0] * _v[6] * _v[11] -
-				_v[0] * _v[7] * _v[10] -
-				_v[4] * _v[2] * _v[11] +
-				_v[4] * _v[3] * _v[10] +
-				_v[8] * _v[2] * _v[7] -
-				_v[8] * _v[3] * _v[6];
-
-			inv._v[11] = -_v[0] * _v[5] * _v[11] +
-				_v[0] * _v[7] * _v[9] +
-				_v[4] * _v[1] * _v[11] -
-				_v[4] * _v[3] * _v[9] -
-				_v[8] * _v[1] * _v[7] +
-				_v[8] * _v[3] * _v[5];
-
-			inv._v[15] = _v[0] * _v[5] * _v[10] -
-				_v[0] * _v[6] * _v[9] -
-				_v[4] * _v[1] * _v[10] +
-				_v[4] * _v[2] * _v[9] +
-				_v[8] * _v[1] * _v[6] -
-				_v[8] * _v[2] * _v[5];
-
-			det = _v[0] * inv._v[0] + _v[1] * inv._v[4] + _v[2] * inv._v[8] + _v[3] * inv._v[12];
-
-			det = 1.0 / det;
-
-			for (i = 0; i < 16; i++)
-				invOut._v[i] = inv._v[i] * det;
-
-			return invOut;
-		}*/
 
 		inline T Get(i32 x, i32 y) const {
 			return _v[x][y];

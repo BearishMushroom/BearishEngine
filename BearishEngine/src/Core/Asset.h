@@ -2,8 +2,10 @@
 #define _BEARISH_CORE_ASSETS_H_
 
 #include "../Types.h"
+
 #include <fstream>
 #include <unordered_map>
+
 
 namespace Bearish { namespace Core {
 	class Asset {

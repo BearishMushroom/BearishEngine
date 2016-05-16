@@ -3,7 +3,7 @@
 
 #include "IAllocatable.h"
 #include "../Types.h"
-#include <glfw3.h>
+#include <Windows.h>
 
 namespace Bearish { namespace Core {
 	class Timer : public IAllocatable<Timer> {
@@ -17,7 +17,8 @@ namespace Bearish { namespace Core {
 		const f32 Delta() const;
 		const f32 DeltaMS() const;
 	private:
-		f32 _lastTime;
+		LARGE_INTEGER _start;
+		f64 _freq;
 	};
 } }
 #endif

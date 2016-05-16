@@ -3,7 +3,6 @@
 
 #include "../Types.h"
 #include "../Core/Logger.h"
-#include <glad.h>
 
 namespace Bearish { namespace Graphics {
 	class OpenGL {
@@ -16,6 +15,8 @@ namespace Bearish { namespace Graphics {
 		static void GetAllExtensions();
 		static bool IsExtensionSupported(string extension);
 		static void PrintSupportedExtensions();
+
+		static void* GetFn(const char* name);
 
 		static void SetDebugCallback();
 		static bool HandleErrors();

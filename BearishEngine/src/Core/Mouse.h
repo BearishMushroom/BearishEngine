@@ -8,15 +8,15 @@
 
 namespace Bearish { namespace Core {
 	enum class MouseButton : u8 {
-		Left   = GLFW_MOUSE_BUTTON_LEFT,
-		Right  = GLFW_MOUSE_BUTTON_RIGHT,
-		Middle = GLFW_MOUSE_BUTTON_MIDDLE,
-		Four   = GLFW_MOUSE_BUTTON_4,
-		Five   = GLFW_MOUSE_BUTTON_5,
-		Six    = GLFW_MOUSE_BUTTON_6,
-		Seven  = GLFW_MOUSE_BUTTON_7,
-		Eight  = GLFW_MOUSE_BUTTON_8,
-		Num    = GLFW_MOUSE_BUTTON_LAST
+		Left   = 0,
+		Right  = 1,
+		Middle = 2,
+		Four   = 3,
+		Five   = 4,
+		Six    = 5,
+		Seven  = 6,
+		Eight  = 7,
+		Num    = 9
 	};
 
 	class Mouse {

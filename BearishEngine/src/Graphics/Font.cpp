@@ -1,12 +1,16 @@
 #include "Font.h"
 #include "../Core/Logger.h"
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+
 using namespace Bearish;
 using namespace Core;
 using namespace Math;
 using namespace Graphics;
 
-FT_Library Font::_Freetype;
+FT_LibraryRec_* Font::_Freetype;
 
 i32 Font::FONT_TEXTURE_SIZE = 1024;
 i32 Font::FONT_CHAR_MIN = 32;

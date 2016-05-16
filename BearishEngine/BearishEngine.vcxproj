@@ -121,6 +121,12 @@
     <ClCompile Include="src\Graphics\Texture\Texture.cpp" />
     <ClCompile Include="src\Graphics\Buffer\VAO.cpp" />
     <ClCompile Include="src\Graphics\Buffer\VBO.cpp" />
+    <ClCompile Include="src\GUI\Win32Window.cpp" />
+    <ClCompile Include="src\GUI\Win32WindowButton.cpp" />
+    <ClCompile Include="src\GUI\Win32WindowComponent.cpp" />
+    <ClCompile Include="src\GUI\Win32WindowGLViewport.cpp" />
+    <ClCompile Include="src\GUI\Win32WindowMenuBar.cpp" />
+    <ClCompile Include="src\GUI\Win32WindowSubMenu.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -180,6 +186,12 @@
     <ClInclude Include="src\Graphics\Texture\Texture3D.h" />
     <ClInclude Include="src\Graphics\Texture\TextureCube.h" />
     <ClInclude Include="src\Graphics\Vertex.h" />
+    <ClInclude Include="src\GUI\Win32Window.h" />
+    <ClInclude Include="src\GUI\Win32WindowButton.h" />
+    <ClInclude Include="src\GUI\Win32WindowComponent.h" />
+    <ClInclude Include="src\GUI\Win32WindowGLViewport.h" />
+    <ClInclude Include="src\GUI\Win32WindowMenuBar.h" />
+    <ClInclude Include="src\GUI\Win32WindowSubMenu.h" />
     <ClInclude Include="src\Math\mat4.h" />
     <ClInclude Include="src\Math\Math.h" />
     <ClInclude Include="src\Math\quat.h" />

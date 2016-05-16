@@ -2,6 +2,7 @@
 #define _BEARISH_UTILS_H_
 
 #include "Types.h"
+#include <time.h>
 
 namespace Bearish { namespace Util {	
 	static void SeedRandom() {
