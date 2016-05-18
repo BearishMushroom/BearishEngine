@@ -79,7 +79,7 @@ Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::
 	}
 
 	std::vector<Vertex> vertices;
-	for (i32 i = 0; i < numVertices; i++) {
+	for (i32 i = 0; i < (i32)numVertices; i++) {
 		vertices.push_back(Vertex(positions[i], texCoords[i], normals[i], tangents[i], boneids[i], boneweights[i]));
 	}
 

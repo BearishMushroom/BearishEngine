@@ -24,7 +24,7 @@ void Win32WindowGLViewport::Register(void* parentHandle, i32 id) {
 	if (nPixelFormat == 0) // If it fails  
 		return;
 
-	bool bResult = SetPixelFormat((HDC)_hdc, nPixelFormat, &pfd);
+	i32 bResult = (i32)SetPixelFormat((HDC)_hdc, nPixelFormat, &pfd);
 
 	HGLRC tempOpenGLContext = wglCreateContext((HDC)_hdc); // Create an OpenGL 2.1 context for our device context  
 	wglMakeCurrent((HDC)_hdc, tempOpenGLContext); // Make the OpenGL 2.1 context current and active  

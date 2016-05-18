@@ -210,7 +210,7 @@ public:
 		WriteBytes(output, (u8*)&numVertices,  1, sizeof(u32));
 		WriteBytes(output, (u8*)&numIndices,   1, sizeof(u32));
 		WriteBytes(output, (u8*)&skinned,      1, sizeof(u8)); 
-		u8 nameLength = name.length();
+		u8 nameLength = (u8)name.length();
 		WriteBytes(output, &nameLength, 1, sizeof(u8));
 		WriteBytes(output, (u8*)name.c_str(), 1, sizeof(u8) * nameLength);
 		printf("%d\n", bytesWritten);
@@ -329,7 +329,7 @@ public:
 				u32 id = *(u32*)ReadBytes(file, 1, sizeof(u32));
 				mat4 offset = *(mat4*)ReadBytes(file, 1, sizeof(mat4));
 				boneOffsets[id] = offset;
-				boneMap.insert(std::make_pair(name, id));
+				boneMap.insert(std::make_pair(name, (i32)id));
 			}
 
 			rootNode = ReadNode(file);

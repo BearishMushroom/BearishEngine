@@ -16,17 +16,17 @@ namespace Bearish { namespace Graphics {
 
 			i32 index = 0;
 			for (auto& pixel : pixels) {
-				data[index] = pixel.r;
-				data[index + 1] = pixel.g;
-				data[index + 2] = pixel.b;
-				data[index + 3] = pixel.a;
+				data[index] = (u8)pixel.r;
+				data[index + 1] = (u8)pixel.g;
+				data[index + 2] = (u8)pixel.b;
+				data[index + 3] = (u8)pixel.a;
 				index += 4;
 			}
 
 			_attachments = std::vector<TextureAttachment>{ TextureAttachment::None };
 			_formats = std::vector<TextureFormat>{ TextureFormat::RGBA };
 
-			_size = Math::vec2(pixels.size(), 1);
+			_size = Math::vec2((f32)pixels.size(), 1);
 			_type = TextureType::Texture1D;
 			_filter = TextureFilter::Nearest;
 

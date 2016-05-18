@@ -7,7 +7,7 @@
 #include "../Types.h"
 #include "Texture/Texture.h"
 
-class FT_LibraryRec_;
+struct FT_LibraryRec_;
 namespace Bearish { namespace Graphics {
 	class Glyph : public Core::IAllocatable<Glyph> {
 	public:

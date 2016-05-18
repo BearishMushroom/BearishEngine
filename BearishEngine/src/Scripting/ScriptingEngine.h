@@ -117,6 +117,7 @@ namespace Bearish { namespace Scripting {
 		catch (luabind::error e) {
 			Core::Logger::Error("Lua: %s\n", lua_tostring(Scripting::L, -1));
 			Core::Logger::Error(e.what());
+			return LuaObject();
 		}
 	}
 
@@ -129,6 +130,7 @@ namespace Bearish { namespace Scripting {
 		catch (luabind::error e) {
 			Core::Logger::Error("Lua: %s\n", lua_tostring(Scripting::L, -1));
 			Core::Logger::Error(e.what());
+			return LuaObject();
 		}
 	}
 

@@ -117,29 +117,29 @@ i32 main(i32 argc, cstring* argv) {
 
 					for (i32 p = 0; p < (i32)anim->mChannels[j]->mNumPositionKeys; p++) {
 						aiVector3D aipos = anim->mChannels[j]->mPositionKeys[p].mValue;
-						auto key = std::make_pair(vec3(aipos.x, aipos.y, aipos.z), anim->mChannels[j]->mPositionKeys[p].mTime);
+						auto key = std::make_pair(vec3(aipos.x, aipos.y, aipos.z), (f32)anim->mChannels[j]->mPositionKeys[p].mTime);
 						positions.push_back(key);
 					}
 
 					for (i32 s = 0; s < (i32)anim->mChannels[j]->mNumScalingKeys; s++) {
 						aiVector3D aiscale = anim->mChannels[j]->mScalingKeys[s].mValue;
-						auto key = std::make_pair(vec3(aiscale.x, aiscale.y, aiscale.z), anim->mChannels[j]->mScalingKeys[s].mTime);
+						auto key = std::make_pair(vec3(aiscale.x, aiscale.y, aiscale.z), (f32)anim->mChannels[j]->mScalingKeys[s].mTime);
 						scales.push_back(key);
 					}
 
 					for (i32 r = 0; r < (i32)anim->mChannels[j]->mNumRotationKeys; r++) {
 						aiQuaternion airot = anim->mChannels[j]->mRotationKeys[r].mValue;
-						auto key = std::make_pair(vec4(airot.x, airot.y, airot.z, airot.w), anim->mChannels[j]->mRotationKeys[r].mTime);
+						auto key = std::make_pair(vec4(airot.x, airot.y, airot.z, airot.w), (f32)anim->mChannels[j]->mRotationKeys[r].mTime);
 						rotations.push_back(key);
 					}
 
-					channels.push_back(BEMAnimationChannel{ name, positions.size(), positions, scales.size(), scales, rotations.size(), rotations });
+					channels.push_back(BEMAnimationChannel{ name, (u32)positions.size(), positions, (u32)scales.size(), scales, (u32)rotations.size(), rotations });
 				}
 
-				animations.push_back(BEMAnimation{ name, tickRate, duration, channels.size(), channels });
+				animations.push_back(BEMAnimation{ name, tickRate, duration, (u32)channels.size(), channels });
 			}
 
-			output.numAnimations = animations.size();
+			output.numAnimations = (i32)animations.size();
 			output.animations = animations;
 
 			std::vector<u32> indices;
@@ -151,7 +151,7 @@ i32 main(i32 argc, cstring* argv) {
 				indices.push_back(face.mIndices[2]);
 			}
 
-			output.numIndices = indices.size();
+			output.numIndices = (i32)indices.size();
 			output.indices = &indices[0];
 
 			output.WriteToFile(path);

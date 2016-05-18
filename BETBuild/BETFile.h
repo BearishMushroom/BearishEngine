@@ -74,7 +74,7 @@ public:
 
 		free(data);
 		data = (u8*)malloc(colors.size() * 5);
-		dataSize = colors.size() * 5;
+		dataSize = (u32)colors.size() * 5;
 
 		pos = 0;
 		for (auto& pair : colors) {

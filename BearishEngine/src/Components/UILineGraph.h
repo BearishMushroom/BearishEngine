@@ -23,7 +23,7 @@ namespace Bearish { namespace Components {
 		void AddDataPoint(f32 data) {
 			_dataPoints.push_back(data);
 
-			if (_dataPoints.size() >= _numDataPoints) {
+			if (_dataPoints.size() >= (u32)_numDataPoints) {
 				_dataPoints.erase(_dataPoints.begin());
 			}
 

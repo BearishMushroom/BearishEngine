@@ -10,15 +10,15 @@ std::vector<ShaderLoadInformation> Shader::_loaded;
 
 void Shader::ReloadChanged() {
 	for (auto&& it : _loaded) {
-		for (i32 file = 0; file < it.files.size(); ++file) {
+		for (i32 file = 0; file < (i32)it.files.size(); ++file) {
 			struct stat st;
 			stat(it.files.at(file).c_str(), &st);
 			if (it.timeStamps.at(file) < st.st_mtime) {
 				Logger::Info("Swapping shader %s.", it.files.at(file).c_str());
 				Shader newSh = Shader();
-				for (i32 i = 0; i < it.files.size(); i++) {
+				for (i32 i = 0; i < (i32)it.files.size(); i++) {
 					stat(it.files.at(i).c_str(), &st);
-					it.timeStamps.at(i) = st.st_mtime;
+					it.timeStamps.at(i) = (u32)st.st_mtime;
 					newSh.AddShader(LoadShader(it.files.at(i)), it.types.at(i));
 				}
 				newSh.Compile();
@@ -83,9 +83,9 @@ Shader::Shader(const string& vsPath, const string& fsPath) {
 
 	struct stat st;
 	stat(vsPath.c_str(), &st);
-	_loaded.back().timeStamps.push_back(st.st_mtime);
+	_loaded.back().timeStamps.push_back((u32)st.st_mtime);
 	stat(fsPath.c_str(), &st);
-	_loaded.back().timeStamps.push_back(st.st_mtime);
+	_loaded.back().timeStamps.push_back((u32)st.st_mtime);
 
 	_loaded.back().types.push_back(ShaderType::Vertex);
 	_loaded.back().types.push_back(ShaderType::Fragment);

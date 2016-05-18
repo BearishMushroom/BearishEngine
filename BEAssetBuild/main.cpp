@@ -38,7 +38,7 @@ i32 main(i32 argc, c8** argv) {
 		i32 pos = -1;
 		while (line.find('"') != -1) {
 			if (pos == -1) {
-				pos = line.find('"');
+				pos = (i32)line.find('"');
 			}
 			else {
 				string name = line.substr(pos + 1, line.find('"', pos + 1) - pos - 1);

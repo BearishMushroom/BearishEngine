@@ -354,18 +354,18 @@ i32 main(i32 argc, c8** argv) {
 		mat->Set("GlossColor", 1.0f - roughness);
 
 		for (auto y = 0; y < 10; y++) {
-			Actor* plane = new Actor(Transform(vec3(x * 10, -2.5f, y * 10), vec3(5, 1, 5)));
+			Actor* plane = new Actor(Transform(vec3(x * 10.f, -2.5f, y * 10.f), vec3(5.f, 1.f, 5.f)));
 
 			plane->AddComponent(new MeshRendererComponent(&mesh2, &brickMaterial));
 			//actors.push_back(plane);
 		}
 	}
 
-	Actor* dir = new Actor(Transform(vec3(0), vec3(1), quat().CreateRotation(vec3(1, 0, 0), AsRadians(83.f))));
-	dir->AddComponent(new DirectionalLightComponent(vec3(1), 0.1f, 0.2f));
+	Actor* dir = new Actor(Transform(vec3(0.f), vec3(1.f), quat().CreateRotation(vec3(1.f, 0.f, 0.f), AsRadians(83.f))));
+	dir->AddComponent(new DirectionalLightComponent(vec3(1.f), 0.1f, 0.2f));
 
-	Actor* ples = new Actor(Transform(vec3(2, 15, 0.0)));
-	ples->AddComponent(new PointLightComponent(vec3(1), 0.0, Attenuation(0.0, 0, 0.0055), 0.3));
+	Actor* ples = new Actor(Transform(vec3(2.f, 15.f, 0.0f)));
+	ples->AddComponent(new PointLightComponent(vec3(1.f), 0.f, Attenuation(0.f, 0.f, 0.0055f), 0.3f));
 	actors.push_back(ples);
 
 	actors.push_back(player);
