@@ -36,31 +36,33 @@ namespace Bearish { namespace Graphics {
 	};
 	
 	enum class TextureFormat : i32 {
-		RG     = GL_RG,
-		RGB    = GL_RGB,
-		RGBA   = GL_RGBA,
-		R16    = GL_R16F,
-		RG16   = GL_RG16F,
-		RGB16  = GL_RGB16F,
-		RGBA16 = GL_RGBA16F,
-		R32    = GL_R32F,
-		RG32   = GL_RG32F,
-		RGB32  = GL_RGB32F,
-		RGBA32 = GL_RGBA32F,
-		BGR    = GL_BGR,
-		ABGR   = GL_ABGR_EXT,
-		Depth  = GL_DEPTH_COMPONENT,
+		RG      = GL_RG,
+		RGB     = GL_RGB,
+		RGBA    = GL_RGBA,
+		R16     = GL_R16F,
+		RG16    = GL_RG16F,
+		RGB16   = GL_RGB16F,
+		RGBA16  = GL_RGBA16F,
+		R32     = GL_R32F,
+		RG32    = GL_RG32F,
+		RGB32   = GL_RGB32F,
+		RGBA32  = GL_RGBA32F,
+		BGR     = GL_BGR,
+		ABGR    = GL_ABGR_EXT,
+		Depth16 = GL_DEPTH_COMPONENT16,
+		Depth24 = GL_DEPTH_COMPONENT24,
+		Depth32 = GL_DEPTH_COMPONENT32,
 	};
 
 	enum class TextureFilter : i32 {
-		Nearest = GL_NEAREST,
-		Linear  = GL_LINEAR,
+		Nearest = GL_NEAREST_MIPMAP_NEAREST,
+		Linear  = GL_LINEAR_MIPMAP_LINEAR,
 	};
 
 	class Texture : public Core::IAllocatable<Texture> {
 	public:
 		Texture(const string filename, const TextureType type = TextureType::Texture2D, 
-				const TextureFormat format = TextureFormat::RGBA, const TextureFilter filter = TextureFilter::Nearest);
+				const TextureFormat format = TextureFormat::RGBA, const TextureFilter filter = TextureFilter::Linear);
 
 		Texture(const Math::vec2& size = Math::vec2(256, 256), const TextureType type = TextureType::Texture2D, const TextureFilter filter = TextureFilter::Nearest,
 			const TextureAttachment attachment = TextureAttachment::Color0, const TextureFormat format = TextureFormat::RGBA, u8* data = 0);

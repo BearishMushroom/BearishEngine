@@ -465,27 +465,27 @@ void RenderingEngine::SetShadowQuality(ShadowQuality quality) {
 			break;
 
 		case ShadowQuality::Terrible:
-			_shadowMap = new Texture(vec2(512), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::R32);
+			_shadowMap = new Texture(vec2(512), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32);
 			_shadowPcfSize = 0;
 			break;
 
 		case ShadowQuality::Low:
-			_shadowMap = new Texture(vec2(1024), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::R32);
+			_shadowMap = new Texture(vec2(1024), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32);
 			_shadowPcfSize = 1;
 			break;
 
 		case ShadowQuality::Medium:
-			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::R32);
+			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32);
 			_shadowPcfSize = 2;
 			break;
 
 		case ShadowQuality::High:
-			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::R32);
+			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32);
 			_shadowPcfSize = 3;
 			break;
 
 		case ShadowQuality::Ultra:
-			_shadowMap = new Texture(vec2(4096), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::R32);
+			_shadowMap = new Texture(vec2(4096), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32);
 			_shadowPcfSize = 4;
 			break;
 		}

@@ -15,7 +15,7 @@ uniform sampler2D gNormal;
 uniform sampler2D gDiffuse;
 uniform sampler2D gSpecRoughness;
 
-uniform sampler2D shadowMap;
+uniform sampler2DShadow shadowMap;
 
 uniform DirectionalLight dLight = { { {0, 0, 0}, 0, 0}, {0, 0, 0}};
 uniform PointLight pLight = { { {0, 0, 0}, 0, 0}, {0, 0, 0}, {0, 0, 0}};
@@ -68,7 +68,7 @@ vec3 PBR(float visibility, vec4 albedo, vec3 specular, float roughness, vec3 wor
 }
 
 void main() {
-	vec2 tc = CalcTexCoord(screen);
+	vec2 tc = CalcTexCoord(screen);  
 
 	vec3 position = texture(gPosition, tc).xyz;
 	vec3 normal = DecodeNormal(texture(gNormal, tc).xy);
@@ -82,7 +82,10 @@ void main() {
 
 	if (light == LIGHT_DIRECTIONAL) {
 	  vec4 lp = (lightMat * vec4(position, 1));
-	  float visibility = CalculateShadow(shadowMap, lp);
+
+		float NdotL = clamp(dot(normal, dLight.direction), 0.0, 1.0);
+
+	  float visibility = CalculateShadow(shadowMap, lp, NdotL);
 	  vec4 final = vec4(PBR(visibility, albedo, specular, roughness, position, normal, eye, dLight.direction, dLight.base.color, dLight.base.diffuseIntensity), albedo.a);
 	  fragcolor = final;
 	}

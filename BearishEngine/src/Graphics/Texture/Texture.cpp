@@ -137,10 +137,19 @@ void Texture::InitTextures(const TextureType type, std::vector<TextureFormat> fo
 		u8* d = 0;
 		if (datas) d = datas[i];
 
-		glTexImage2D((GLenum)type, 0, (GLint)formats[i], static_cast<i32>(_size.x), static_cast<i32>(_size.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, d);
-		glGenerateMipmap((GLenum)type);
-		glTexParameteri((GLenum)type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri((GLenum)type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		if (formats[i] == TextureFormat::Depth16 || formats[i] == TextureFormat::Depth24 || formats[i] == TextureFormat::Depth32) {
+			// Special case for depth textures.
+			glTexImage2D((GLenum)type, 0, (GLint)formats[i], static_cast<i32>(_size.x), static_cast<i32>(_size.y), 0, GL_DEPTH_COMPONENT, GL_FLOAT, d);
+			glTexParameteri((GLenum)type, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+			glTexParameteri((GLenum)type, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+		}
+		else {
+			glTexImage2D((GLenum)type, 0, (GLint)formats[i], static_cast<i32>(_size.x), static_cast<i32>(_size.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, d);
+			glGenerateMipmap((GLenum)type);
+		}
+
+		glTexParameteri((GLenum)type, GL_TEXTURE_MAG_FILTER, _filter == TextureFilter::Linear ? GL_LINEAR : GL_NEAREST);
+		glTexParameteri((GLenum)type, GL_TEXTURE_MIN_FILTER, (GLenum)_filter);
 
 		glTexParameteri((GLenum)type, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri((GLenum)type, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -191,6 +200,11 @@ void Texture::InitRenderTargets(std::vector<TextureAttachment> attachments) {
 	}
 
 	glDrawBuffers(_numTextures, (const GLenum*)&attachments[0]);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		printf("");
+	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

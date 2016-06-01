@@ -1,24 +1,16 @@
 uniform int pcfSize;
 uniform int shadowSize;
 
-float CalculateShadow(sampler2D sm, vec4 lightPos) {
-  if(shadowSize > 0) {
-    float texelCount = (pcfSize * 2.0 + 1.0) * (pcfSize * 2.0 + 1.0);
-  	vec4 coords = lightPos / lightPos.w;
+float CalculateShadow(sampler2DShadow sm, vec4 lightPos, float ndotl) {
+  float texelCount = (pcfSize * 2.0 + 1.0) * (pcfSize * 2.0 + 1.0);
 
-    float texels = 0;
-    for(int x = -pcfSize; x <= pcfSize; x++) {
-      for(int y = -pcfSize; y <= pcfSize; y++) {
-        vec2 coords2 = clamp(coords.xy + vec2(x, y) * (1.0 / shadowSize), 0.001, 0.999);
-
-        if(texture(sm, coords2).r < coords.z - 0.001) {
-          texels++;
-        }
-      }
+  float texels = 0;
+  for(float x = -1.5; x <= 1.5; x += 1.0) {
+    for(float y = -1.5; y <= 1.5; y += 1.0) {
+      texels += textureProj(sm, vec4(lightPos.xy + vec2(x, y) *
+                                (1.0/float(shadowSize)) * lightPos.w, lightPos.z - 0.01, lightPos.w));
     }
-
-    return 1 - texels / texelCount;
-  } else {
-    return 1.0;
   }
+
+  return texels / 16;
 }

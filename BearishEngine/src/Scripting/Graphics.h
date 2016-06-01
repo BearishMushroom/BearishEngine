@@ -92,7 +92,9 @@ namespace Bearish { namespace Scripting {
 					value("RGBA32", (i32)TextureFormat::RGBA32),
 					value("BGR", (i32)TextureFormat::BGR),
 					value("ABGR", (i32)TextureFormat::ABGR),
-					value("Depth", (i32)TextureFormat::Depth)
+					value("Depth16", (i32)TextureFormat::Depth16),
+					value("Depth24", (i32)TextureFormat::Depth24),
+					value("Depth32", (i32)TextureFormat::Depth32)
 				],
 
 			class_<texture_filter_wrapper>("TextureFilter")

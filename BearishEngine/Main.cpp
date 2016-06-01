@@ -91,6 +91,10 @@ void Update() {
 		renderer.SetShadowQuality(ShadowQuality::Ultra);
 	}
 
+	if (Keyboard::IsKeyPressed(Key::R)) {
+		Shader::ReloadChanged();
+	}
+
 	if (Keyboard::IsKeyPressed(Key::L)) {
 		// DEBUG MENU CREATION!!!?!
 		if (!PANEL_OPEN) {

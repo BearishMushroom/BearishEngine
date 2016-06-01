@@ -168,6 +168,7 @@ void Shader::Compile() {
 		c8 log[1024];
 		glGetProgramInfoLog(_programID, 1024, NULL, log);
 		Logger::Error("Shader program failed to compile(%s, %s): %s", _vsPath.c_str(), _fsPath.c_str(), &log);
+		printf("");
 	}
 
 	for (auto& str : _uniformsToAdd) {
