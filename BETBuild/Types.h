@@ -20,7 +20,7 @@ typedef char               c8;
 typedef std::string        string;
 typedef const char*        cstring;
 
-typedef bool					b8;
+typedef bool               b8;
 
 static const void* null = (void*)0;
 

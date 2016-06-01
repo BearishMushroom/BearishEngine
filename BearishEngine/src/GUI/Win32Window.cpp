@@ -1,6 +1,10 @@
 #include "Win32Window.h"
-#include <Windows.h>
+#include "../Core/Keyboard.h"
+#include "../Core/Mouse.h"
 #include "Win32WindowGLViewport.h"
+
+#include <Windows.h>
+#include <windowsx.h>
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
@@ -21,6 +25,45 @@ LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	case WM_COMMAND:
 		Win32Window::ACTIVE_WINDOW->Command(LOWORD(wparam));
 		break;
+	case WM_KEYDOWN:
+		Core::Keyboard::SetKeyState((Core::Key)wparam, Core::ButtonState::Pressed);
+		break;
+	case WM_KEYUP:
+		Core::Keyboard::SetKeyState((Core::Key)wparam, Core::ButtonState::Released);
+		break;
+	case WM_LBUTTONDOWN:
+		Core::Mouse::SetButtonState(Core::MouseButton::Left, Core::ButtonState::Pressed);
+		break;
+	case WM_LBUTTONUP:
+		Core::Mouse::SetButtonState(Core::MouseButton::Left, Core::ButtonState::Released);
+		break;
+	case WM_RBUTTONDOWN:
+		Core::Mouse::SetButtonState(Core::MouseButton::Right, Core::ButtonState::Pressed);
+		break;
+	case WM_RBUTTONUP:
+		Core::Mouse::SetButtonState(Core::MouseButton::Right, Core::ButtonState::Released);
+		break;
+	case WM_MBUTTONDOWN:
+		Core::Mouse::SetButtonState(Core::MouseButton::Middle, Core::ButtonState::Pressed);
+		break;
+	case WM_MBUTTONUP:
+		Core::Mouse::SetButtonState(Core::MouseButton::Middle, Core::ButtonState::Released);
+		break;
+	case WM_MOUSEMOVE:
+		TRACKMOUSEEVENT track;
+		track.cbSize = sizeof(TRACKMOUSEEVENT);
+		track.dwFlags = TME_LEAVE;
+		track.hwndTrack = hwnd;
+
+		TrackMouseEvent(&track);
+
+		Core::Mouse::SetCursorPosition((i32)GET_X_LPARAM(lparam), (i32)GET_Y_LPARAM(lparam));
+		break;
+	case WM_MOUSELEAVE:
+		Core::Mouse::SetButtonState(Core::MouseButton::Left, Core::ButtonState::Released);
+		Core::Mouse::SetButtonState(Core::MouseButton::Right, Core::ButtonState::Released);
+		Core::Mouse::SetButtonState(Core::MouseButton::Middle, Core::ButtonState::Released);
+		break;
 	default:
 		return DefWindowProc(hwnd, msg, wparam, lparam);
 		break;
@@ -34,11 +77,12 @@ Win32Window::~Win32Window() {
 }
 
 void Win32Window::AddComponent(Win32WindowComponent* component) {
+	component->SetWindow(this);
 	_components.push_back(component);
 }
 
 void Win32Window::RegisterComponents(void* handle) {
-	for (auto i = 0; i < _components.size(); i++) {
+	for (auto i = 0; i < (i32)_components.size(); i++) {
 		_components.at(i)->Create(handle, i);
 	}
 }
@@ -98,6 +142,7 @@ void Win32Window::Update() {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+
 	auto gl = GetComponentOfType<Win32WindowGLViewport>();
 	if (gl)
 		gl->Update();

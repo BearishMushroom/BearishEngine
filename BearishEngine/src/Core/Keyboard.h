@@ -91,15 +91,16 @@ namespace Bearish { namespace Core {
 	class Keyboard {
 	public:
 		static void Update();
+
 		static const ButtonState GetKeyState(const Key key);
 		static bool IsKeyDown(const Key key);
 		static bool IsKeyUp(const Key key);
 		static bool IsKeyPressed(const Key key);
 		static bool IsKeyReleased(const Key key);
-		static void SetWindow(Window* window);
+
+		static void SetKeyState(const Key key, const ButtonState state);
 	private:
 		static ButtonState _keys[(u32)Key::Max];
-		static Window* _window;
 	};
 } }
 

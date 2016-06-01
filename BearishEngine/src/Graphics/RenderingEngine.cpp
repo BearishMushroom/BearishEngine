@@ -432,7 +432,7 @@ f32 RenderingEngine::PointLightSize(PointLight* pl) {
 
 void RenderingEngine::DrawGuiQuad(Transform t, Texture* tex, u32 subid) {
 	glDisable(GL_DEPTH_TEST);
-	_window->BindAsRenderTarget();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	_guiShader->Bind();
 	_guiShader->SetUniform("diffuse", 0);
 	tex->Bind(0, subid);

@@ -37,8 +37,6 @@ Window::Window(string title, u32 width, u32 height, bool fs) {
 	}
 
 	glfwMakeContextCurrent(_window);
-	Keyboard::SetWindow(this);
-	Mouse::SetWindow(this);
 	glfwSwapInterval(0);
 }
 
@@ -93,6 +91,5 @@ void Window::SetFullscreen(bool yes) {
 	//glfwDestroyWindow(_window);
 	_window = glfwCreateWindow(_width, _height, _title.c_str(), yes ? glfwGetPrimaryMonitor() : NULL, NULL);
 	//glfwMakeContextCurrent(_window);
-	Keyboard::SetWindow(this);
-	Mouse::SetWindow(this);
+	//Keyboard::SetWindow(this);
 }

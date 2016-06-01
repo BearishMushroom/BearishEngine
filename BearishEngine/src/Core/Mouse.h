@@ -34,11 +34,11 @@ namespace Bearish { namespace Core {
 		static void LockToCentre();
 		static void FreeFromCentre();
 
-		static void SetWindow(Window* window);
+		static void SetButtonState(const MouseButton button, const ButtonState state);
+		static void SetCursorPosition(const i32 x, const i32 y);
 	private:
 		static Math::vec2 _mousePosition, _mouseDelta;
 		static ButtonState _buttons[(u32)MouseButton::Num];
-		static Window* _window;
 	};
 } }
 

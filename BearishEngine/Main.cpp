@@ -55,39 +55,39 @@ void Update() {
 		Logger::Info(player->GetTransform().GetTranslation().ToString());
 	}
 
-	if (Keyboard::IsKeyPressed(Key::F1)) {
+	if (Keyboard::IsKeyPressed(Key::One)) {
 		Renderer::SetFillMode(FillMode::Normal);
 	} 
 	
-	if (Keyboard::IsKeyPressed(Key::F2)) {
+	if (Keyboard::IsKeyPressed(Key::Two)) {
 		Renderer::SetFillMode(FillMode::Wireframe);
 	}
 
-	if (Keyboard::IsKeyPressed(Key::F3)) {
+	if (Keyboard::IsKeyPressed(Key::Three)) {
 		Renderer::SetFillMode(FillMode::Points);
 	}
 
-	if (Keyboard::IsKeyPressed(Key::F6)) {
+	if (Keyboard::IsKeyPressed(Key::Six)) {
 		renderer.SetShadowQuality(ShadowQuality::Off);
 	}
 
-	if (Keyboard::IsKeyPressed(Key::F7)) {
+	if (Keyboard::IsKeyPressed(Key::Seven)) {
 		renderer.SetShadowQuality(ShadowQuality::Terrible);
 	}
 
-	if (Keyboard::IsKeyPressed(Key::F8)) {
+	if (Keyboard::IsKeyPressed(Key::Eight)) {
 		renderer.SetShadowQuality(ShadowQuality::Low);
 	}
 	
-	if (Keyboard::IsKeyPressed(Key::F9)) {
+	if (Keyboard::IsKeyPressed(Key::Nine)) {
 		renderer.SetShadowQuality(ShadowQuality::Medium);
 	}
 	
-	if (Keyboard::IsKeyPressed(Key::F10)) {
+	if (Keyboard::IsKeyPressed(Key::Zero)) {
 		renderer.SetShadowQuality(ShadowQuality::High);
 	}
 
-	if (Keyboard::IsKeyPressed(Key::F11)) {
+	if (Keyboard::IsKeyPressed(Key::P)) {
 		renderer.SetShadowQuality(ShadowQuality::Ultra);
 	}
 
@@ -331,14 +331,13 @@ i32 main(i32 argc, c8** argv) {
 	actors.push_back(fpsCounter);
 	
 	player = new Actor;
-	player->GetTransform().Rotate(vec3(1, 1, 0), 0.4);
 	player->AddComponent(new SkyboxComponent(skybox));
 
 	player->AddComponent(new IActorComponent("CameraComponent"));
 
 	//player->AddComponent(new IActorComponent("EditorLookComponent"));
-	player->AddComponent(new IActorComponent("FreeLookComponent", 0.2f));
-	player->AddComponent(new IActorComponent("FreeMoveComponent", 1.0f / 3.0f));
+	player->AddComponent(new IActorComponent("FreeLookComponent", 0.6f));
+	player->AddComponent(new IActorComponent("FreeMoveComponent", 1.0f / 6.0f));
 	Mouse::FreeFromCentre();
 
 	for (auto x = 0; x < 10; x++) {
@@ -587,9 +586,9 @@ for (i32 i = 0; i < 41; i++) {
 		updated = false;
 		lastFrameTimer.LoopMS();
 		while (updateTimer > UPDATE_TIME) {
+			Update();
 			Keyboard::Update();
 			Mouse::Update();
-			Update();
 			updateTimer -= UPDATE_TIME;
 
 			if (PANEL_OPEN) {

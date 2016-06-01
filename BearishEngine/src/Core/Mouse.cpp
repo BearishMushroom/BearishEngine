@@ -6,42 +6,22 @@ using namespace Bearish;
 using namespace Core;
 using namespace Math;
 
-Window* Mouse::_window;
 ButtonState Mouse::_buttons[(u32)MouseButton::Num];
 Math::vec2 Mouse::_mousePosition;
 Math::vec2 Mouse::_mouseDelta;
 
 void Mouse::Update() {
-	/*vec2 pos = _window->GetMousePosition();
-	
-	i32 width = _window->GetWidth(), height = _window->GetHeight();
-
-	Math::vec2 currentPos(pos.x * ((f32)Graphics::Renderer::UI_RESOLUTION_X / (f32)width), pos.y * ((f32)Graphics::Renderer::UI_RESOLUTION_Y / (f32)height));
-
-	_mouseDelta = currentPos - _mousePosition;
-	_mousePosition = currentPos;
-
-	for (i32 i = 0; i < (i32)MouseButton::Num; i++) {
-		ButtonState result = _window->GetMouseButton(i);
-
-		if (result == ButtonState::Down) {
-			if (_buttons[i] == ButtonState::Up || _buttons[i] == ButtonState::Released) {
-				_buttons[i] = ButtonState::Pressed;
-			}
-			else {
-				_buttons[i] = ButtonState::Down;
-			}
+	for (auto i = 0; i < (i32)MouseButton::Num; i++) {
+		if (_buttons[i] == ButtonState::Pressed) {
+			_buttons[i] = ButtonState::Down;
 		}
 
-		if (result == ButtonState::Up) {
-			if (_buttons[i] == ButtonState::Down || _buttons[i] == ButtonState::Pressed) {
-				_buttons[i] = ButtonState::Released;
-			}
-			else {
-				_buttons[i] = ButtonState::Up;
-			}
+		if (_buttons[i] == ButtonState::Released) {
+			_buttons[i] = ButtonState::Up;
 		}
-	}*/
+	}
+
+	_mouseDelta = vec2(0, 0);
 }
 
 const ButtonState Mouse::GetButtonState(const MouseButton key) {
@@ -73,14 +53,37 @@ const Math::vec2 Mouse::GetMouseDelta() {
 	return _mouseDelta;
 }
 
-void Mouse::SetWindow(Window* window) {
-	_window = window;
-}
-
 void Mouse::LockToCentre() {
-	_window->LockCursor();
+	//_window->LockCursor();
 }
 
 void Mouse::FreeFromCentre() {
-	_window->FreeCursor();
+	//_window->FreeCursor();
+}
+
+void Mouse::SetButtonState(const MouseButton button, const ButtonState state) {
+	if (state == ButtonState::Pressed) {
+		if (_buttons[(i32)button] == ButtonState::Up || _buttons[(i32)button] == ButtonState::Released) {
+			_buttons[(i32)button] = ButtonState::Pressed;
+		}
+		else {
+			_buttons[(i32)button] = ButtonState::Down;
+		}
+	}
+
+	if (state == ButtonState::Released) {
+		if (_buttons[(i32)button] == ButtonState::Down || _buttons[(i32)button] == ButtonState::Pressed) {
+			_buttons[(i32)button] = ButtonState::Released;
+		}
+		else {
+			_buttons[(i32)button] = ButtonState::Up;
+		}
+	}
+}
+
+void Mouse::SetCursorPosition(const i32 x, const i32 y) {
+	Math::vec2 currentPos((f32)x / 1280.f * 1920.f, (f32)y / 720.f * 1080.f);
+
+	_mouseDelta = currentPos - _mousePosition;
+	_mousePosition = currentPos;
 }

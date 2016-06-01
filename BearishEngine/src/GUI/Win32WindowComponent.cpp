@@ -1,4 +1,5 @@
 #include "Win32WindowComponent.h"
+#include "Win32Window.h"
 
 using namespace Bearish;
 using namespace GUI;
@@ -26,5 +27,15 @@ void Win32WindowComponent::Trigger(i32 id) {
 }
 
 void Win32WindowComponent::AddChild(Win32WindowComponent* child) {
+	child->SetWindow(_window);
+	child->SetParent(this);
 	_children.push_back(child);
+}
+
+void Win32WindowComponent::SetWindow(Win32Window* window) {
+	_window = window;
+}
+
+void Win32WindowComponent::SetParent(Win32WindowComponent* parent) {
+	_parent = parent;
 }
