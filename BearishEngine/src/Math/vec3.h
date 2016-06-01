@@ -190,7 +190,7 @@ namespace Bearish { namespace Math {
 			return (*this);
 		}
 
-		inline T Dot(const vec3_t& other) {
+		inline T Dot(const vec3_t& other) const {
 			return x * other.x + y * other.y + z * other.z;
 		}
 

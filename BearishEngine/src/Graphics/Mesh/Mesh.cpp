@@ -4,10 +4,12 @@
 #include "../../Math/mat4.h"
 #include "Mesh.h"
 #include "../Shader.h"
+#include "../Frustum.h"
 
 using namespace Bearish;
 using namespace Graphics;
 using namespace Math;
+using namespace Core;
 
 Mesh* Mesh::CreateQuad(vec4 texCoords) {
 	std::vector<Vertex> vertices {
@@ -79,8 +81,15 @@ Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::
 	}
 
 	std::vector<Vertex> vertices;
+	_extremes = vec3(0, 0, 0);
 	for (i32 i = 0; i < (i32)numVertices; i++) {
-		vertices.push_back(Vertex(positions[i], texCoords[i], normals[i], tangents[i], boneids[i], boneweights[i]));
+		vec3 pos = positions[i];
+
+		if (abs(pos.x) > abs(_extremes.x)) _extremes.x = abs(pos.x);
+		if (abs(pos.y) > abs(_extremes.y)) _extremes.y = abs(pos.y);
+		if (abs(pos.z) > abs(_extremes.z)) _extremes.z = abs(pos.z);
+
+		vertices.push_back(Vertex(pos, texCoords[i], normals[i], tangents[i], boneids[i], boneweights[i]));
 	}
 
 	SetVertexData(&vertices[0], sizeof(Vertex) * vertices.size());
@@ -145,7 +154,15 @@ void Mesh::SetVertexData(Vertex* data, u32 size) {
 	//_ubo->Unbind();
 }
 
-void Mesh::Submit(const mat4& world, const mat4& mvp) {
+void Mesh::Submit(Transform* transform, const mat4& world, const mat4& mvp) {
+	if (transform != 0) {
+		Frustum fr(mvp);
+
+		if (!fr.SphereIntersects(transform->GetTranslation(), _extremes.Max() * transform->GetScale().Max())) {
+			return;
+		}
+	}
+
 	_worldMatrices.push_back(world);
 	_mvpMatrices.push_back(mvp);
 }

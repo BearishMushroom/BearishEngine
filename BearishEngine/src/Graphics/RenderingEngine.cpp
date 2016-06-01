@@ -255,7 +255,7 @@ void RenderingEngine::Draw() {
 				//_sphere->Submit(t.GetTransformation(), _camera->GetViewMatrix() * t.GetTransformation());
 				_pbrShader->SetUniform("pLight", *pl);
 				_pbrShader->SetUniform("light", 1);
-				_quad->Submit(mat4().CreateIdentity(), mat4().CreateIdentity());
+				_quad->Submit(0, mat4().CreateIdentity(), mat4().CreateIdentity());
 				_quad->Flush(_pbrShader);
 				//_sphere->Flush(mat.first->GetShader());
 				//glFrontFace(GL_CW);
@@ -276,14 +276,14 @@ void RenderingEngine::Draw() {
 				_pbrShader->SetUniform("light", 0);
 					
 
-				_quad->Submit(mat4().CreateIdentity(), mat4().CreateIdentity());
+				_quad->Submit(0, mat4().CreateIdentity(), mat4().CreateIdentity());
 				_quad->Flush(_pbrShader);
 					
 			}
 			else if (l->GetType() == LightType::Spot) {
 				SpotLight* dl = static_cast<SpotLight*>(l);
 
-				_quad->Submit(mat4().CreateIdentity(), mat4().CreateIdentity());
+				_quad->Submit(0, mat4().CreateIdentity(), mat4().CreateIdentity());
 				_pbrShader->SetUniform("spotLight", *dl);
 				_pbrShader->SetUniform("light", 2);
 				_quad->Flush(_pbrShader);
@@ -436,7 +436,7 @@ void RenderingEngine::DrawGuiQuad(Transform t, Texture* tex, u32 subid) {
 	_guiShader->Bind();
 	_guiShader->SetUniform("diffuse", 0);
 	tex->Bind(0, subid);
-	_quad->Submit(mat4().CreateIdentity(), mat4().CreateIdentity());
+	_quad->Submit(0, mat4().CreateIdentity(), mat4().CreateIdentity());
 	_quad->Flush(_guiShader);
 	_guiShader->Unbind();
 }

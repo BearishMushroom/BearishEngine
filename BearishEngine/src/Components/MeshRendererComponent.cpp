@@ -16,7 +16,7 @@ MeshRendererComponent::~MeshRendererComponent() { }
 
 void MeshRendererComponent::Draw(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) {
 	auto trans = _actor->GetTransform().GetTransformation();
-	_mesh->Submit(trans, camera->GetViewMatrix() * trans);
+	_mesh->Submit(&_actor->GetTransform(), trans, camera->GetViewMatrix() * trans);
 	renderer->Submit(_mesh, _material);
 }
 
@@ -38,7 +38,7 @@ void AnimatedMeshRendererComponent::FixedUpdate() {
 
 void AnimatedMeshRendererComponent::Draw(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) {
 	auto trans = _actor->GetTransform().GetTransformation();
-	_mesh->Submit(trans, camera->GetViewMatrix() * trans);
+	_mesh->Submit(&_actor->GetTransform(), trans, camera->GetViewMatrix() * trans);
 
 	shader->SetUniform("bones", _mesh->GetBones());
 

@@ -3,6 +3,7 @@
 
 #include "../../Core/IAllocatable.h"
 #include "../../Core/Model.h"
+#include "../../Core/Transform.h"
 #include "../Renderer.h"
 #include "../Buffer/VBO.h"
 #include "../Buffer/IBO.h"
@@ -59,7 +60,7 @@ namespace Bearish {
 				_transform = transform;
 			}
 
-			void Submit(const Math::mat4& world, const Math::mat4& mvp);
+			void Submit(Core::Transform* transform, const Math::mat4& world, const Math::mat4& mvp);
 
 			void Flush(Shader* shader);
 			void CalculateNormals(std::vector<Vertex>& vertices, std::vector<u32>& indices) const;
@@ -100,6 +101,8 @@ namespace Bearish {
 			Math::mat4 _transform;
 			std::vector<Math::mat4> _boneTransforms;
 			bool _firstAnim, _rigged;
+
+			Math::vec3 _extremes;
 		};
 } }
 

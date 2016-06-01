@@ -216,6 +216,7 @@
     <ClCompile Include="src\Graphics\Camera.cpp" />
     <ClCompile Include="src\Graphics\Buffer\IBO.cpp" />
     <ClCompile Include="src\Graphics\Font.cpp" />
+    <ClCompile Include="src\Graphics\Frustum.cpp" />
     <ClCompile Include="src\Graphics\ImageBuffer.cpp" />
     <ClCompile Include="src\Graphics\Mesh\Mesh.cpp" />
     <ClCompile Include="src\Graphics\Mesh\MeshAnimation.cpp" />
@@ -274,6 +275,7 @@
     <ClInclude Include="src\Graphics\Camera.h" />
     <ClInclude Include="src\Graphics\Buffer\IBO.h" />
     <ClInclude Include="src\Graphics\Font.h" />
+    <ClInclude Include="src\Graphics\Frustum.h" />
     <ClInclude Include="src\Graphics\ImageBuffer.h" />
     <ClInclude Include="src\Graphics\Lights.h" />
     <ClInclude Include="src\Graphics\Material.h" />

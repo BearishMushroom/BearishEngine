@@ -2,6 +2,7 @@
 #define _BEARISH_COMPONENTS_UILABEL_H_
 
 #include "../Core/IActorComponent.h"
+#include "../Core/Actor.h"
 #include "../Core/IAllocatable.h"
 #include "../Graphics/Texture/Texture.h"
 #include "../Graphics/Font.h"
@@ -21,7 +22,7 @@ namespace Bearish { namespace Components {
 			Core::Transform model = _actor->GetTransform();
 			model.GetTranslation() += offset;
 
-			_mesh->Submit(model.GetTransformation(), camera->GetViewMatrix() * model.GetTransformation());
+			_mesh->Submit(0, model.GetTransformation(), camera->GetViewMatrix() * model.GetTransformation());
 
 			_font->GetTexture()->Bind(0);
 			_mesh->Flush(shader);

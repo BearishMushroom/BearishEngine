@@ -40,7 +40,7 @@ namespace Bearish { namespace Components {
 			Math::mat4 mvp = camera->GetViewMatrix() * t.GetTransformation();
 
 			_texture->Bind(0);
-			_mesh->Submit(t.GetTransformation(), mvp);
+			_mesh->Submit(0, t.GetTransformation(), mvp);
 			_mesh->Flush(_shader);
 
 			glCullFace(oldCullFaceMode);
