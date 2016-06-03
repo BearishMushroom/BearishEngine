@@ -307,4 +307,6 @@ i32 Texture::GetFormatForInternalFormat(const TextureFormat in) {
 		return GL_DEPTH_COMPONENT;
 		break;
 	}
+
+	return GL_RGBA;
 }
