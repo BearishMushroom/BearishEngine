@@ -8,15 +8,6 @@
 #include "../OpenGL.h"
 
 namespace Bearish { namespace Graphics {
-	static std::vector<i32> CubeMapFaces {
-		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-	};
-
 	enum class TextureType : u32 {
 		Texture1D = GL_TEXTURE_1D,
 		Texture2D = GL_TEXTURE_2D,
@@ -59,15 +50,22 @@ namespace Bearish { namespace Graphics {
 		Linear  = GL_LINEAR_MIPMAP_LINEAR,
 	};
 
+	enum class TextureDataFormat : i32 {
+		Byte  = GL_UNSIGNED_BYTE,
+		Float = GL_FLOAT
+	};
+
 	class Texture : public Core::IAllocatable<Texture> {
 	public:
 		Texture(const string filename, const TextureType type = TextureType::Texture2D, 
 				const TextureFormat format = TextureFormat::RGBA, const TextureFilter filter = TextureFilter::Linear);
 
 		Texture(const Math::vec2& size = Math::vec2(256, 256), const TextureType type = TextureType::Texture2D, const TextureFilter filter = TextureFilter::Nearest,
-			const TextureAttachment attachment = TextureAttachment::Color0, const TextureFormat format = TextureFormat::RGBA, u8* data = 0);
+				const TextureAttachment attachment = TextureAttachment::Color0, const TextureFormat format = TextureFormat::RGBA, u8* data = 0, 
+				const TextureDataFormat dataFormat = TextureDataFormat::Byte);
 
-		Texture(const Math::vec2& size, const TextureType type, std::vector<TextureAttachment> attachments, std::vector<TextureFormat> formats, u32 num, const TextureFilter filter = TextureFilter::Nearest);
+		Texture(const Math::vec2& size, const TextureType type, std::vector<TextureAttachment> attachments, std::vector<TextureFormat> formats, u32 num, 
+				const TextureFilter filter = TextureFilter::Nearest, std::vector<TextureDataFormat> dataFormats = std::vector<TextureDataFormat>{ TextureDataFormat::Byte });
 
 		Texture(const string posX, const string negX, const string posY, const string negY, const string posZ, const string negZ, 
 			const TextureFormat format = TextureFormat::RGBA, const TextureFilter filter = TextureFilter::Nearest);
@@ -102,7 +100,18 @@ namespace Bearish { namespace Graphics {
 		void SetReadBuffer(u32 buffer) const;
 
 		string GetName() { return _filename; }
+
+		i32 GetFormatForInternalFormat(const TextureFormat in);
 	protected:
+		const std::vector<i32> CubeMapFaces {
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+			GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+			GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+			GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+			GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+			GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+		};
+
 		string _filename;
 		Math::vec2 _size;
 		u32* _ids;
@@ -110,6 +119,7 @@ namespace Bearish { namespace Graphics {
 		
 		TextureFilter _filter;
 		TextureType _type;
+		std::vector<TextureDataFormat> _dataFormats;
 		std::vector<TextureFormat> _formats;
 		std::vector<TextureAttachment> _attachments;
 	};

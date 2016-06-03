@@ -76,7 +76,14 @@ void RenderingEngine::Load() {
 		TextureFormat::RGBA,  // Spec + gloss
 	};
 
-	_gbuffer = new Texture(vec2(1280, 720), TextureType::Texture2D, att, fmt, 4);
+	std::vector<TextureDataFormat> dfmt{
+		TextureDataFormat::Float,
+		TextureDataFormat::Byte,
+		TextureDataFormat::Byte,
+		TextureDataFormat::Float
+	};
+
+	_gbuffer = new Texture(vec2(1280, 720), TextureType::Texture2D, att, fmt, 4, TextureFilter::Nearest, dfmt);
 
 	_geomShader = new Shader("res/geometrypass.vert", "res/geometrypass.frag");
 	_geomShader->SetName("geom");
@@ -465,27 +472,27 @@ void RenderingEngine::SetShadowQuality(ShadowQuality quality) {
 			break;
 
 		case ShadowQuality::Terrible:
-			_shadowMap = new Texture(vec2(512), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32);
+			_shadowMap = new Texture(vec2(512), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32, 0, TextureDataFormat::Float);
 			_shadowPcfSize = 0;
 			break;
 
 		case ShadowQuality::Low:
-			_shadowMap = new Texture(vec2(1024), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32);
+			_shadowMap = new Texture(vec2(1024), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32, 0, TextureDataFormat::Float);
 			_shadowPcfSize = 1;
 			break;
 
 		case ShadowQuality::Medium:
-			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32);
+			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32, 0, TextureDataFormat::Float);
 			_shadowPcfSize = 2;
 			break;
 
 		case ShadowQuality::High:
-			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32);
+			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32, 0, TextureDataFormat::Float);
 			_shadowPcfSize = 3;
 			break;
 
 		case ShadowQuality::Ultra:
-			_shadowMap = new Texture(vec2(4096), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32);
+			_shadowMap = new Texture(vec2(4096), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32, 0, TextureDataFormat::Float);
 			_shadowPcfSize = 4;
 			break;
 		}

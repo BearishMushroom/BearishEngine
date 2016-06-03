@@ -9,25 +9,38 @@ using namespace Core;
 
 Texture::Texture(const string filename, const TextureType type, const TextureFormat format, const TextureFilter filter) {
 	_filter = filter;
+	_dataFormats = std::vector<TextureDataFormat>{ TextureDataFormat::Byte };
 	Load(filename, type, format);
 }
 
-Texture::Texture(const vec2& size, const TextureType type, const TextureFilter filter, const TextureAttachment attachment, const TextureFormat format, u8* data) {
+Texture::Texture(const vec2& size, const TextureType type, const TextureFilter filter, const TextureAttachment attachment, const TextureFormat format, u8* data, const TextureDataFormat dataFormat) {
 	_size = size;
 	_type = type;
 	_filter = filter;
 	_attachments = std::vector<TextureAttachment>{ attachment };
 	_formats = std::vector<TextureFormat>{ format };
+	_dataFormats = std::vector<TextureDataFormat>{ TextureDataFormat::Byte };
+
 	InitTextures(type, _formats, &data);
 	InitRenderTargets(_attachments);
 }
 
-Texture::Texture(const vec2& size, const TextureType type, std::vector<TextureAttachment> attachments, std::vector<TextureFormat> formats, u32 num, const TextureFilter filter) {
+Texture::Texture(const vec2& size, const TextureType type, std::vector<TextureAttachment> attachments, std::vector<TextureFormat> formats, u32 num, 
+				const TextureFilter filter, std::vector<TextureDataFormat> dataFormats) {
 	_size = size;
 	_type = type;
 	_filter = filter;
 	_attachments = attachments;
 	_formats = formats;
+
+	if (dataFormats.size() == 1) {
+		for (i32 i = 0; i < num - 1; i++) {
+			dataFormats.push_back(dataFormats[0]);
+		}
+	}
+
+	_dataFormats = dataFormats;
+
 	u8* datas = 0;
 	InitTextures(type, formats, 0, num);
 	InitRenderTargets(attachments);
@@ -38,6 +51,8 @@ Texture::Texture(const string posX, const string negX, const string posY, const 
 	_formats = std::vector<TextureFormat>{ format };
 	_type = TextureType::CubeMap;
 	_filter = filter;
+	_dataFormats = std::vector<TextureDataFormat>{ TextureDataFormat::Byte };
+
 	Load(posX, negX, posY, negY, posZ, negZ);
 }
 
@@ -51,6 +66,7 @@ Texture::Texture(const vec4& color) {
 
 	_size = vec2(1, 1);
 	_type = TextureType::Texture2D;
+	_dataFormats = std::vector<TextureDataFormat>{ TextureDataFormat::Byte };
 
 	InitTextures(_type, _formats, &data, 1);
 	InitRenderTargets(_attachments);
@@ -137,16 +153,18 @@ void Texture::InitTextures(const TextureType type, std::vector<TextureFormat> fo
 		u8* d = 0;
 		if (datas) d = datas[i];
 
-		if (formats[i] == TextureFormat::Depth16 || formats[i] == TextureFormat::Depth24 || formats[i] == TextureFormat::Depth32) {
-			// Special case for depth textures.
-			glTexImage2D((GLenum)type, 0, (GLint)formats[i], static_cast<i32>(_size.x), static_cast<i32>(_size.y), 0, GL_DEPTH_COMPONENT, GL_FLOAT, d);
+		i32 format = GetFormatForInternalFormat(formats[i]);
+
+		glTexImage2D((GLenum)type, 0, (GLint)formats[i], static_cast<i32>(_size.x), static_cast<i32>(_size.y), 0, (GLint)format, (GLenum)_dataFormats[i], d);
+
+		if (format == GL_DEPTH_COMPONENT) {
 			glTexParameteri((GLenum)type, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 			glTexParameteri((GLenum)type, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 		}
 		else {
-			glTexImage2D((GLenum)type, 0, (GLint)formats[i], static_cast<i32>(_size.x), static_cast<i32>(_size.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, d);
 			glGenerateMipmap((GLenum)type);
 		}
+
 
 		glTexParameteri((GLenum)type, GL_TEXTURE_MAG_FILTER, _filter == TextureFilter::Linear ? GL_LINEAR : GL_NEAREST);
 		glTexParameteri((GLenum)type, GL_TEXTURE_MIN_FILTER, (GLenum)_filter);
@@ -254,4 +272,39 @@ void Texture::BindForReading() const {
 
 void Texture::SetReadBuffer(u32 buffer) const {
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + buffer);
+}
+
+i32 Texture::GetFormatForInternalFormat(const TextureFormat in) {
+	switch (in) {
+	case TextureFormat::R16:
+	case TextureFormat::R32:
+		return GL_RED;
+		break;
+	case TextureFormat::RG:
+	case TextureFormat::RG16:
+	case TextureFormat::RG32:
+		return GL_RG;
+		break;
+	case TextureFormat::RGB:
+	case TextureFormat::RGB16:
+	case TextureFormat::RGB32:
+		return GL_RGB;
+		break;
+	case TextureFormat::RGBA:
+	case TextureFormat::RGBA16:
+	case TextureFormat::RGBA32:
+		return GL_RGBA;
+		break;
+	case TextureFormat::BGR:
+		return GL_BGR;
+		break;	
+	case TextureFormat::ABGR:
+			return GL_BGRA;
+			break;
+	case TextureFormat::Depth16:
+	case TextureFormat::Depth24:
+	case TextureFormat::Depth32:
+		return GL_DEPTH_COMPONENT;
+		break;
+	}
 }
