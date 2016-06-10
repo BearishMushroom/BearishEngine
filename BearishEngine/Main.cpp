@@ -206,6 +206,24 @@ void Update() {
 			button6->AddChild(label6);
 			UI_PANEL->AddChild(button6);
 
+			Actor* button7 = new Actor(Transform(vec3(0, 160, 1), vec3(260, 75, 1)));
+			button7->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+				renderer.SetDebugMode(6);
+			}));
+			Actor* label7 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label7->AddComponent(new IActorComponent("UILabel", UI_FONT, "SSAO", 48));
+			button7->AddChild(label7);
+			UI_PANEL->AddChild(button7);
+
+			Actor* button8 = new Actor(Transform(vec3(0, 260, 1), vec3(260, 75, 1)));
+			button8->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			}));
+
+			Actor* label8 = new Actor(Transform(vec3(0, 0, 10), vec3(1, 1, 1)));
+			label8->AddComponent(new UITextArea(vec2(240, 40), UI_FONT, 48));
+			button8->AddChild(label8);
+			UI_PANEL->AddChild(button8);
+
 			actors.push_back(UI_PANEL);
 			actors.push_back(UI_GRAPH);
 			PANEL_OPEN = true;
@@ -334,7 +352,7 @@ i32 main(i32 argc, c8** argv) {
 	fpsCounter->AddComponent(new UILabel(new Font("res/Roboto.ttf"), "FPS: 0", 48));
 	actors.push_back(fpsCounter);
 	
-	player = new Actor;
+	player = new Actor(Transform(vec3(30, 0, 30)));
 	player->AddComponent(new SkyboxComponent(skybox));
 
 	player->AddComponent(new IActorComponent("CameraComponent"));
@@ -364,10 +382,10 @@ i32 main(i32 argc, c8** argv) {
 		}
 	}
 
-	Actor* dir = new Actor(Transform(vec3(0.f), vec3(1.f), quat().CreateRotation(vec3(1.f, 0.f, 0.f), AsRadians(83.f))));
+	Actor* dir = new Actor(Transform(vec3(30, 0.f, 30), vec3(1.f), quat().CreateRotation(vec3(1.f, 0.f, 0.f), AsRadians(83.f))));
 	dir->AddComponent(new DirectionalLightComponent(vec3(1.f), 0.1f, 0.2f));
 
-	Actor* ples = new Actor(Transform(vec3(2.f, 15.f, 0.0f)));
+	Actor* ples = new Actor(Transform(vec3(32.f, 15.f, 30.0f)));
 	ples->AddComponent(new PointLightComponent(vec3(1.f), 0.f, Attenuation(0.f, 0.f, 0.0055f), 0.3f));
 	actors.push_back(ples);
 
@@ -525,7 +543,7 @@ i32 main(i32 argc, c8** argv) {
 
 	for (i32 i = 0; i < 393; i++) {
 		auto model = Model("asset/sponza2/sponza_" + std::to_string(i) + ".bem");
-		Actor* a = new Actor(Transform(vec3(0), vec3(0.01)));
+		Actor* a = new Actor(Transform(vec3(30, 0, 30), vec3(0.01)));
 		Material* mat = &pbrTest;
 
 		if (model.name.find("Mesh", 0) == string::npos) {

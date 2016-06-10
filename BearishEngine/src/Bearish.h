@@ -66,6 +66,7 @@
 #include "Components\CameraComponent.h"
 #include "Components\UIDraggable.h"
 #include "Components\UILineGraph.h"
+#include "Components\UITextArea.h"
 #include "Components\UIButton.h"
 #include "Components\UIPanel.h"
 #include "Components\UILabel.h"

@@ -223,6 +223,13 @@ void Shader::SetUniform(const string& name, const Math::vec3& value) {
 	glUniform3f(pos, value.x, value.y, value.z);
 }
 
+void Shader::SetUniform(const string& name, std::vector<Math::vec3>& value) {
+	i32 pos = _uniformLocations[name];
+	if (pos == -1) return;
+	glUniform3fv(pos, value.size(), (f32*)&value[0]);
+}
+
+
 void Shader::SetUniform(const string& name, const Math::vec4& value) {
 	i32 pos = _uniformLocations[name];
 	if (pos == -1) return;

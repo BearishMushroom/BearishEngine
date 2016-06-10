@@ -62,6 +62,7 @@ namespace Bearish { namespace Graphics {
 		void SetUniform(const string& name, f32 value);
 		void SetUniform(const string& name, const Math::vec2& value);
 		void SetUniform(const string& name, const Math::vec3& value);
+		void SetUniform(const string& name, std::vector<Math::vec3>& value);
 		void SetUniform(const string& name, const Math::vec4& value);
 		void SetUniform(const string& name, Math::mat4 value);
 		void SetUniform(const string& name, std::vector<Math::mat4>& value);

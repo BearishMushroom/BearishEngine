@@ -12,7 +12,7 @@
 namespace Bearish { namespace Components {
 	class UILabel : public Core::IActorComponent, public Core::IAllocatable<UILabel> {
 	public:
-		UILabel(Graphics::Font* font, std::string text, f32 scale) : _font(font), _text(text), _mesh(font->GenerateMesh(text, scale)), _scale(scale) {}
+		UILabel(Graphics::Font* font, string text, f32 scale) : _font(font), _text(text), _mesh(font->GenerateMesh(text, scale)), _scale(scale) {}
 		~UILabel() {
 			delete _mesh;
 		}
@@ -39,7 +39,7 @@ namespace Bearish { namespace Components {
 		f32 _scale;
 		Graphics::Mesh* _mesh;
 		Graphics::Font* _font;
-		std::string _text;
+		string _text;
 	};
 } }
 

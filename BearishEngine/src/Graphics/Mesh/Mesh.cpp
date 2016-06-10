@@ -155,13 +155,13 @@ void Mesh::SetVertexData(Vertex* data, u32 size) {
 }
 
 void Mesh::Submit(Transform* transform, const mat4& world, const mat4& mvp) {
-	if (transform != 0) {
+	/*if (transform != 0) {
 		Frustum fr(mvp);
 
 		if (!fr.SphereIntersects(transform->GetTranslation(), _extremes.Max() * transform->GetScale().Max())) {
 			return;
 		}
-	}
+	}*/
 
 	_worldMatrices.push_back(world);
 	_mvpMatrices.push_back(mvp);

@@ -15,7 +15,7 @@ uniform sampler2D gNormal;
 uniform sampler2D gDiffuse;
 uniform sampler2D gSpecRoughness;
 
-uniform sampler2DShadow shadowMap;
+uniform sampler2D shadowMap;
 
 uniform DirectionalLight dLight = { { {0, 0, 0}, 0, 0}, {0, 0, 0}};
 uniform PointLight pLight = { { {0, 0, 0}, 0, 0}, {0, 0, 0}, {0, 0, 0}};
@@ -30,6 +30,8 @@ in mat4 lightMat;
 // PBR Inputs
 uniform sampler2D PreintegratedFG;
 uniform samplerCube EnvironmentMap;
+
+uniform sampler2D gSSAO;
 
 vec4 GammaCorrectTexture(sampler2D tex, vec2 uv) {
 	vec4 samp = texture(tex, uv);
@@ -68,10 +70,10 @@ vec3 PBR(float visibility, vec4 albedo, vec3 specular, float roughness, vec3 wor
 }
 
 void main() {
-	vec2 tc = CalcTexCoord(screen);  
+	vec2 tc = CalcTexCoord(screen);
 
 	vec3 position = texture(gPosition, tc).xyz;
-	vec3 normal = DecodeNormal(texture(gNormal, tc).xy);
+	vec3 normal = (texture(gNormal, tc).xyz);
   vec3 eye = normalize(eyePos - position);
 
   vec4 albedo = vec4(GammaCorrectTextureRGB(gDiffuse, tc), 1);
@@ -83,10 +85,11 @@ void main() {
 	if (light == LIGHT_DIRECTIONAL) {
 	  vec4 lp = (lightMat * vec4(position, 1));
 
-		float NdotL = clamp(dot(normal, dLight.direction), 0.0, 1.0);
+		float NdotL = dot(normal, dLight.direction);
 
 	  float visibility = CalculateShadow(shadowMap, lp, NdotL);
 	  vec4 final = vec4(PBR(visibility, albedo, specular, roughness, position, normal, eye, dLight.direction, dLight.base.color, dLight.base.diffuseIntensity), albedo.a);
+		final += albedo * dLight.base.ambientIntensity * texture(gSSAO, tc).r;
 	  fragcolor = final;
 	}
 
@@ -103,6 +106,7 @@ void main() {
   						pLight.attenuation.exponent * distanceToPoint * distanceToPoint);
 
 		vec4 final = color * attenuation;
+		final += albedo * pLight.base.ambientIntensity * texture(gSSAO, tc).r;
 		fragcolor = final;
 	}
 }

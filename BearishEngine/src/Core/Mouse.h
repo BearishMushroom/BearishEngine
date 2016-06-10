@@ -4,7 +4,6 @@
 #include "../Math/vec2.h"
 #include "ButtonState.h"
 #include "../Types.h"
-#include "Window.h"
 
 namespace Bearish { namespace Core {
 	enum class MouseButton : u8 {

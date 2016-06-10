@@ -17,6 +17,8 @@
 
 #include "../Utils.h"
 
+#include <random>
+
 using namespace Bearish;
 using namespace Core;
 using namespace Graphics;
@@ -39,6 +41,9 @@ void RenderingEngine::Load() {
 	_phongShader = new Shader("res/phong.vert", "res/phong.frag");
 	_shadowShader = new Shader("res/shadowmap.vert", "res/shadowmap.frag");
 	_guiShader = new Shader("res/gui.vert", "res/gui.frag");
+	_blur7 = new Shader("res/blur7.vert", "res/blur7.frag");
+	_blur9 = new Shader("res/blur9.vert", "res/blur9.frag");
+	_blur = 0;
 
 	SetShadowQuality(ShadowQuality::High);
 
@@ -70,20 +75,15 @@ void RenderingEngine::Load() {
 	*/
 
 	std::vector<TextureFormat> fmt {
-		TextureFormat::RGB16, // Position
-		TextureFormat::RG16,  // Normal XY
+		TextureFormat::RGBA16, // Position
+		TextureFormat::RGB16,  // Normal XY
 		TextureFormat::RGB,   // Diffuse
 		TextureFormat::RGBA,  // Spec + gloss
 	};
 
-	std::vector<TextureDataFormat> dfmt{
-		TextureDataFormat::Float,
-		TextureDataFormat::Byte,
-		TextureDataFormat::Byte,
-		TextureDataFormat::Float
-	};
 
-	_gbuffer = new Texture(vec2(1280, 720), TextureType::Texture2D, att, fmt, 4, TextureFilter::Nearest, dfmt);
+	_gbuffer = new Texture(vec2(1280, 720), TextureType::Texture2D, att, fmt, 4);
+	_ssaoBuffer = new Texture(vec2(1280, 720), TextureType::Texture2D, TextureFilter::Nearest, TextureAttachment::Color0, TextureFormat::R, 0);
 
 	_geomShader = new Shader("res/geometrypass.vert", "res/geometrypass.frag");
 	_geomShader->SetName("geom");
@@ -102,6 +102,34 @@ void RenderingEngine::Load() {
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	testFont = new Font("res/Roboto.ttf");
+
+	std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0); // random floats between 0.0 - 1.0
+	std::default_random_engine generator;
+	f32 scale = 0;
+	for (i32 i = 0; i < 64; ++i) {
+		vec3 sample(
+			randomFloats(generator) * 2.0 - 1.0,
+			randomFloats(generator) * 2.0 - 1.0,
+			randomFloats(generator));
+
+		sample.Normalize();
+		scale = 0.1f + (scale * scale) * (1.0f - 0.1f);
+		sample *= scale;
+		_ssaoKernel.push_back(sample);
+	}
+
+	std::vector<vec3> ssaoNoise;
+	for (i32 i = 0; i < 16; i++) {
+		vec3 noise(
+			randomFloats(generator) * 2.0 - 1.0,
+			randomFloats(generator) * 2.0 - 1.0,
+			0.0f);
+		ssaoNoise.push_back(noise);
+	}
+
+	_ssaoNoise = new Texture(vec2(4, 4), TextureType::Texture2D, TextureFilter::Nearest, TextureAttachment::None, TextureFormat::RGB16, (u8*)&ssaoNoise[0], TextureDataFormat::Float, TextureWrapMode::Repeat);
+
+	_ssaoShader = new Shader("res/ssaoresolve.vert", "res/ssaoresolve.frag");
 
 	testPart = new ParticleSystem(new Texture("asset/particle.bet"),
 	[](const vec3& pos) -> Particle {
@@ -172,7 +200,7 @@ void RenderingEngine::Draw() {
 	
 	vec3 cameraLightTrans = _camera->GetTransform().GetTranslation();// +
 		//vec3(_camera->GetTransform().GetRotation().Forward().x, 0, _camera->GetTransform().GetRotation().Forward().z) * 10;
-	cameraLightTrans.y = 5;
+	cameraLightTrans.y = 2;
 
 	// Prepare geometry pass.
 	glEnable(GL_DEPTH_TEST);
@@ -185,8 +213,8 @@ void RenderingEngine::Draw() {
 				glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 				_shadowMap->Clear();
 				_shadowShader->Bind();
-				Camera scamera = Camera(mat4().CreateOrthographic(-30, 30, -30, 30, -20, 10), Transform(cameraLightTrans,
-					vec3(1), ((DirectionalLight*)light)->GetDirection()));
+
+				Camera scamera = GetShadowMapProjection(cameraLightTrans, (DirectionalLight*)light);
 
 				glCullFace(GL_FRONT);
 
@@ -203,6 +231,15 @@ void RenderingEngine::Draw() {
 	}
 
 	//glFinish();
+
+	if (_blur != 0) {
+		_blur->Bind();
+		_blur->SetUniform("scale", vec2(1, 0));
+		ApplyFilter(_blur, _shadowMap, _shadowMapPong);
+		_blur->SetUniform("scale", vec2(0, 1));
+		ApplyFilter(_blur, _shadowMapPong, _shadowMap);
+	}
+
 	_shadowTime += frameTimer.LoopMS();
 
 	_gbuffer->BindForWriting();
@@ -210,7 +247,7 @@ void RenderingEngine::Draw() {
 	_renderer->Clear();
 
 	_geomShader->Bind();
-
+	_geomShader->SetUniform("CameraPlanes", vec2(0.1f, 100.f));
 	for (auto& a : *_actors) {
 		a->Draw(this, _geomShader, _camera);
 	}
@@ -219,33 +256,45 @@ void RenderingEngine::Draw() {
 	//glFinish();
 	_geomTime += frameTimer.LoopMS();
 
+	// SSAO
+	glDisable(GL_DEPTH_TEST);
+	_gbuffer->BindForReading();
+	_gbuffer->Bind(0, 0);
+	_gbuffer->Bind(1, 1);
+
+	_ssaoBuffer->BindAsRenderTarget();
+	_ssaoShader->Bind();
+	_ssaoShader->SetUniform("Kernel", _ssaoKernel);
+	_ssaoShader->SetUniform("Noise", _ssaoNoise);
+	_ssaoShader->SetUniform("Screen", vec2(1280, 720));
+	_ssaoShader->SetUniform("Projection", _camera->GetViewMatrix());
+	_quad->Submit(0, mat4().CreateIdentity(), mat4().CreateIdentity());
+	_quad->Flush(_ssaoShader);
+
 	// Prepare lighting pass.
 	glDepthMask(GL_FALSE);
-	glDisable(GL_DEPTH_TEST);
 
 	glEnable(GL_BLEND);
 	Renderer::SetBlendState(BlendState::Additive);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	_gbuffer->BindForReading();
 	if (_debugMode == 0) {
 		_renderer->Clear();
 
-		_gbuffer->Bind(0, 0);
-		_gbuffer->Bind(1, 1);
 		_gbuffer->Bind(2, 2);
 		_gbuffer->Bind(3, 3);
 
 			// Disable backface culling so we can render the light while inside its radius.
 		_pbrShader->Bind();
+		_pbrShader->SetUniform("gSSAO", 7);
+		_ssaoBuffer->Bind(7);
 		_pbrShader->SetUniform("screen", vec2(1280, 720));
 		_pbrShader->SetUniform("eyePos", GetCamera()->GetTransform().GetTranslation());
 		_pbrShader->SetUniform("gPosition", 0);
 		_pbrShader->SetUniform("gNormal", 1);
 		_pbrShader->SetUniform("gDiffuse", 2);
 		_pbrShader->SetUniform("gSpecRoughness", 3);
-		_pbrShader->SetUniform("pcfSize", (i32)_shadowPcfSize);
-		_pbrShader->SetUniform("shadowSize", _shadowMap == nullptr ? 0 : (i32)_shadowMap->GetSize().x);
+		_pbrShader->SetUniform("shadowMS", (i32)_shadowSamples);
 
 		_pbrShader->SetUniform("PreintegratedFG", 5);
 		_pbrShader->SetUniform("EnvironmentMap", 6);
@@ -270,8 +319,8 @@ void RenderingEngine::Draw() {
 			}
 			else if (l->GetType() == LightType::Directional) {
 				DirectionalLight* dl = static_cast<DirectionalLight*>(l);
-				Camera scamera = Camera(mat4().CreateOrthographic(-30, 30, -30, 30, -20, 10), Transform(cameraLightTrans,
-					vec3(1), dl->GetDirection()));
+
+				Camera scamera = GetShadowMapProjection(cameraLightTrans, dl);
 
 				if (_shadowMap) {
 					_pbrShader->SetUniform("shadowMap", 4);
@@ -341,6 +390,7 @@ void RenderingEngine::Draw() {
 		if (_shadowMap) {
 			if(_debugMode == 5) DrawGuiQuad(Transform(vec3(2.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _shadowMap, 0);
 		}
+		if (_debugMode == 6) DrawGuiQuad(Transform(vec3(2.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _ssaoBuffer, 0);
 		Renderer::SetFillMode(start);
 	}
 
@@ -462,38 +512,51 @@ i32 RenderingEngine::PushMaterial(Material* material) {
 }
 
 void RenderingEngine::SetShadowQuality(ShadowQuality quality) {
+	glEnable(GL_MULTISAMPLE);
 	if (quality != _shadowQuality) {
 		_shadowQuality = quality;
 		delete _shadowMap;
 		_shadowMap = nullptr;
+		delete _shadowMapPong;
+		_shadowMapPong = nullptr;
 		switch (quality) {
 		case ShadowQuality::Off:
-			_shadowPcfSize = 0;
+			_blur = 0;
 			break;
 
 		case ShadowQuality::Terrible:
-			_shadowMap = new Texture(vec2(512), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32, 0, TextureDataFormat::Float);
-			_shadowPcfSize = 0;
+			_shadowMap = new Texture(vec2(512), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::RG32, 0, TextureDataFormat::Float);
+			_shadowMapPong = new Texture(vec2(512), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::RG32, 0, TextureDataFormat::Float);
+			_shadowMapSize = 512;
+			_blur = 0;
 			break;
 
 		case ShadowQuality::Low:
-			_shadowMap = new Texture(vec2(1024), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32, 0, TextureDataFormat::Float);
-			_shadowPcfSize = 1;
+			_shadowMap = new Texture(vec2(1024), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::RG32, 0, TextureDataFormat::Float);
+			_shadowMapPong = new Texture(vec2(1024), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::RG32, 0, TextureDataFormat::Float);
+			_shadowMapSize = 1024;
+			_blur = 0;
 			break;
 
 		case ShadowQuality::Medium:
-			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32, 0, TextureDataFormat::Float);
-			_shadowPcfSize = 2;
+			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::RG32, 0, TextureDataFormat::Float);
+			_shadowMapPong = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::RG32, 0, TextureDataFormat::Float);
+			_shadowMapSize = 2048;
+			_blur = _blur7;
 			break;
 
 		case ShadowQuality::High:
-			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32, 0, TextureDataFormat::Float);
-			_shadowPcfSize = 3;
+			_shadowMap = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::RG32, 0, TextureDataFormat::Float);
+			_shadowMapPong = new Texture(vec2(2048), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::RG32, 0, TextureDataFormat::Float);
+			_shadowMapSize = 2048;
+			_blur = _blur7;
 			break;
 
 		case ShadowQuality::Ultra:
-			_shadowMap = new Texture(vec2(4096), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Depth, TextureFormat::Depth32, 0, TextureDataFormat::Float);
-			_shadowPcfSize = 4;
+			_shadowMap = new Texture(vec2(4096), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::RG32, 0, TextureDataFormat::Float);
+			_shadowMapPong = new Texture(vec2(4096), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::RG32, 0, TextureDataFormat::Float);
+			_shadowMapSize = 4096;
+			_blur = _blur9;
 			break;
 		}
 	}
@@ -501,4 +564,71 @@ void RenderingEngine::SetShadowQuality(ShadowQuality quality) {
 
 Renderer* RenderingEngine::GetRenderer() {
 	return _renderer;
+}
+
+void RenderingEngine::ApplyFilter(Shader* filter, Texture* src, Texture* dest) const {
+	filter->Bind();
+	filter->SetUniform("diffuse", src);
+	dest->BindAsRenderTarget();
+	_quad->Submit(0, mat4().CreateIdentity(), mat4().CreateIdentity());
+	_quad->Flush(filter);
+}
+
+Camera RenderingEngine::GetShadowMapProjection(vec3 position, DirectionalLight* light) {
+	/*std::vector<vec3> cube(NDC);
+	Transform lightTrans = Transform(cameraLightTrans, vec3(1), dl->GetDirection());
+	mat4 invVP = _camera->GetViewMatrix().Inverse();
+	mat4 invWorld = lightTrans.GetTransformation().Inverse();
+
+	mat4 trans = invVP * invWorld;
+
+	for (i32 i = 0; i < cube.size(); i++) {
+	cube[i] = trans.Transform(cube[i]);
+	}
+
+	vec2 x(INFINITY, -INFINITY), y(INFINITY, -INFINITY), z(INFINITY, -INFINITY);
+
+	for (auto& c : cube) {
+	x.x = min(x.x, c.x);
+	x.y = max(x.y, c.x);
+
+	y.x = min(y.x, c.y);
+	y.y = max(y.y, c.y);
+
+	z.x = min(z.x, c.z);
+	z.y = max(z.y, c.z);
+	}
+
+	f32 xs = abs((x.y - x.x) / 2) + 5;
+	f32 ys = abs((y.y - y.x) / 2) + 5;
+	f32 zs = abs((z.y - z.x) / 2) + 5;*/
+
+	auto cam = Camera(mat4().CreateOrthographic(-30, 30, -30, 30, -10, 30), Transform(position,
+		vec3(1), light->GetDirection()));
+
+	/*mat4 view = cam.GetViewMatrix();
+	vec3 origin(0, 0, 0);
+
+	origin = view.Transform(origin);
+	f32 texX = origin.x * _shadowMapSize * 0.5f;
+	f32 texY = origin.z * _shadowMapSize * 0.5f;
+
+	f32 rX = roundf(texX);
+	f32 rY = roundf(texY);
+
+	f32 dx = rX - texX;
+	f32 dy = rY - texY;
+
+	dx /= _shadowMapSize * 0.5f;
+	dy /= _shadowMapSize * 0.5f;*/
+
+	/*f32 factor = 60 / _shadowMapSize;
+	i32 x = roundf(cam.GetTransform().GetTranslation().x / factor) * factor;
+	i32 z = roundf(cam.GetTransform().GetTranslation().z / factor) * factor;
+
+	printf("%s\n", cam.GetTransform().GetTranslation().ToString().c_str());
+	cam.GetTransform().SetTranslation(cam.GetTransform().GetTranslation() + vec3(-x, 0, -z));
+	printf("%s\n---\n", cam.GetTransform().GetTranslation().ToString().c_str());
+	*/
+	return cam;
 }

@@ -19,6 +19,7 @@ namespace Bearish { namespace Graphics {
 		
 		Math::mat4 GetViewMatrix() const;
 	private:
+		f32 _near, _far;
 		Math::mat4 _projection;
 		Core::Transform _transform;
 	};

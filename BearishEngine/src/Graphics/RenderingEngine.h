@@ -79,6 +79,9 @@ namespace Bearish {
 
 		f32 GetCPUTime() const { return _cpuRenderTime; }
 
+		void ApplyFilter(Shader* filter, Texture* src, Texture* dest) const;
+		Camera GetShadowMapProjection(Math::vec3 position, DirectionalLight* light);
+
 		Renderer* GetRenderer();
 	private:
 		std::vector<Light*> _lights;
@@ -98,11 +101,18 @@ namespace Bearish {
 		Texture* _environmentMap;
 		Texture* _preFG;
 
-		Texture* _shadowMap;
-		f32 _shadowPcfSize;
+		Texture* _shadowMap,* _shadowMapPong;
+		f32 _shadowMapSize;
+		f32 _shadowSamples;
 		ShadowQuality _shadowQuality;
 
+		std::vector<Math::vec3> _ssaoKernel;
+		Texture* _ssaoNoise,* _ssaoBuffer;
+		Shader* _ssaoShader;
+
 		f32 PointLightSize(PointLight* pl);
+
+		Shader* _blur,* _blur7,* _blur9;
 
 		Font* testFont;
 
@@ -112,6 +122,18 @@ namespace Bearish {
 		f32 _time, _shadowTime, _geomTime, _accTime, _preTime, _postTime, _2dTime, _frameTime,
 			_shadowTimeFrame, _geomTimeFrame, _accTimeFrame, _preTimeFrame, _postTimeFrame, _2dTimeFrame,
 			_cpuRenderTime;
+
+		const std::vector<Math::vec3> NDC {
+			Math::vec3(-1, -1, -1),
+			Math::vec3( 1, -1, -1),
+			Math::vec3( 1, -1,  1),
+			Math::vec3(-1, -1,  1),
+
+			Math::vec3(-1,  1, -1),
+			Math::vec3( 1,  1, -1),
+			Math::vec3( 1,  1,  1),
+			Math::vec3(-1,  1,  1),
+		};
 	public:
 		Shader* _phongShader, *_shadowShader, *_geomShader, *_guiShader, *_pbrShader;
 		ParticleSystem* testPart;

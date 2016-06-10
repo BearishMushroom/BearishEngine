@@ -17,6 +17,7 @@ namespace Bearish { namespace Math {
 	private:
 		union {
 			T _v[4][4];
+			T _flat[16];
 		};
 	public:
 		inline const T* operator[](size_t index) const {
@@ -192,8 +193,148 @@ namespace Bearish { namespace Math {
 			return _v[x][y];
 		}
 
+		inline T Get(i32 idx) const {
+			return _v[(i32)(idx / 4)][idx % 4];
+		}
+
+		inline void Set(i32 idx, T val) {
+			_v[(i32)(idx / 4)][idx % 4] = val;
+		}
+
 		inline void Set(i32 x, i32 y, T value) {
 			_v[x][y] = value;
+		}
+
+		inline mat4_t<T> Inverse() const {
+			mat4_t<T> inv;
+			f32 det;
+			i32 i;
+
+			inv.Set(0, Get(5) * Get(10) * Get(15) -
+				Get(5) * Get(11) * Get(14) -
+				Get(9) * Get(6) * Get(15) +
+				Get(9) * Get(7) * Get(14) +
+				Get(13) * Get(6) * Get(11) -
+				Get(13) * Get(7) * Get(10));
+
+			inv.Set(4, -Get(4) * Get(10) * Get(15) +
+				Get(4) * Get(11) * Get(14) +
+				Get(8) * Get(6) * Get(15) -
+				Get(8) * Get(7) * Get(14) -
+				Get(12) * Get(6) * Get(11) +
+				Get(12) * Get(7) * Get(10));
+
+			inv.Set(8, Get(4) * Get(9) * Get(15) -
+				Get(4) * Get(11) * Get(13) -
+				Get(8) * Get(5) * Get(15) +
+				Get(8) * Get(7) * Get(13) +
+				Get(12) * Get(5) * Get(11) -
+				Get(12) * Get(7) * Get(9));
+
+			inv.Set(12, -Get(4) * Get(9) * Get(14) +
+				Get(4) * Get(10) * Get(13) +
+				Get(8) * Get(5) * Get(14) -
+				Get(8) * Get(6) * Get(13) -
+				Get(12) * Get(5) * Get(10) +
+				Get(12) * Get(6) * Get(9));
+
+			inv.Set(1, -Get(1) * Get(10) * Get(15) +
+				Get(1) * Get(11) * Get(14) +
+				Get(9) * Get(2) * Get(15) -
+				Get(9) * Get(3) * Get(14) -
+				Get(13) * Get(2) * Get(11) +
+				Get(13) * Get(3) * Get(10));
+
+			inv.Set(5, Get(0) * Get(10) * Get(15) -
+				Get(0) * Get(11) * Get(14) -
+				Get(8) * Get(2) * Get(15) +
+				Get(8) * Get(3) * Get(14) +
+				Get(12) * Get(2) * Get(11) -
+				Get(12) * Get(3) * Get(10));
+
+			inv.Set(9, -Get(0) * Get(9) * Get(15) +
+				Get(0) * Get(11) * Get(13) +
+				Get(8) * Get(1) * Get(15) -
+				Get(8) * Get(3) * Get(13) -
+				Get(12) * Get(1) * Get(11) +
+				Get(12) * Get(3) * Get(9));
+
+			inv.Set(13, Get(0) * Get(9) * Get(14) -
+				Get(0) * Get(10) * Get(13) -
+				Get(8) * Get(1) * Get(14) +
+				Get(8) * Get(2) * Get(13) +
+				Get(12) * Get(1) * Get(10) -
+				Get(12) * Get(2) * Get(9));
+
+			inv.Set(2, Get(1) * Get(6) * Get(15) -
+				Get(1) * Get(7) * Get(14) -
+				Get(5) * Get(2) * Get(15) +
+				Get(5) * Get(3) * Get(14) +
+				Get(13) * Get(2) * Get(7) -
+				Get(13) * Get(3) * Get(6));
+
+			inv.Set(6, -Get(0) * Get(6) * Get(15) +
+				Get(0) * Get(7) * Get(14) +
+				Get(4) * Get(2) * Get(15) -
+				Get(4) * Get(3) * Get(14) -
+				Get(12) * Get(2) * Get(7) +
+				Get(12) * Get(3) * Get(6));
+
+			inv.Set(10, Get(0) * Get(5) * Get(15) -
+				Get(0) * Get(7) * Get(13) -
+				Get(4) * Get(1) * Get(15) +
+				Get(4) * Get(3) * Get(13) +
+				Get(12) * Get(1) * Get(7) -
+				Get(12) * Get(3) * Get(5));
+
+			inv.Set(14, -Get(0) * Get(5) * Get(14) +
+				Get(0) * Get(6) * Get(13) +
+				Get(4) * Get(1) * Get(14) -
+				Get(4) * Get(2) * Get(13) -
+				Get(12) * Get(1) * Get(6) +
+				Get(12) * Get(2) * Get(5));
+
+			inv.Set(3, -Get(1) * Get(6) * Get(11) +
+				Get(1) * Get(7) * Get(10) +
+				Get(5) * Get(2) * Get(11) -
+				Get(5) * Get(3) * Get(10) -
+				Get(9) * Get(2) * Get(7) +
+				Get(9) * Get(3) * Get(6));
+
+			inv.Set(7, Get(0) * Get(6) * Get(11) -
+				Get(0) * Get(7) * Get(10) -
+				Get(4) * Get(2) * Get(11) +
+				Get(4) * Get(3) * Get(10) +
+				Get(8) * Get(2) * Get(7) -
+				Get(8) * Get(3) * Get(6));
+
+			inv.Set(11, -Get(0) * Get(5) * Get(11) +
+				Get(0) * Get(7) * Get(9) +
+				Get(4) * Get(1) * Get(11) -
+				Get(4) * Get(3) * Get(9) -
+				Get(8) * Get(1) * Get(7) +
+				Get(8) * Get(3) * Get(5));
+
+			inv.Set(15, Get(0) * Get(5) * Get(10) -
+				Get(0) * Get(6) * Get(9) -
+				Get(4) * Get(1) * Get(10) +
+				Get(4) * Get(2) * Get(9) +
+				Get(8) * Get(1) * Get(6) -
+				Get(8) * Get(2) * Get(5));
+
+			det = Get(0) * inv.Get(0) + Get(1) * inv.Get(4) + Get(2) * inv.Get(8) + Get(3) * inv.Get(12);
+
+			if (det == 0)
+				return mat4_t<T>();
+
+			det = 1.0 / det;
+
+			mat4_t<T> invOut;
+
+			for (i = 0; i < 16; i++)
+				invOut.Set(i, inv.Get(i) * det);
+
+			return invOut;
 		}
 
 		inline string ToString() const {

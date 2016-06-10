@@ -8,8 +8,8 @@ in vec2 texCoord0;
 in vec3 normal0;
 in vec3 tangent0;
 
-layout (location = 0) out vec3 Out_World;
-layout (location = 1) out vec2 Out_Normal;
+layout (location = 0) out vec4 Out_World;
+layout (location = 1) out vec3 Out_Normal;
 layout (location = 2) out vec3 Out_Diffuse;
 layout (location = 3) out vec4 Out_SpecRoughness;
 
@@ -27,6 +27,8 @@ uniform float GlossColor;
 uniform float UsingAlbedoMap;
 uniform float UsingSpecularMap;
 uniform float UsingGlossMap;
+
+uniform vec2 CameraPlanes;
 
 vec4 GetAlbedo(vec2 uv) {
 	return (1.0 - UsingAlbedoMap) * AlbedoColor + UsingAlbedoMap * texture(AlbedoMap, uv).rgba;
@@ -47,8 +49,13 @@ float GetRoughness(vec2 uv) {
 
 #include "res/LAEA.glsl"
 
+float LinearizeDepth(float depth) {
+    float z = depth * 2.0 - 1.0; // Back to NDC
+    return (2.0 * CameraPlanes.x * CameraPlanes.y) / (CameraPlanes.y + CameraPlanes.x - z * (CameraPlanes.y - CameraPlanes.x));
+}
+
 void main() {
-  Out_World = worldPos0;
+  Out_World = vec4(worldPos0, LinearizeDepth(gl_FragCoord.z));
 
   // Calculate normalmap
   vec3 tangent = normalize(tangent0 - dot(tangent0, normal0) * normal0);
@@ -57,7 +64,7 @@ void main() {
 
   vec3 normal = normalize(tbn * (2 * texture(NormalMap, texCoord0).xyz - 1));
 
-  Out_Normal = EncodeNormal(normal);
+  Out_Normal = normal;
   vec4 albedo = GetAlbedo(texCoord0);
   Out_Diffuse = albedo.rgb;
   Out_SpecRoughness = vec4(GetSpecular(texCoord0), GetRoughness(texCoord0));

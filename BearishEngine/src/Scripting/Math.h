@@ -150,8 +150,8 @@ namespace Bearish { namespace Scripting {
 				.def("CreateProjection", &mat4::CreateProjection)
 				.def("Transform", &mat4::Transform)
 				.def("Transpose", &mat4::Transpose)
-				.def("Get", &mat4::Get)
-				.def("Set", &mat4::Set)
+				//.def("Get", &mat4::Get)
+				//.def("Set", &mat4::Set)
 				.def("__mul", &mat4::operator*)
 				.def("__tostring", &mat4::ToString)
 		];

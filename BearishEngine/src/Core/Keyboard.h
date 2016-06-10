@@ -4,10 +4,11 @@
 #include "IAllocatable.h"
 #include "ButtonState.h"
 #include "../Types.h"
-#include "Window.h"
+#include "Callback.h"
 
 namespace Bearish { namespace Core {
 	enum class Key : u16 {
+#ifdef _WIN32
 		A = 65,
 		B = 66,
 		C = 67,
@@ -46,45 +47,54 @@ namespace Bearish { namespace Core {
 		Eight = 56,
 		Nine  = 57,
 
-		NumpadZero  = 320,
-		NumpadOne   = 321,
-		NumpadTwo   = 322,
-		NumpadThree = 323,
-		NumpadFour  = 324,
-		NumpadFive  = 325,
-		NumpadSix   = 326,
-		NumpadSeven = 327,
-		NumpadEight = 328,
-		NumpadNine  = 329,
+		NumpadZero  = VK_NUMPAD0,
+		NumpadOne   = VK_NUMPAD1,
+		NumpadTwo   = VK_NUMPAD2,
+		NumpadThree = VK_NUMPAD3,
+		NumpadFour  = VK_NUMPAD4,
+		NumpadFive  = VK_NUMPAD5,
+		NumpadSix   = VK_NUMPAD6,
+		NumpadSeven = VK_NUMPAD7,
+		NumpadEight = VK_NUMPAD8,
+		NumpadNine  = VK_NUMPAD9,
 
-		Period     = 46,
-		Comma      = 44,
-		LeftShift  = 340,
-		RightShift = 344,
-		LeftAlt    = 342,
-		RightAlt   = 346,
-		LeftCtrl   = 341,
-		RightCtrl  = 345,
-		Home       = 268,
+		Period     = VK_OEM_PERIOD,
+		Comma      = VK_OEM_COMMA,
+		LeftShift  = VK_LSHIFT,
+		RightShift = VK_RSHIFT,
+		LeftAlt    = VK_LMENU,
+		RightAlt   = VK_RMENU,
+		LeftCtrl   = VK_LCONTROL,
+		RightCtrl  = VK_RCONTROL,
+		Home       = VK_HOME,
 
-		Up    = 265,
-		Down  = 264,
-		Left  = 263,
-		Right = 262,
+		Up    = VK_UP,
+		Down  = VK_DOWN,
+		Left  = VK_LEFT,
+		Right = VK_RIGHT,
 
-		F1  = 290,
-		F2  = 291,
-		F3  = 292,
-		F4  = 293,
-		F5  = 294,
-		F6  = 295,
-		F7  = 296,
-		F8  = 297,
-		F9  = 298,
-		F10 = 299,
-		F11 = 300,
-		F12 = 301,
+		F1  = VK_F1,
+		F2  = VK_F2,
+		F3  = VK_F3,
+		F4  = VK_F4,
+		F5  = VK_F5,
+		F6  = VK_F6,
+		F7  = VK_F7,
+		F8  = VK_F8,
+		F9  = VK_F9,
+		F10 = VK_F10,
+		F11 = VK_F11,
+		F12 = VK_F12,
 
+		Backspace = VK_BACK,
+		Tab       = VK_TAB,
+		Enter     = VK_RETURN,
+		Escape    = VK_ESCAPE,
+		Spacebar  = VK_SPACE,
+
+		Minus = VK_OEM_MINUS,
+		Plus = VK_OEM_PLUS,
+#endif // _WIN32
 		Max = 512,
 	};
 
@@ -99,7 +109,16 @@ namespace Bearish { namespace Core {
 		static bool IsKeyReleased(const Key key);
 
 		static void SetKeyState(const Key key, const ButtonState state);
+
+		static void Listen(Callback<bool, Key, ButtonState>::Function function) {
+			_callbacks += function;
+		}
+
+		static void Deafen(Callback<bool, Key, ButtonState>::Function function) {
+			_callbacks -= function;
+		}
 	private:
+		static Callback<bool, Key, ButtonState> _callbacks;
 		static ButtonState _keys[(u32)Key::Max];
 	};
 } }

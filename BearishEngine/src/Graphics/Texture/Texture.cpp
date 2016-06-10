@@ -9,37 +9,50 @@ using namespace Core;
 
 Texture::Texture(const string filename, const TextureType type, const TextureFormat format, const TextureFilter filter) {
 	_filter = filter;
+	_wrap = TextureWrapMode::Repeat;
 	_dataFormats = std::vector<TextureDataFormat>{ TextureDataFormat::Byte };
 	Load(filename, type, format);
 }
 
-Texture::Texture(const vec2& size, const TextureType type, const TextureFilter filter, const TextureAttachment attachment, const TextureFormat format, u8* data, const TextureDataFormat dataFormat) {
+
+Texture::Texture(const vec2& size, const TextureType type, const TextureFilter filter, const TextureAttachment attachment, const TextureFormat format, i32 multisamples) {
 	_size = size;
 	_type = type;
 	_filter = filter;
 	_attachments = std::vector<TextureAttachment>{ attachment };
 	_formats = std::vector<TextureFormat>{ format };
 	_dataFormats = std::vector<TextureDataFormat>{ TextureDataFormat::Byte };
+	_multisamples = multisamples;
+	_wrap = TextureWrapMode::Repeat;
+
+	InitTextures(type, _formats, 0);
+	InitRenderTargets(_attachments);
+}
+
+Texture::Texture(const vec2& size, const TextureType type, const TextureFilter filter, const TextureAttachment attachment, const TextureFormat format,
+	u8* data, const TextureDataFormat dataFormat, const TextureWrapMode wrap) {
+	_size = size;
+	_type = type;
+	_filter = filter;
+	_attachments = std::vector<TextureAttachment>{ attachment };
+	_formats = std::vector<TextureFormat>{ format };
+	_dataFormats = std::vector<TextureDataFormat>{ dataFormat };
+	_multisamples = 0;
+	_wrap = wrap;
 
 	InitTextures(type, _formats, &data);
 	InitRenderTargets(_attachments);
 }
 
 Texture::Texture(const vec2& size, const TextureType type, std::vector<TextureAttachment> attachments, std::vector<TextureFormat> formats, u32 num, 
-				const TextureFilter filter, std::vector<TextureDataFormat> dataFormats) {
+				const TextureFilter filter, i32 multisamples) {
 	_size = size;
 	_type = type;
 	_filter = filter;
 	_attachments = attachments;
 	_formats = formats;
-
-	if (dataFormats.size() == 1) {
-		for (i32 i = 0; i < num - 1; i++) {
-			dataFormats.push_back(dataFormats[0]);
-		}
-	}
-
-	_dataFormats = dataFormats;
+	_multisamples = multisamples;
+	_wrap = TextureWrapMode::Repeat;
 
 	u8* datas = 0;
 	InitTextures(type, formats, 0, num);
@@ -52,6 +65,8 @@ Texture::Texture(const string posX, const string negX, const string posY, const 
 	_type = TextureType::CubeMap;
 	_filter = filter;
 	_dataFormats = std::vector<TextureDataFormat>{ TextureDataFormat::Byte };
+	_multisamples = 0;
+	_wrap = TextureWrapMode::Repeat;
 
 	Load(posX, negX, posY, negY, posZ, negZ);
 }
@@ -67,6 +82,8 @@ Texture::Texture(const vec4& color) {
 	_size = vec2(1, 1);
 	_type = TextureType::Texture2D;
 	_dataFormats = std::vector<TextureDataFormat>{ TextureDataFormat::Byte };
+	_multisamples = 0;
+	_wrap = TextureWrapMode::Repeat;
 
 	InitTextures(_type, _formats, &data, 1);
 	InitRenderTargets(_attachments);
@@ -147,37 +164,46 @@ void Texture::InitTextures(const TextureType type, std::vector<TextureFormat> fo
 	_ids = new u32[num];
 	glGenTextures(num, _ids);
 
+	if(_multisamples > 0)
+		_type = TextureType::Texture2DMS;
+
 	for (i32 i = 0; i < (i32)num; i++) {
 		Bind(0, i);
 
 		u8* d = 0;
 		if (datas) d = datas[i];
 
-		i32 format = GetFormatForInternalFormat(formats[i]);
+		if (_multisamples == 0) {
+			i32 format = GetFormatForInternalFormat(formats[i]);
 
-		glTexImage2D((GLenum)type, 0, (GLint)formats[i], static_cast<i32>(_size.x), static_cast<i32>(_size.y), 0, (GLint)format, (GLenum)_dataFormats[i], d);
+			glTexImage2D((GLenum)_type, 0, (GLint)formats[i], static_cast<i32>(_size.x), static_cast<i32>(_size.y), 0, (GLint)format,
+				_dataFormats.size() > 0 ? (GLenum)_dataFormats[i] : (GLenum)TextureDataFormat::Byte, d);
 
-		if (format == GL_DEPTH_COMPONENT) {
-			glTexParameteri((GLenum)type, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-			glTexParameteri((GLenum)type, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+			if (format == GL_DEPTH_COMPONENT) {
+				glTexParameteri((GLenum)_type, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+				glTexParameteri((GLenum)_type, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+			}
+			else if (formats[i] != TextureFormat::RG32) {
+				glGenerateMipmap((GLenum)_type);
+			}
+			else {
+				glTexParameteri((GLenum)_type, GL_TEXTURE_BASE_LEVEL, 0);
+				glTexParameteri((GLenum)_type, GL_TEXTURE_MAX_LEVEL, 0);
+			}
+
+			glTexParameteri((GLenum)_type, GL_TEXTURE_MAG_FILTER, _filter == TextureFilter::Linear ? GL_LINEAR : GL_NEAREST);
+			glTexParameteri((GLenum)_type, GL_TEXTURE_MIN_FILTER, (GLenum)_filter);
+
+			glTexParameteri((GLenum)_type, GL_TEXTURE_WRAP_S, (GLenum)_wrap);
+			glTexParameteri((GLenum)_type, GL_TEXTURE_WRAP_T, (GLenum)_wrap);
 		}
 		else {
-			glGenerateMipmap((GLenum)type);
+			glTexImage2DMultisample((GLenum)_type, _multisamples, (GLint)formats[i], static_cast<i32>(_size.x), static_cast<i32>(_size.y), true);
 		}
-
-
-		glTexParameteri((GLenum)type, GL_TEXTURE_MAG_FILTER, _filter == TextureFilter::Linear ? GL_LINEAR : GL_NEAREST);
-		glTexParameteri((GLenum)type, GL_TEXTURE_MIN_FILTER, (GLenum)_filter);
-
-		glTexParameteri((GLenum)type, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri((GLenum)type, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		if (type == TextureType::CubeMap || type == TextureType::Texture3D) {
 			glTexParameteri((GLenum)type, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 		}
-
-		glTexParameteri((GLenum)type, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri((GLenum)type, GL_TEXTURE_MAX_LEVEL, 0);
 	}
 
 	Unbind(0);
@@ -204,7 +230,7 @@ void Texture::InitRenderTargets(std::vector<TextureAttachment> attachments) {
 			drawBuffers[i] = attachments[i];
 		}
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, (GLenum)attachments[i], GL_TEXTURE_2D, _ids[i], 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, (GLenum)attachments[i], (GLenum)_type, _ids[i], 0);
 
 		if (_framebuffer == 0)
 			return;
@@ -213,7 +239,13 @@ void Texture::InitRenderTargets(std::vector<TextureAttachment> attachments) {
 	if (!hasDepth) {
 		glGenRenderbuffers(1, &_renderbuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, _renderbuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, static_cast<i32>(_size.x), static_cast<i32>(_size.y));
+		if (_multisamples == 0) {
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, static_cast<i32>(_size.x), static_cast<i32>(_size.y));
+		}
+		else {
+			glRenderbufferStorageMultisample(GL_RENDERBUFFER, _multisamples, GL_DEPTH_COMPONENT, static_cast<i32>(_size.x), static_cast<i32>(_size.y));
+		}
+		
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _renderbuffer);
 	}
 
@@ -228,7 +260,12 @@ void Texture::InitRenderTargets(std::vector<TextureAttachment> attachments) {
 
 void Texture::Bind(const u32 slot, const u32 id) const {
 	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture((const GLenum)_type, _ids[id]);
+	if (_multisamples > 0) {
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, _ids[id]);
+	}
+	else {
+		glBindTexture((const GLenum)_type, _ids[id]);
+	}
 }
 
 void Texture::Unbind(const u32 slot) const {

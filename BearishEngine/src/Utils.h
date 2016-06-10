@@ -1,10 +1,36 @@
 #ifndef _BEARISH_UTILS_H_
 #define _BEARISH_UTILS_H_
 
+#include "Core/Keyboard.h"
 #include "Types.h"
 #include <time.h>
 
-namespace Bearish { namespace Util {	
+namespace Bearish { namespace Util {
+	static string KeyToString(Core::Key key) {
+		// If is ASCII
+		if ((i32)key <= (i32)Core::Key::Z && (i32)key >= (i32)Core::Key::A) {
+			return string(1, (c8)key + 32);
+		}
+
+		if ((i32)key <= (i32)Core::Key::Nine && (i32)key >= (i32)Core::Key::Zero) {
+			return string(1, (c8)key);
+		}
+
+		// Convert numpad numbers to regular numbers
+		if ((i32)key >= (i32)Core::Key::NumpadZero && (i32)key <= (i32)Core::Key::NumpadNine) {
+			return string(1, (c8)((i32)key - ((i32)Core::Key::NumpadZero - (i32)Core::Key::Zero)));
+		}
+
+		if (key == Core::Key::Spacebar) return " ";
+		if (key == Core::Key::Tab) return "   ";
+		if (key == Core::Key::Period) return ".";
+		if (key == Core::Key::Comma) return ",";
+		if (key == Core::Key::Minus) return "-";
+		if (key == Core::Key::Plus) return "+";
+
+		return "";
+	}
+
 	static void SeedRandom() {
 		srand((u32)time(NULL));
 	}

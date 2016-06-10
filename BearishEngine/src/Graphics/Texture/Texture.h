@@ -9,10 +9,11 @@
 
 namespace Bearish { namespace Graphics {
 	enum class TextureType : u32 {
-		Texture1D = GL_TEXTURE_1D,
-		Texture2D = GL_TEXTURE_2D,
-		Texture3D = GL_TEXTURE_3D,
-		CubeMap   = GL_TEXTURE_CUBE_MAP,
+		Texture1D   = GL_TEXTURE_1D,
+		Texture2D   = GL_TEXTURE_2D,
+		Texture3D   = GL_TEXTURE_3D,
+		CubeMap     = GL_TEXTURE_CUBE_MAP,
+		Texture2DMS = GL_TEXTURE_2D_MULTISAMPLE,
 	};
 
 	enum class TextureAttachment : u32 {
@@ -27,6 +28,7 @@ namespace Bearish { namespace Graphics {
 	};
 	
 	enum class TextureFormat : i32 {
+		R       = GL_RED,
 		RG      = GL_RG,
 		RGB     = GL_RGB,
 		RGBA    = GL_RGBA,
@@ -55,17 +57,25 @@ namespace Bearish { namespace Graphics {
 		Float = GL_FLOAT
 	};
 
+	enum class TextureWrapMode : i32 {
+		Clamp  = GL_CLAMP_TO_EDGE,
+		Repeat = GL_REPEAT,
+	};
+
 	class Texture : public Core::IAllocatable<Texture> {
 	public:
 		Texture(const string filename, const TextureType type = TextureType::Texture2D, 
 				const TextureFormat format = TextureFormat::RGBA, const TextureFilter filter = TextureFilter::Linear);
 
 		Texture(const Math::vec2& size = Math::vec2(256, 256), const TextureType type = TextureType::Texture2D, const TextureFilter filter = TextureFilter::Nearest,
-				const TextureAttachment attachment = TextureAttachment::Color0, const TextureFormat format = TextureFormat::RGBA, u8* data = 0, 
-				const TextureDataFormat dataFormat = TextureDataFormat::Byte);
+				const TextureAttachment attachment = TextureAttachment::Color0, const TextureFormat format = TextureFormat::RGBA, u8* data = 0,
+				const TextureDataFormat dataFormat = TextureDataFormat::Byte, const TextureWrapMode wrap = TextureWrapMode::Clamp);
+
+		Texture(const Math::vec2& size, const TextureType type = TextureType::Texture2D, const TextureFilter filter = TextureFilter::Nearest,
+				const TextureAttachment attachment = TextureAttachment::Color0, const TextureFormat format = TextureFormat::RGBA, i32 multisamples = 0);
 
 		Texture(const Math::vec2& size, const TextureType type, std::vector<TextureAttachment> attachments, std::vector<TextureFormat> formats, u32 num, 
-				const TextureFilter filter = TextureFilter::Nearest, std::vector<TextureDataFormat> dataFormats = std::vector<TextureDataFormat>{ TextureDataFormat::Byte });
+				const TextureFilter filter = TextureFilter::Nearest, i32 multisamples = 0);
 
 		Texture(const string posX, const string negX, const string posY, const string negY, const string posZ, const string negZ, 
 			const TextureFormat format = TextureFormat::RGBA, const TextureFilter filter = TextureFilter::Nearest);
@@ -116,9 +126,11 @@ namespace Bearish { namespace Graphics {
 		Math::vec2 _size;
 		u32* _ids;
 		u32 _framebuffer, _renderbuffer, _numTextures;
+		i32 _multisamples;
 		
 		TextureFilter _filter;
 		TextureType _type;
+		TextureWrapMode _wrap;
 		std::vector<TextureDataFormat> _dataFormats;
 		std::vector<TextureFormat> _formats;
 		std::vector<TextureAttachment> _attachments;
