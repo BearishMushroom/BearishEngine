@@ -25,12 +25,16 @@ namespace Bearish {
 	class Material;
 
 	enum class ShadowQuality : u8 {
-		Off,
+		Off = 0,
 		Terrible,
 		Low,
 		Medium,
 		High,
 		Ultra,
+	};
+
+	enum class SSAOSetting : u8 {
+		Off = 0, On
 	};
 
 	struct MeshEntry {
@@ -62,7 +66,7 @@ namespace Bearish {
 		void Submit(Mesh* mesh, Material* mat);
 
 		void Draw();
-		void FlushMeshes(Shader* shader, bool bind);
+		void FlushMeshes(Shader* shader, bool bind, u32* verts = 0, u32* faces = 0, u32* calls = 0);
 
 		void DrawGuiQuad(Core::Transform t, Texture* tex, u32 subid = 0);
 
@@ -71,6 +75,7 @@ namespace Bearish {
 		i32 PushMaterial(Material* material);
 
 		void SetShadowQuality(ShadowQuality quality);
+		void SetSSAOSetting(SSAOSetting setting);
 
 		void SetDebugMode(i32 mode) { _debugMode = mode; }
 
@@ -83,6 +88,11 @@ namespace Bearish {
 		Camera GetShadowMapProjection(Math::vec3 position, DirectionalLight* light);
 
 		Renderer* GetRenderer();
+
+		u32 GetVertsPerFrame() const { return _vertsPerFrame; }
+		u32 GetFacesPerFrame() const { return _facesPerFrame; }
+		u32 GetPassesPerFrame() const { return _passesPerFrame; }
+		u32 GetDrawcallsPerFrame() const { return _drawcallsPerFrame; }
 	private:
 		std::vector<Light*> _lights;
 		Texture* _gbuffer;
@@ -106,9 +116,9 @@ namespace Bearish {
 		f32 _shadowSamples;
 		ShadowQuality _shadowQuality;
 
-		std::vector<Math::vec3> _ssaoKernel;
 		Texture* _ssaoNoise,* _ssaoBuffer;
 		Shader* _ssaoShader;
+		SSAOSetting _ssaoSetting;
 
 		f32 PointLightSize(PointLight* pl);
 
@@ -118,6 +128,7 @@ namespace Bearish {
 
 		Core::Timer _timer;
 
+		u32 _vertsPerFrame, _facesPerFrame, _passesPerFrame, _drawcallsPerFrame;
 		i32 _framesRendered;
 		f32 _time, _shadowTime, _geomTime, _accTime, _preTime, _postTime, _2dTime, _frameTime,
 			_shadowTimeFrame, _geomTimeFrame, _accTimeFrame, _preTimeFrame, _postTimeFrame, _2dTimeFrame,

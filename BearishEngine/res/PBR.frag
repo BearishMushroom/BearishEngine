@@ -32,6 +32,7 @@ uniform sampler2D PreintegratedFG;
 uniform samplerCube EnvironmentMap;
 
 uniform sampler2D gSSAO;
+uniform float ssaoScale;
 
 vec4 GammaCorrectTexture(sampler2D tex, vec2 uv) {
 	vec4 samp = texture(tex, uv);
@@ -89,7 +90,7 @@ void main() {
 
 	  float visibility = CalculateShadow(shadowMap, lp, NdotL);
 	  vec4 final = vec4(PBR(visibility, albedo, specular, roughness, position, normal, eye, dLight.direction, dLight.base.color, dLight.base.diffuseIntensity), albedo.a);
-		final += albedo * dLight.base.ambientIntensity * texture(gSSAO, tc).r;
+		final += ssaoScale > 0 ? albedo * dLight.base.ambientIntensity * texture(gSSAO, tc).r : vec4(0);
 	  fragcolor = final;
 	}
 
@@ -106,7 +107,7 @@ void main() {
   						pLight.attenuation.exponent * distanceToPoint * distanceToPoint);
 
 		vec4 final = color * attenuation;
-		final += albedo * pLight.base.ambientIntensity * texture(gSSAO, tc).r;
+		final += ssaoScale > 0 ? albedo * pLight.base.ambientIntensity * texture(gSSAO, tc).r : vec4(0);
 		fragcolor = final;
 	}
 }

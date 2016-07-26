@@ -5,15 +5,14 @@ out float ssaoFactor;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 
-uniform vec3 Kernel[64];
 uniform sampler2D Noise;
 uniform vec2 Screen;
 uniform mat4 Projection;
 
-const float g_scale = 1.2;
-const float g_intensity = 1;
-const float g_bias = 0.5;
-const float g_sample_rad = 1.4;
+const float g_scale = 0.3;
+const float g_intensity = 3;
+const float g_bias = 0.3;
+const float g_sample_rad = 1;
 
 float doAmbientOcclusion(vec2 tcoord, vec2 uv, vec3 p, vec3 cnorm) {
   vec3 diff = texture(gPosition, tcoord + uv).xyz - p;

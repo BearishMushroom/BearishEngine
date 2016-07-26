@@ -24,9 +24,10 @@ uniform vec3 SpecularColor;
 uniform float GlossColor;
 
 	// PBR Modes
-uniform float UsingAlbedoMap;
-uniform float UsingSpecularMap;
-uniform float UsingGlossMap;
+uniform float UsingAlbedoMap = 0;
+uniform float UsingSpecularMap = 0;
+uniform float UsingGlossMap = 0;
+uniform float UsingNormalMap = 0;
 
 uniform vec2 CameraPlanes;
 
@@ -55,6 +56,9 @@ float LinearizeDepth(float depth) {
 }
 
 void main() {
+	vec4 albedo = GetAlbedo(texCoord0);
+	if(albedo.a < 0.9) discard;
+
   Out_World = vec4(worldPos0, LinearizeDepth(gl_FragCoord.z));
 
   // Calculate normalmap
@@ -62,10 +66,9 @@ void main() {
   vec3 biTangent = cross(tangent, normal0);
   mat3 tbn = mat3(tangent, biTangent, normal0);
 
-  vec3 normal = normalize(tbn * (2 * texture(NormalMap, texCoord0).xyz - 1));
+  vec3 normal = (1 - UsingNormalMap) * normal0 + UsingNormalMap * normalize(tbn * (2 * texture(NormalMap, texCoord0).xyz - 1));
 
   Out_Normal = normal;
-  vec4 albedo = GetAlbedo(texCoord0);
   Out_Diffuse = albedo.rgb;
   Out_SpecRoughness = vec4(GetSpecular(texCoord0), GetRoughness(texCoord0));
 }

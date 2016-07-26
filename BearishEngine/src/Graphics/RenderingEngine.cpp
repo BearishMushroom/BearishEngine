@@ -6,6 +6,7 @@
 #include "../Core/Actor.h"
 #include "../Core/Model.h"
 #include "../Core/Timer.h"
+#include "../Core/Settings.h"
 
 #include "Renderer.h"
 #include "Texture/Texture.h"
@@ -45,7 +46,6 @@ void RenderingEngine::Load() {
 	_blur9 = new Shader("res/blur9.vert", "res/blur9.frag");
 	_blur = 0;
 
-	SetShadowQuality(ShadowQuality::High);
 
 	std::vector<TextureAttachment> att = {
 		TextureAttachment::Color0,
@@ -66,24 +66,24 @@ void RenderingEngine::Load() {
 
 	// New Gbuffer at 720p:
 	/*
-		Position buffer     : 1280 * 720 * (RGB16)6 = 5.3MB
-		Normal buffer       : 1280 * 720 * (RG16) 4 = 3.5MB
-		Diffuse buffer      : 1280 * 720 * (RGB8) 3 = 2.6MB
-		Spec + gloss buffer : 1280 * 720 * (RGBA8)4 = 3.5MB
-		Total               : 5.3 + 3.5 + 2.6 + 3.5 = 14.9MB of VRAM
-		Total BPP           : 17 * 8 = 136 BPP
+		Position buffer     : 1280 * 720 * (RGBA32)16 = 14.1MB
+		Normal buffer       : 1280 * 720 * (RG16)   4 = 3.5MB
+		Diffuse buffer      : 1280 * 720 * (RGB8)   3 = 2.6MB
+		Spec + gloss buffer : 1280 * 720 * (RGBA8)  4 = 3.5MB
+		Total               : 14.1 + 3.5 + 2.6 + 3.5 = 23.7MB of VRAM
+		Total BPP           : 27 * 8 = 216 BPP
 	*/
 
 	std::vector<TextureFormat> fmt {
-		TextureFormat::RGBA16, // Position
+		TextureFormat::RGBA32, // Position
 		TextureFormat::RGB16,  // Normal XY
 		TextureFormat::RGB,   // Diffuse
 		TextureFormat::RGBA,  // Spec + gloss
 	};
 
 
-	_gbuffer = new Texture(vec2(1280, 720), TextureType::Texture2D, att, fmt, 4);
-	_ssaoBuffer = new Texture(vec2(1280, 720), TextureType::Texture2D, TextureFilter::Nearest, TextureAttachment::Color0, TextureFormat::R, 0);
+	_gbuffer = new Texture(vec2(Settings::Get<i32>("resolution_x"), Settings::Get<i32>("resolution_y")), TextureType::Texture2D, att, fmt, 4);
+	_ssaoBuffer = new Texture(vec2(Settings::Get<i32>("resolution_x"), Settings::Get<i32>("resolution_y")), TextureType::Texture2D, TextureFilter::Nearest, TextureAttachment::Color0, TextureFormat::R, 0);
 
 	_geomShader = new Shader("res/geometrypass.vert", "res/geometrypass.frag");
 	_geomShader->SetName("geom");
@@ -105,18 +105,6 @@ void RenderingEngine::Load() {
 
 	std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0); // random floats between 0.0 - 1.0
 	std::default_random_engine generator;
-	f32 scale = 0;
-	for (i32 i = 0; i < 64; ++i) {
-		vec3 sample(
-			randomFloats(generator) * 2.0 - 1.0,
-			randomFloats(generator) * 2.0 - 1.0,
-			randomFloats(generator));
-
-		sample.Normalize();
-		scale = 0.1f + (scale * scale) * (1.0f - 0.1f);
-		sample *= scale;
-		_ssaoKernel.push_back(sample);
-	}
 
 	std::vector<vec3> ssaoNoise;
 	for (i32 i = 0; i < 16; i++) {
@@ -148,6 +136,10 @@ void RenderingEngine::Load() {
 		p->scale += vec3(0.01f);
 		p->life -= dt;
 	});
+
+	_shadowQuality = (ShadowQuality)-1;
+	SetShadowQuality((ShadowQuality)Settings::Get<i32>("shadows"));
+	SetSSAOSetting(/*(SSAOSetting)Settings::Get<i32>("ssao")*/SSAOSetting::Off);
 }
 
 void RenderingEngine::Unload() {
@@ -158,6 +150,7 @@ void RenderingEngine::Unload() {
 	delete _geomShader;
 
 	delete _shadowMap;
+	delete _shadowMapPong;
 }
 
 void RenderingEngine::SetActorReference(std::vector<Core::Actor*>* actors) {
@@ -186,6 +179,8 @@ void RenderingEngine::Draw() {
 	Timer frameTimer;
 	frameTimer.Start();
 
+	u32 verts = 0, faces = 0, passes = 0, calls = 0;
+
 	_lights.clear();
 
 	glDepthFunc(GL_LESS);
@@ -205,12 +200,13 @@ void RenderingEngine::Draw() {
 	// Prepare geometry pass.
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 
 	if (_shadowMap) {
+		passes++;
 		for (Light* light : _lights) {
 			if (light->GetType() == LightType::Directional) {
 				_shadowMap->BindAsRenderTarget();
-				glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 				_shadowMap->Clear();
 				_shadowShader->Bind();
 
@@ -221,7 +217,7 @@ void RenderingEngine::Draw() {
 				for (auto& a : *_actors) {
 					a->Draw(this, _shadowShader, &scamera);
 				}
-				FlushMeshes(_shadowShader, false);
+				FlushMeshes(_shadowShader, false, 0, 0, &calls);
 
 				glCullFace(GL_BACK);
 
@@ -232,13 +228,14 @@ void RenderingEngine::Draw() {
 
 	//glFinish();
 
-	if (_blur != 0) {
+	/*if (_blur != 0) {
 		_blur->Bind();
 		_blur->SetUniform("scale", vec2(1, 0));
 		ApplyFilter(_blur, _shadowMap, _shadowMapPong);
 		_blur->SetUniform("scale", vec2(0, 1));
 		ApplyFilter(_blur, _shadowMapPong, _shadowMap);
-	}
+		calls += 2;
+	}*/
 
 	_shadowTime += frameTimer.LoopMS();
 
@@ -251,7 +248,8 @@ void RenderingEngine::Draw() {
 	for (auto& a : *_actors) {
 		a->Draw(this, _geomShader, _camera);
 	}
-	FlushMeshes(_geomShader, true);
+	passes++;
+	FlushMeshes(_geomShader, true, &verts, &faces, &calls);
 
 	//glFinish();
 	_geomTime += frameTimer.LoopMS();
@@ -262,14 +260,17 @@ void RenderingEngine::Draw() {
 	_gbuffer->Bind(0, 0);
 	_gbuffer->Bind(1, 1);
 
-	_ssaoBuffer->BindAsRenderTarget();
-	_ssaoShader->Bind();
-	_ssaoShader->SetUniform("Kernel", _ssaoKernel);
-	_ssaoShader->SetUniform("Noise", _ssaoNoise);
-	_ssaoShader->SetUniform("Screen", vec2(1280, 720));
-	_ssaoShader->SetUniform("Projection", _camera->GetViewMatrix());
-	_quad->Submit(0, mat4().CreateIdentity(), mat4().CreateIdentity());
-	_quad->Flush(_ssaoShader);
+	if (_ssaoSetting == SSAOSetting::On) {
+		passes++;
+		_ssaoBuffer->BindAsRenderTarget();
+		_ssaoShader->Bind();
+		_ssaoShader->SetUniform("Noise", _ssaoNoise);
+		_ssaoShader->SetUniform("Screen", vec2(Settings::Get<i32>("resolution_x"), Settings::Get<i32>("resolution_y")));
+		_ssaoShader->SetUniform("Projection", _camera->GetViewMatrix());
+		_quad->Submit(0, mat4().CreateIdentity(), Camera::Identity);
+		_quad->Flush(_ssaoShader);
+		calls++;
+	}
 
 	// Prepare lighting pass.
 	glDepthMask(GL_FALSE);
@@ -288,20 +289,23 @@ void RenderingEngine::Draw() {
 		_pbrShader->Bind();
 		_pbrShader->SetUniform("gSSAO", 7);
 		_ssaoBuffer->Bind(7);
-		_pbrShader->SetUniform("screen", vec2(1280, 720));
+		_pbrShader->SetUniform("ssaoScale", (f32)_ssaoSetting);
+		_pbrShader->SetUniform("screen", vec2(Settings::Get<i32>("resolution_x"), Settings::Get<i32>("resolution_y")));
 		_pbrShader->SetUniform("eyePos", GetCamera()->GetTransform().GetTranslation());
 		_pbrShader->SetUniform("gPosition", 0);
 		_pbrShader->SetUniform("gNormal", 1);
 		_pbrShader->SetUniform("gDiffuse", 2);
 		_pbrShader->SetUniform("gSpecRoughness", 3);
-		_pbrShader->SetUniform("shadowMS", (i32)_shadowSamples);
+		_pbrShader->SetUniform("shadowMS", (i32)_shadowMapSize);
 
 		_pbrShader->SetUniform("PreintegratedFG", 5);
 		_pbrShader->SetUniform("EnvironmentMap", 6);
 		_environmentMap->Bind(6);
 		_preFG->Bind(5);
 
-		for (Light* l : _lights) {		
+		for (Light* l : _lights) {
+			passes++;
+			calls++;
 			if (l->GetType() == LightType::Point) {
 				//glDisable(GL_CULL_FACE);
 				//glFrontFace(GL_CCW);
@@ -311,7 +315,7 @@ void RenderingEngine::Draw() {
 				//_sphere->Submit(t.GetTransformation(), _camera->GetViewMatrix() * t.GetTransformation());
 				_pbrShader->SetUniform("pLight", *pl);
 				_pbrShader->SetUniform("light", 1);
-				_quad->Submit(0, mat4().CreateIdentity(), mat4().CreateIdentity());
+				_quad->Submit(0, mat4().CreateIdentity(), Camera::Identity);
 				_quad->Flush(_pbrShader);
 				//_sphere->Flush(mat.first->GetShader());
 				//glFrontFace(GL_CW);
@@ -332,14 +336,14 @@ void RenderingEngine::Draw() {
 				_pbrShader->SetUniform("light", 0);
 					
 
-				_quad->Submit(0, mat4().CreateIdentity(), mat4().CreateIdentity());
+				_quad->Submit(0, mat4().CreateIdentity(), Camera::Identity);
 				_quad->Flush(_pbrShader);
 					
 			}
 			else if (l->GetType() == LightType::Spot) {
 				SpotLight* dl = static_cast<SpotLight*>(l);
 
-				_quad->Submit(0, mat4().CreateIdentity(), mat4().CreateIdentity());
+				_quad->Submit(0, mat4().CreateIdentity(), Camera::Identity);
 				_pbrShader->SetUniform("spotLight", *dl);
 				_pbrShader->SetUniform("light", 2);
 				_quad->Flush(_pbrShader);
@@ -356,7 +360,8 @@ void RenderingEngine::Draw() {
 	glDepthMask(GL_TRUE);
 	if (_debugMode == 0) {
 		_gbuffer->BindForReading();
-		glBlitFramebuffer(0, 0, 1280, 1280, 0, 0, 1280, 1280, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+		glBlitFramebuffer(0, 0, Settings::Get<i32>("resolution_x"), Settings::Get<i32>("resolution_y"), 0, 0, 
+			Settings::Get<i32>("resolution_x"), Settings::Get<i32>("resolution_y"), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
 		for (auto& a : *_actors) {
 			a->PostDraw(this, _camera);
@@ -459,9 +464,14 @@ FPS:               %d
 		_framesRendered = 0;
 		_time = 0;
 	}
+
+	_vertsPerFrame = verts;
+	_facesPerFrame = faces;
+	_passesPerFrame = passes;
+	_drawcallsPerFrame = calls;
 }
 
-void RenderingEngine::FlushMeshes(Shader* shader, bool materialize) {
+void RenderingEngine::FlushMeshes(Shader* shader, bool materialize, u32* verts, u32* faces, u32* calls) {
 	Material* current = 0;
 	if (materialize) std::sort(_meshesToRender.begin(), _meshesToRender.end());
 
@@ -472,6 +482,9 @@ void RenderingEngine::FlushMeshes(Shader* shader, bool materialize) {
 				current->Bind(shader);
 			}
 		}
+		if (verts) *verts += a.mesh->GetNumVerts() * a.mesh->GetQueued();
+		if (faces) *faces += a.mesh->GetNumFaces() * a.mesh->GetQueued();
+		if (calls) *calls += a.mesh->GetQueued();
 		a.mesh->Flush(shader);
 	}
 
@@ -493,7 +506,7 @@ void RenderingEngine::DrawGuiQuad(Transform t, Texture* tex, u32 subid) {
 	_guiShader->Bind();
 	_guiShader->SetUniform("diffuse", 0);
 	tex->Bind(0, subid);
-	_quad->Submit(0, mat4().CreateIdentity(), mat4().CreateIdentity());
+	_quad->Submit(0, mat4().CreateIdentity(), Camera::Identity);
 	_quad->Flush(_guiShader);
 	_guiShader->Unbind();
 }
@@ -515,13 +528,15 @@ void RenderingEngine::SetShadowQuality(ShadowQuality quality) {
 	glEnable(GL_MULTISAMPLE);
 	if (quality != _shadowQuality) {
 		_shadowQuality = quality;
-		delete _shadowMap;
-		_shadowMap = nullptr;
-		delete _shadowMapPong;
-		_shadowMapPong = nullptr;
+		if(_shadowMap) delete _shadowMap;
+		_shadowMap = 0;
+		if (_shadowMapPong) delete _shadowMapPong;
+		_shadowMapPong = 0;
 		switch (quality) {
 		case ShadowQuality::Off:
+			_shadowMapSize = 0;
 			_blur = 0;
+			_shadowSamples = 0;
 			break;
 
 		case ShadowQuality::Terrible:
@@ -570,7 +585,7 @@ void RenderingEngine::ApplyFilter(Shader* filter, Texture* src, Texture* dest) c
 	filter->Bind();
 	filter->SetUniform("diffuse", src);
 	dest->BindAsRenderTarget();
-	_quad->Submit(0, mat4().CreateIdentity(), mat4().CreateIdentity());
+	_quad->Submit(0, mat4().CreateIdentity(), Camera::Identity);
 	_quad->Flush(filter);
 }
 
@@ -603,7 +618,7 @@ Camera RenderingEngine::GetShadowMapProjection(vec3 position, DirectionalLight* 
 	f32 ys = abs((y.y - y.x) / 2) + 5;
 	f32 zs = abs((z.y - z.x) / 2) + 5;*/
 
-	auto cam = Camera(mat4().CreateOrthographic(-30, 30, -30, 30, -10, 30), Transform(position,
+	auto cam = Camera(mat4().CreateOrthographic(-25, 25, -25, 25, -10, 20), Transform(position,
 		vec3(1), light->GetDirection()));
 
 	/*mat4 view = cam.GetViewMatrix();
@@ -631,4 +646,8 @@ Camera RenderingEngine::GetShadowMapProjection(vec3 position, DirectionalLight* 
 	printf("%s\n---\n", cam.GetTransform().GetTranslation().ToString().c_str());
 	*/
 	return cam;
+}
+
+void RenderingEngine::SetSSAOSetting(SSAOSetting setting) {
+	_ssaoSetting = setting;
 }
