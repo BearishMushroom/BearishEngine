@@ -79,6 +79,7 @@ namespace Bearish { namespace Core {
 		bool _alive;
 		std::vector<IActorComponent*> _components;
 		Transform _transform;
+		Math::vec3 _min, _max;
 		Actor* _parent;
 		std::vector<Actor*> _children;
 	};

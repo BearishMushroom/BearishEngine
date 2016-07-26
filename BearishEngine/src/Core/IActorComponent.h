@@ -70,6 +70,11 @@ namespace Bearish { namespace Core {
 			if (_hasPostDraw2D) _lua.CallFunction<void>("PostDraw2D", renderer, camera);
 		}
 
+		virtual Math::vec3 GetBounds() {
+			if (_hasGetBounds) return _lua.CallFunction<Math::vec3>("GetBounds");
+			return vec3(0);
+		}
+
 		virtual void OnTrigger(string id, void* data) {}
 
 		void SetParent(Actor* actor) { _actor = actor; if (_lua.Valid()) _lua.Set("actor", actor); }
@@ -86,16 +91,10 @@ namespace Bearish { namespace Core {
 		Scripting::LuaObject _lua;
 		bool _hasInit, _hasUpdate, _hasFixedUpdate, 
 			_hasPreDraw, _hasDraw, _hasPostDraw,
-			_hasPreDraw2D, _hasDraw2D, _hasPostDraw2D;
+			_hasPreDraw2D, _hasDraw2D, _hasPostDraw2D,
+			_hasGetBounds;
 	private:
 		void GetLuaFuncs() {
-			_hasInit = false;
-			_hasUpdate = false;
-			_hasFixedUpdate = false;
-			_hasPreDraw = false;
-			_hasDraw = false;
-			_hasPostDraw = false;
-
 			if (_lua.Valid()) {
 				_hasInit = _lua.HasFunction("Init");
 				_hasUpdate = _lua.HasFunction("Update");
@@ -106,7 +105,7 @@ namespace Bearish { namespace Core {
 				_hasPreDraw2D = _lua.HasFunction("PreDraw2D");
 				_hasDraw2D = _lua.HasFunction("Draw2D");
 				_hasPostDraw2D = _lua.HasFunction("PostDraw2D");
-
+				_hasGetBounds = _lua.HasFunction("GetBounds");
 			}
 		}
 	};
