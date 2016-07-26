@@ -101,7 +101,6 @@ namespace Bearish {
 		Mesh* _sphere,* _quad;
 		Shader* _currentShader;
 
-		Core::Window* _window;
 		Camera* _camera;
 		std::vector<Core::Actor*>* _actors;
 		i32 _debugMode;

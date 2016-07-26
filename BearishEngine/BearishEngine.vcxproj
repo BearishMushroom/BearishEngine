@@ -162,7 +162,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>glfw3.lib;GLAD.lib;opengl32.lib;soil.lib;freetype26.lib;lua51.lib;luabind.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>GLAD.lib;opengl32.lib;soil.lib;freetype26.lib;lua51.lib;luabind.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/NODEFAULTLIB:"LIBCMT" %(AdditionalOptions)</AdditionalOptions>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <ShowProgress>LinkVerboseLib</ShowProgress>
@@ -211,7 +211,6 @@
     <ClCompile Include="src\Core\Model.cpp" />
     <ClCompile Include="src\Core\Mouse.cpp" />
     <ClCompile Include="src\Core\Transform.cpp" />
-    <ClCompile Include="src\Core\Window.cpp" />
     <ClCompile Include="src\Graphics\Buffer\UniformBuffer.cpp" />
     <ClCompile Include="src\Graphics\Camera.cpp" />
     <ClCompile Include="src\Graphics\Buffer\IndexBuffer.cpp" />
@@ -258,6 +257,7 @@
     <ClInclude Include="src\Components\UILineGraph.h" />
     <ClInclude Include="src\Components\UIPanel.h" />
     <ClInclude Include="src\Components\UITextArea.h" />
+    <ClInclude Include="src\Core\AABB.h" />
     <ClInclude Include="src\Core\Actor.h" />
     <ClInclude Include="src\Core\Asset.h" />
     <ClInclude Include="src\Core\BEMFile.h" />
@@ -270,6 +270,7 @@
     <ClInclude Include="src\Core\Logger.h" />
     <ClInclude Include="src\Core\Model.h" />
     <ClInclude Include="src\Core\Mouse.h" />
+    <ClInclude Include="src\Core\Settings.h" />
     <ClInclude Include="src\Core\Transform.h" />
     <ClInclude Include="src\Graphics\BETFile.h" />
     <ClInclude Include="src\Graphics\Buffer\IndexBuffer.h" />
@@ -324,7 +325,6 @@
     <ClInclude Include="src\Math\vec2.h" />
     <ClInclude Include="src\Graphics\OpenGL.h" />
     <ClInclude Include="src\Types.h" />
-    <ClInclude Include="src\Core\Window.h" />
     <ClInclude Include="src\Math\vec3.h" />
     <ClInclude Include="src\Core\Timer.h" />
   </ItemGroup>

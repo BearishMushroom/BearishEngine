@@ -1,7 +1,6 @@
 #include "RenderingEngine.h"
 
 #include "../Core/Transform.h"
-#include "../Core/Window.h"
 #include "../Core/Asset.h"
 #include "../Core/Actor.h"
 #include "../Core/Model.h"
@@ -159,10 +158,6 @@ void RenderingEngine::SetActorReference(std::vector<Core::Actor*>* actors) {
 
 void RenderingEngine::SetCamera(Camera* const camera) {
 	_camera = camera;
-}
-
-void RenderingEngine::SetWindow(Window* const window) {
-	_window = window;
 }
 
 void RenderingEngine::Submit(Light* light) {
