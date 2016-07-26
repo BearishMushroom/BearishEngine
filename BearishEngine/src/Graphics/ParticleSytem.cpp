@@ -17,14 +17,12 @@ ParticleSystem::ParticleSystem(Texture* texture, std::function<Particle(const Ma
 
 	_state.Bind();
 	_renderData.SetData((void*)0, MAX_PARTICLES * sizeof(Particle), DrawStyle::Stream);
-	Renderer::EnableAttribArray(0);
-	Renderer::SetAttribPointer(0, 3, sizeof(Particle), offsetof(Particle, position));
-	Renderer::EnableAttribArray(1);
-	Renderer::SetAttribPointer(1, 3, sizeof(Particle), offsetof(Particle, scale));
-	Renderer::EnableAttribArray(2);
-	Renderer::SetAttribPointer(2, 1, sizeof(Particle), offsetof(Particle, rotation));
-	Renderer::EnableAttribArray(3);
-	Renderer::SetAttribPointer(3, 4, sizeof(Particle), offsetof(Particle, color));
+	VertexLayout<Particle> layout;
+	layout.PushComponent("POSITION", sizeof(vec3));
+	layout.PushComponent("SCALE", sizeof(vec3));
+	layout.PushComponent("ROTATION", sizeof(f32));
+	layout.PushComponent("COLOR", sizeof(vec4));
+	_renderData.SetLayout(layout);
 	_state.Unbind();
 
 	_shader = new Shader();

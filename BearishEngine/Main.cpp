@@ -506,7 +506,7 @@ i32 main(i32 argc, c8** argv) {
 
 	Material* curtRedMaterial = new Material(pbrTest);
 	curtRedMaterial->Set("UsingAlbedoMap", 1.f);
-	curtRedMaterial->Set("AlbedoMap", new Texture("asset/miko.bet"/*"asset/sponza2/curtain.bet"*/), 7);
+	curtRedMaterial->Set("AlbedoMap", new Texture("asset/sponza2/curtain.bet"), 7);
 
 	Material* curtBlueMaterial = new Material(pbrTest);
 	curtBlueMaterial->Set("UsingAlbedoMap", 1.f);
