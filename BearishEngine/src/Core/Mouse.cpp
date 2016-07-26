@@ -1,6 +1,7 @@
 #include "../Graphics/Renderer.h"
 #include "Mouse.h"
 #include "../Math/vec2.h"
+#include "../Core/Settings.h"
 
 using namespace Bearish;
 using namespace Core;
@@ -82,7 +83,7 @@ void Mouse::SetButtonState(const MouseButton button, const ButtonState state) {
 }
 
 void Mouse::SetCursorPosition(const i32 x, const i32 y) {
-	Math::vec2 currentPos((f32)x / 1280.f * 1920.f, (f32)y / 720.f * 1080.f);
+	Math::vec2 currentPos((f32)x / Settings::Get<f32>("resolution_x") * 1920.f, (f32)y / Settings::Get<f32>("resolution_y") * 1080.f);
 
 	_mouseDelta = currentPos - _mousePosition;
 	_mousePosition = currentPos;

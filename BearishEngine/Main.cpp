@@ -19,10 +19,16 @@ Actor* player;
 
 Actor* fpsCounter = new Actor(Transform(vec3(10, 40, -2)));
 
+Actor* vertCounter = new Actor(Transform(vec3(1775, 925, -2)));
+Actor* faceCounter = new Actor(Transform(vec3(1775, 945, -2)));
+Actor* passCounter = new Actor(Transform(vec3(1775, 965, -2)));
+Actor* callCounter = new Actor(Transform(vec3(1775, 985, -2)));
+
 std::vector<Actor*> actors;
 RenderingEngine renderer;
 
 std::unordered_map<string, string> Asset::_values;
+Bearish::Scripting::LuaObject Settings::_map;
 
 Font* UI_FONT;
 
@@ -102,23 +108,23 @@ void Update() {
 			UI_GRAPH->AddComponent(new UIPanel(new Texture2D(vec4(0.2, 0.2, 0.2, 0.65))));
 
 			Actor* graph = new Actor(Transform(vec3(0, -300, 0), vec3(1, 0.25, 1)));
-			graph->AddComponent(new UILineGraph(0, 60, 60));
+			graph->AddComponent(new UILineGraph(0, 16, 60));
 			UI_GRAPH->AddChild(graph);
 
 			Actor* graph2 = new Actor(Transform(vec3(0, -100, 0), vec3(1, 0.25, 1)));
-			graph2->AddComponent(new UILineGraph(0, 60, 60, vec4(1, 0.4, 0.4, 1)));
+			graph2->AddComponent(new UILineGraph(0, 16, 60, vec4(1, 0.4, 0.4, 1)));
 			UI_GRAPH->AddChild(graph2);
 
 			Actor* graph3 = new Actor(Transform(vec3(0, 100, 0), vec3(1, 0.25, 1)));
-			graph3->AddComponent(new UILineGraph(0, 60, 60, vec4(0.4, 0.4, 1, 1)));
+			graph3->AddComponent(new UILineGraph(0, 16, 60, vec4(0.4, 0.4, 1, 1)));
 			UI_GRAPH->AddChild(graph3);
 
 			Actor* graph4 = new Actor(Transform(vec3(0, 300, 0), vec3(1, 0.25, 1)));
-			graph4->AddComponent(new UILineGraph(0, 60, 60, vec4(1, 0.4, 1, 1)));
+			graph4->AddComponent(new UILineGraph(0, 16, 60, vec4(1, 0.4, 1, 1)));
 			UI_GRAPH->AddChild(graph4);
 
 			Actor* glb1 = new Actor(Transform(vec3(-150, -386, 0)));
-			glb1->AddComponent(new IActorComponent("UILabel", UI_FONT, "60ms", 18));
+			glb1->AddComponent(new IActorComponent("UILabel", UI_FONT, "16ms", 18));
 			UI_GRAPH->AddChild(glb1);
 
 			Actor* glb2 = new Actor(Transform(vec3(-150, -200, 0)));
@@ -126,7 +132,7 @@ void Update() {
 			UI_GRAPH->AddChild(glb2);
 
 			Actor* glb3 = new Actor(Transform(vec3(-150, -186, 0)));
-			glb3->AddComponent(new IActorComponent("UILabel", UI_FONT, "60ms", 18));
+			glb3->AddComponent(new IActorComponent("UILabel", UI_FONT, "16ms", 18));
 			UI_GRAPH->AddChild(glb3);
 
 			Actor* glb4 = new Actor(Transform(vec3(-150, 0, 0)));
@@ -134,7 +140,7 @@ void Update() {
 			UI_GRAPH->AddChild(glb4);
 
 			Actor* glb5 = new Actor(Transform(vec3(-150, 14, 0)));
-			glb5->AddComponent(new IActorComponent("UILabel", UI_FONT, "60ms", 18));
+			glb5->AddComponent(new IActorComponent("UILabel", UI_FONT, "16ms", 18));
 			UI_GRAPH->AddChild(glb5);
 
 			Actor* glb6 = new Actor(Transform(vec3(-150, 200, 0)));
@@ -142,7 +148,7 @@ void Update() {
 			UI_GRAPH->AddChild(glb6);
 
 			Actor* glb7 = new Actor(Transform(vec3(-150, 214, 0)));
-			glb7->AddComponent(new IActorComponent("UILabel", UI_FONT, "60ms", 18));
+			glb7->AddComponent(new IActorComponent("UILabel", UI_FONT, "16ms", 18));
 			UI_GRAPH->AddChild(glb7);
 
 			Actor* glb8 = new Actor(Transform(vec3(-150, 400, 0)));
@@ -240,7 +246,14 @@ void Update() {
 }
 
 i32 main(i32 argc, c8** argv) {
-	GUI::Win32Window testwin("TEST", 1280, 720);
+	Scripting::InitLua();
+	Scripting::RunFile("scr/lib/init.lua");
+	Scripting::RunFile("scr/lib/class.lua");
+	Scripting::InitMoonScript();
+
+	Settings::Load();
+
+	GUI::Win32Window testwin("TEST", Settings::Get<i32>("resolution_x"), Settings::Get<i32>("resolution_y"));
 	
 	GUI::Win32WindowMenuBar menu;
 	
@@ -256,7 +269,7 @@ i32 main(i32 argc, c8** argv) {
 
 	testwin.AddComponent(&menu);
 
-	testwin.AddComponent(new GUI::Win32WindowGLViewport(0, 0, 1280, 720));
+	testwin.AddComponent(new GUI::Win32WindowGLViewport(0, 0, Settings::Get<i32>("resolution_x"), Settings::Get<i32>("resolution_y")));
 	testwin.Open();
 
 	PANEL_OPEN = false;
@@ -267,15 +280,10 @@ i32 main(i32 argc, c8** argv) {
 
 	Asset::LoadAssetDefinitions();
 
-	Scripting::InitLua();
-	Scripting::RunFile("scr/lib/init.lua");
-
 	Scripting::RegisterMath();
 	Scripting::RegisterCore();
 	Scripting::RegisterGraphics();
 
-	Scripting::RunFile("scr/lib/class.lua");
-	Scripting::InitMoonScript();
 
 	for (auto& file : Util::GetFilesInFolder("./scr/run/", "lua")) {
 		Logger::Info("Running %s", file.c_str());
@@ -324,6 +332,7 @@ i32 main(i32 argc, c8** argv) {
 	pbrTest.Set("SpecularColor", vec3(0.2f));
 	pbrTest.Set("GlossColor", 0.25f);
 	pbrTest.Set("NormalMap", &texture2, 10);
+	pbrTest.Set("UsingNormalMap", 1.f);
 
 	renderer.SetPreFG(new Texture2D(Asset::Get("PreFG")));
 	renderer.SetEnvironmentMap(skybox);
@@ -351,8 +360,17 @@ i32 main(i32 argc, c8** argv) {
 
 	fpsCounter->AddComponent(new UILabel(new Font("res/Roboto.ttf"), "FPS: 0", 48));
 	actors.push_back(fpsCounter);
-	
-	player = new Actor(Transform(vec3(30, 0, 30)));
+
+	vertCounter->AddComponent(new UILabel(new Font("res/Roboto.ttf"), "Verts: 0", 16));
+	actors.push_back(vertCounter);
+	faceCounter->AddComponent(new UILabel(new Font("res/Roboto.ttf"), "Faces: 0", 16));
+	actors.push_back(faceCounter);
+	passCounter->AddComponent(new UILabel(new Font("res/Roboto.ttf"), "Passes: 0", 16));
+	actors.push_back(passCounter);
+	callCounter->AddComponent(new UILabel(new Font("res/Roboto.ttf"), "Drawcalls: 0", 16));
+	actors.push_back(callCounter);
+
+	player = new Actor(Transform(vec3(0, 0, 0)));
 	player->AddComponent(new SkyboxComponent(skybox));
 
 	player->AddComponent(new IActorComponent("CameraComponent"));
@@ -382,10 +400,10 @@ i32 main(i32 argc, c8** argv) {
 		}
 	}
 
-	Actor* dir = new Actor(Transform(vec3(30, 0.f, 30), vec3(1.f), quat().CreateRotation(vec3(1.f, 0.f, 0.f), AsRadians(83.f))));
+	Actor* dir = new Actor(Transform(vec3(0, 0.f, 0), vec3(1.f), quat().CreateRotation(vec3(1.f, 0.f, 0.f), AsRadians(83.f))));
 	dir->AddComponent(new DirectionalLightComponent(vec3(1.f), 0.1f, 0.2f));
 
-	Actor* ples = new Actor(Transform(vec3(32.f, 15.f, 30.0f)));
+	Actor* ples = new Actor(Transform(vec3(2.f, 15.f, 0)));
 	ples->AddComponent(new PointLightComponent(vec3(1.f), 0.f, Attenuation(0.f, 0.f, 0.0055f), 0.3f));
 	actors.push_back(ples);
 
@@ -543,7 +561,7 @@ i32 main(i32 argc, c8** argv) {
 
 	for (i32 i = 0; i < 393; i++) {
 		auto model = Model("asset/sponza2/sponza_" + std::to_string(i) + ".bem");
-		Actor* a = new Actor(Transform(vec3(30, 0, 30), vec3(0.01)));
+		Actor* a = new Actor(Transform(vec3(0, 0, 0), vec3(0.01)));
 		Material* mat = &pbrTest;
 
 		if (model.name.find("Mesh", 0) == string::npos) {
@@ -563,7 +581,7 @@ i32 main(i32 argc, c8** argv) {
 		a->AddComponent(new MeshRendererComponent(new Mesh(model), mat));
 		actors.push_back(a);
 	}
-#elif 1
+#elif 0
 for (i32 i = 0; i < 1087; i++) {
 	auto model = Model("asset/sibenik/sibenik_" + std::to_string(i) + ".bem");
 	Actor* a = new Actor(Transform(vec3(0), vec3(1)));
@@ -572,7 +590,7 @@ for (i32 i = 0; i < 1087; i++) {
 	a->AddComponent(new MeshRendererComponent(new Mesh(model), mat));
 	actors.push_back(a);
 }
-#else
+#elif 0
 for (i32 i = 0; i < 41; i++) {
 	auto model = Model("asset/conference/conference_" + std::to_string(i) + ".bem");
 	Actor* a = new Actor(Transform(vec3(0), vec3(0.01)));
@@ -582,7 +600,22 @@ for (i32 i = 0; i < 41; i++) {
 	actors.push_back(a);
 }
 #endif
+#if 1
+	for (i32 i = 0; i < 10; i++) {
+		for (i32 j = 0; j < 10; j++) {
+			Material* mat = new Material(pbrTest);
+			mat->Set("UsingNormalMap", 0.f);
+			mat->Set("AlbedoColor", vec4(0.2, 0.2, 0.2, 1));
+			mat->Set("SpecularColor", vec3(1.f - (f32)i / 10 - 0.01f));
+			mat->Set("GlossColor", 1.f - (f32)j / 10.f - 0.01f);
+			Mesh* sphere = new Mesh(Model("res/models/sphere.bem").ToMesh());
+			Actor* a = new Actor(Transform(vec3(-5+i, 1.5, -5+j), vec3(0.09)));
+			a->AddComponent(new MeshRendererComponent(sphere, mat));
+			actors.push_back(a);
+		}
+	}
 
+#endif
 	renderer.SetActorReference(&actors);
 	//renderer.SetWindow(&window);
 
@@ -656,6 +689,11 @@ for (i32 i = 0; i < 41; i++) {
 			secondTimer = 0;
 			f32 d = (f32)(1.f / (f32)fps) * 1000.f;
 			fpsCounter->GetComponentsByType<UILabel>().at(0)->SetText("FPS: " + std::to_string(fps), 48);
+
+			vertCounter->GetComponentsByType<UILabel>().at(0)->SetText("Verts: "     + std::to_string(renderer.GetVertsPerFrame()),     16);
+			faceCounter->GetComponentsByType<UILabel>().at(0)->SetText("Faces: "     + std::to_string(renderer.GetFacesPerFrame()),     16);
+			passCounter->GetComponentsByType<UILabel>().at(0)->SetText("Passes: "    + std::to_string(renderer.GetPassesPerFrame()),    16);
+			callCounter->GetComponentsByType<UILabel>().at(0)->SetText("Drawcalls: " + std::to_string(renderer.GetDrawcallsPerFrame()), 16);
 			//Scripting::UpdateScripts();
 			fps = 0;
 		}
