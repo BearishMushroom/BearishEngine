@@ -37,10 +37,9 @@ namespace Bearish { namespace Components {
 			glDepthFunc(GL_LEQUAL);
 
 			Core::Transform t(camera->GetTransform().GetTranslation(), Math::vec3(40, 40, 40));
-			Math::mat4 mvp = camera->GetViewMatrix() * t.GetTransformation();
 
 			_texture->Bind(0);
-			_mesh->Submit(0, t.GetTransformation(), mvp);
+			_mesh->Submit(0, t.GetTransformation(), camera);
 			_mesh->Flush(_shader);
 
 			glCullFace(oldCullFaceMode);

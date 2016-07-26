@@ -281,7 +281,7 @@ void Shader::SetUniform(const string& name, const Texture* const value) {
 	value->Bind(loc);
 }
 
-void Shader::SetUniformBlock(const string& name, UBO* const value) {
+void Shader::SetUniformBlock(const string& name, UniformBuffer* const value) {
 	value->Bind(_uniformBlockLocations.at(name));
 }
 

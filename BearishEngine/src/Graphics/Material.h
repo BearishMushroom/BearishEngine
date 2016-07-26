@@ -27,8 +27,8 @@ namespace Bearish {namespace Graphics {
 	public:
 		Material(string name, Shader* shader) : _shader(shader), _name(name) {
 			_copies = 0;
-			//_ubo = new UBO();
-			//_ubo->SetData(0, sizeof(PBRData));
+			//_uniformBuffer = new UBO();
+			//_uniformBuffer->SetData(0, sizeof(PBRData));
 			Set("UsingAlbedoMap", 0.f);
 			Set("UsingSpecularMap", 0.f);
 			Set("UsingGlossMap", 0.f);
@@ -78,8 +78,8 @@ namespace Bearish {namespace Graphics {
 				i.second.first->Bind(i.second.second);
 			}
 
-			//_ubo->UpdateData(_pbrData);
-			//shader->SetUniformBlock("pbr_data", _ubo);
+			//_uniformBuffer->UpdateData(_pbrData);
+			//shader->SetUniformBlock("pbr_data", _uniformBuffer);
 		}
 
 		Shader* GetShader() {
@@ -110,7 +110,7 @@ namespace Bearish {namespace Graphics {
 		Shader* _shader;
 		i32 _copies;
 
-		UBO* _ubo;
+		UniformBuffer* _ubo;
 		PBRData _pbrData;
 	};
 

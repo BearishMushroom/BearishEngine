@@ -56,7 +56,7 @@ namespace Bearish { namespace Components {
 				model.GetTranslation() += offset;
 				model.GetTranslation() -= vec3((_bounds / 2).x, -(_bounds / 2).y, 0);
 
-				_mesh->Submit(0, model.GetTransformation(), camera->GetViewMatrix() * model.GetTransformation());
+				_mesh->Submit(0, model.GetTransformation(), camera);
 
 				_font->GetTexture()->Bind(0);
 				_mesh->Flush(shader);
@@ -103,6 +103,8 @@ namespace Bearish { namespace Components {
 				NewMesh();
 				return true;
 			}
+
+			return false;
 		}
 
 		bool _focus;

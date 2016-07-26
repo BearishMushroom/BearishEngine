@@ -8,7 +8,7 @@
 #include "Lights.h"
 #include "OpenGL.h"
 #include "Vertex.h"
-#include "Buffer\UBO.h"
+#include "Buffer\UniformBuffer.h"
 
 namespace Bearish { namespace Graphics {
 	class Shader;
@@ -72,7 +72,7 @@ namespace Bearish { namespace Graphics {
 		void SetUniform(const string& name, const PointLight& value);
 		void SetUniform(const string& name, const SpotLight& value);
 		void SetUniform(const string& name, const Texture* const value);
-		void SetUniformBlock(const string& name, UBO* const value);
+		void SetUniformBlock(const string& name, UniformBuffer* const value);
 
 		void Bind() const;
 		void Unbind() const;

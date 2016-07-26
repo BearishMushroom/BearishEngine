@@ -5,6 +5,9 @@ using namespace Graphics;
 using namespace Core;
 using namespace Math;
 
+Camera* Camera::Identity = new Camera(mat4().CreateIdentity(), Transform());
+
+
 Camera::Camera(const Math::mat4& projection, const Core::Transform& transform) : _transform(transform), _projection(projection) {} 
 Camera::~Camera() {}
 

@@ -99,5 +99,23 @@ namespace Bearish { namespace Util {
 
 		return names;
 	}
+
+	static void CreateFolder(string name) {
+		CreateDirectory(name.c_str(), 0);
+	}
+
+	static bool FileExists(string name) {
+		DWORD dwAttrib = GetFileAttributes(name.c_str());
+
+		return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
+			!(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+	}
+
+	static bool DirectoryExists(string name) {
+		DWORD dwAttrib = GetFileAttributes(name.c_str());
+
+		return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
+			(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+	}
 } }
 #endif

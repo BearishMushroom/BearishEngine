@@ -8,6 +8,8 @@
 namespace Bearish { namespace Graphics {
 	class Camera : public Core::IAllocatable<Camera> {
 	public:
+		static Camera* Identity;
+
 		Camera(const Math::mat4& projection = Math::mat4(), const Core::Transform& transform = Core::Transform());
 		~Camera();
 

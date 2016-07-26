@@ -73,7 +73,7 @@ namespace Bearish { namespace Components {
 
 				_texture->Bind(0);
 
-				_line->Submit(0, model.GetTransformation(), camera->GetViewMatrix() * model.GetTransformation());
+				_line->Submit(0, model.GetTransformation(), camera);
 				_line->Flush(shader);
 
 				_texture->Unbind(0);

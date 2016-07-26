@@ -24,7 +24,7 @@ export class UIButton
     model = Transform @actor\GetTransform!
     model\SetTranslation model\GetTranslation! + vec3 offset.x, offset.y, -1
 
-    @mesh\Submit nil, model\GetTransformation!, camera\GetViewMatrix! * model\GetTransformation!
+    @mesh\Submit nil, model\GetTransformation!, camera
 
     @texture\Bind 0, 0
     @mesh\Flush!
