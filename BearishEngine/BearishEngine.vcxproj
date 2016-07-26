@@ -212,9 +212,9 @@
     <ClCompile Include="src\Core\Mouse.cpp" />
     <ClCompile Include="src\Core\Transform.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
-    <ClCompile Include="src\Graphics\Buffer\UBO.cpp" />
+    <ClCompile Include="src\Graphics\Buffer\UniformBuffer.cpp" />
     <ClCompile Include="src\Graphics\Camera.cpp" />
-    <ClCompile Include="src\Graphics\Buffer\IBO.cpp" />
+    <ClCompile Include="src\Graphics\Buffer\IndexBuffer.cpp" />
     <ClCompile Include="src\Graphics\Font.cpp" />
     <ClCompile Include="src\Graphics\Frustum.cpp" />
     <ClCompile Include="src\Graphics\ImageBuffer.cpp" />
@@ -229,8 +229,8 @@
     <ClCompile Include="src\Graphics\Shader.cpp" />
     <ClCompile Include="src\Core\Timer.cpp" />
     <ClCompile Include="src\Graphics\Texture\Texture.cpp" />
-    <ClCompile Include="src\Graphics\Buffer\VAO.cpp" />
-    <ClCompile Include="src\Graphics\Buffer\VBO.cpp" />
+    <ClCompile Include="src\Graphics\Buffer\VertexState.cpp" />
+    <ClCompile Include="src\Graphics\Buffer\VertexBuffer.cpp" />
     <ClCompile Include="src\GUI\Win32Window.cpp" />
     <ClCompile Include="src\GUI\Win32WindowButton.cpp" />
     <ClCompile Include="src\GUI\Win32WindowComponent.cpp" />
@@ -272,7 +272,12 @@
     <ClInclude Include="src\Core\Mouse.h" />
     <ClInclude Include="src\Core\Transform.h" />
     <ClInclude Include="src\Graphics\BETFile.h" />
+    <ClInclude Include="src\Graphics\Buffer\IndexBuffer.h" />
     <ClInclude Include="src\Graphics\Buffer\UBO.h" />
+    <ClInclude Include="src\Graphics\Buffer\UniformBuffer.h" />
+    <ClInclude Include="src\Graphics\Buffer\VertexBuffer.h" />
+    <ClInclude Include="src\Graphics\Buffer\VertexLayout.h" />
+    <ClInclude Include="src\Graphics\Buffer\VertexState.h" />
     <ClInclude Include="src\Graphics\Camera.h" />
     <ClInclude Include="src\Graphics\Buffer\IBO.h" />
     <ClInclude Include="src\Graphics\Font.h" />

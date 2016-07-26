@@ -15,6 +15,7 @@
 #include "Core\Transform.h"
 #include "Core\Keyboard.h"
 #include "Core\Callback.h"
+#include "Core\Settings.h"
 #include "Core\Logger.h"
 #include "Core\Window.h"
 #include "Core\Asset.h"
@@ -36,9 +37,9 @@
 #include "Graphics\Mesh\MeshBone.h"
 #include "Graphics\Mesh\Mesh.h"
 
-#include "Graphics\Buffer\VAO.h"
-#include "Graphics\Buffer\VBO.h"
-#include "Graphics\Buffer\IBO.h"
+#include "Graphics\Buffer\VertexState.h"
+#include "Graphics\Buffer\VertexBuffer.h"
+#include "Graphics\Buffer\IndexBuffer.h"
 
 #include "Graphics\Texture\Texture.h"
 #include "Graphics\Texture\Texture1D.h"

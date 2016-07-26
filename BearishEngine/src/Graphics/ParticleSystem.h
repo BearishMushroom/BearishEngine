@@ -2,7 +2,7 @@
 #define _BEARISH_GRAPHICS_PARTICLESYSTEM_H_
 
 #include "../Core/IAllocatable.h"
-#include "Buffer/VBO.h"
+#include "Buffer/VertexBuffer.h"
 #include "Mesh\Mesh.h"
 #include "Particle.h"
 #include "../Types.h"
@@ -32,8 +32,8 @@ namespace Bearish { namespace Graphics {
 		std::function<void(Particle*, f32)> _update;
 		Shader* _shader;
 		Texture* _texture;
-		VAO _state;
-		VBO _renderData;
+		VertexState _state;
+		VertexBuffer _renderData;
 		i32 _aliveParticles;
 	};
 } }

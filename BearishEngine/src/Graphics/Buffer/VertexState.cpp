@@ -1,20 +1,20 @@
-#include "VAO.h"
+#include "VertexState.h"
 
 using namespace Bearish;
 using namespace Graphics;
 
-VAO::VAO() {
+VertexState::VertexState() {
 	glGenVertexArrays(1, &_id);
 }
 
-VAO::~VAO() {
+VertexState::~VertexState() {
 	glDeleteVertexArrays(1, &_id);
 }
 
-void VAO::Bind() const {
+void VertexState::Bind() const {
 	glBindVertexArray(_id);
 }
 
-void VAO::Unbind() {
+void VertexState::Unbind() {
 	glBindVertexArray(0);
 }

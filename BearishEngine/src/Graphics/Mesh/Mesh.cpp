@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include "../Shader.h"
 #include "../Frustum.h"
+#include "../Camera.h"
 
 using namespace Bearish;
 using namespace Graphics;
@@ -62,7 +63,7 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<u32>& indices, bool calcul
 
 	SetIndexData(&indices[0], indices.size());
 
-	_vao->Unbind();
+	_vertexState->Unbind();
 	_firstAnim = true;
 }
 
@@ -70,18 +71,28 @@ Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::
 		   u32 numIndices, u32* indices) {
 	SetupBuffers();
 
-	bool alloc = false;
-	if (boneids == 0) {
-		alloc = true;
-		boneids = new vec4i[numVertices];
-		memset(boneids, -1, sizeof(vec4i) * numVertices);
+	_extremes = vec3(0, 0, 0);
+	_min = vec3(0, 0, 0);
+	_max = vec3(0, 0, 0);
 
-		boneweights = new vec4[numVertices];
-		memset(boneweights, -1, sizeof(vec4) * numVertices);
+	if (boneids == 0) {
+		std::vector<Vertex> vertices;
+		for (i32 i = 0; i < (i32)numVertices; i++) {
+			vertices.push_back(Vertex(positions[i], texCoords[i], normals[i], tangents[i]));
+		}
+		
+		SetVertexData(&vertices[0], sizeof(Vertex) * vertices.size());
+	}
+	else {
+		std::vector<SkinnedVertex> vertices;
+		for (i32 i = 0; i < (i32)numVertices; i++) {
+			vertices.push_back(SkinnedVertex(positions[i], texCoords[i], normals[i], tangents[i], 
+				boneids ? boneids[i] : vec4i(-1, -1, -1, -1), boneids ? boneweights[i] : vec4(0, 0, 0, 0)));
+		}
+
+		SetVertexData(&vertices[0], sizeof(SkinnedVertex) * vertices.size());
 	}
 
-	std::vector<Vertex> vertices;
-	_extremes = vec3(0, 0, 0);
 	for (i32 i = 0; i < (i32)numVertices; i++) {
 		vec3 pos = positions[i];
 
@@ -89,19 +100,19 @@ Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::
 		if (abs(pos.y) > abs(_extremes.y)) _extremes.y = abs(pos.y);
 		if (abs(pos.z) > abs(_extremes.z)) _extremes.z = abs(pos.z);
 
-		vertices.push_back(Vertex(pos, texCoords[i], normals[i], tangents[i], boneids[i], boneweights[i]));
+		if (pos.x < _min.x) _min.x = pos.x;
+		if (pos.y < _min.y) _min.y = pos.y;
+		if (pos.z < _min.z) _min.z = pos.z;
+
+		if (pos.x > _max.x) _max.x = pos.x;
+		if (pos.y > _max.y) _max.y = pos.y;
+		if (pos.z > _max.z) _max.z = pos.z;
 	}
 
-	SetVertexData(&vertices[0], sizeof(Vertex) * vertices.size());
 	SetIndexData(indices, numIndices);
 
-	_vao->Unbind();
+	_vertexState->Unbind();
 	_firstAnim = true;
-
-	if (alloc) {
-		delete[] boneids;
-		delete[] boneweights;
-	}
 }
 
 Mesh::Mesh(Core::Model model) {
@@ -109,27 +120,31 @@ Mesh::Mesh(Core::Model model) {
 }
 
 Mesh::~Mesh() {
-	//if(_ubo)     delete _ubo;
-	//if(_attribs) delete _attribs;
-	//if(_indices) delete _indices;
-	//if (_vao)	 delete _vao;
+	//if(_uniformBuffer)     delete _uniformBuffer;
+	//if(_vertexBuffer) delete _vertexBuffer;
+	//if(_indexBuffer) delete _indexBuffer;
+	//if (_vertexState)	 delete _vertexState;
 }
 
 
 void Mesh::SetupBuffers() {
-	_vao = new VAO;
-	_vao->Bind();
+	_vertexState = new VertexState;
+	_vertexState->Bind();
 
-	_attribs = new VBO;
-	_indices = new IBO;
+	_vertexBuffer = new VertexBuffer;
+	_indexBuffer = new IndexBuffer;
 }
 
 void Mesh::SetIndexData(u32* data, u32 size) {
-	_indices->SetData(data, size);
+	// This function assumes that _vertexState is already bound.
+	_numFaces = size / 3;
+	_indexBuffer->SetData(data, size);
 }
 
-void Mesh::SetVertexData(Vertex* data, u32 size) {
-	_attribs->SetData((void*)data, size);
+/*void Mesh::SetVertexData(void* data, u32 size) {
+	// This function assumes that _vertexState is already bound.
+	_numVerts = size / sizeof(Vertex);
+	_vertexBuffer->SetData(data, size);
 	Renderer::EnableAttribArray(Renderer::POSITION_ATTRIBUTE);
 	Renderer::SetAttribPointer(Renderer::POSITION_ATTRIBUTE, sizeof(vec3) / sizeof(f32), sizeof(Vertex), 0);
 
@@ -149,26 +164,54 @@ void Mesh::SetVertexData(Vertex* data, u32 size) {
 	Renderer::SetAttribPointer(Renderer::BONEWEIGHT_ATTRIBUTE, sizeof(vec4) / sizeof(f32), sizeof(Vertex), offsetof(Vertex, boneWeights));
 
 	// This sets up our uniform buffer, so we can set the data without reallocating it.
-	//_ubo = new UBO;
-	//_ubo->SetData(0, sizeof(InstanceData));
-	//_ubo->Unbind();
+	//_uniformBuffer = new UBO;
+	//_uniformBuffer->SetData(0, sizeof(InstanceData));
+	//_uniformBuffer->Unbind();
+}*/
+
+void Mesh::SetVertexData(Vertex* vertices, u32 size) {
+	VertexLayout<Vertex> layout;
+	// Vertex layout
+	layout.PushComponent("POSITION", sizeof(Math::vec3));
+	layout.PushComponent("TEXCOORD", sizeof(Math::vec2));
+	layout.PushComponent("NORMAL", sizeof(Math::vec3));
+	layout.PushComponent("TANGENT", sizeof(Math::vec3));
+
+	// Constants for skinning
+	layout.PushComponent(Math::vec4i(-1, -1, -1, -1));
+	layout.PushComponent(Math::vec4(0, 0, 0, 0));
+
+	SetVertexData<Vertex>(vertices, size, layout);
 }
 
-void Mesh::Submit(Transform* transform, const mat4& world, const mat4& mvp) {
-	/*if (transform != 0) {
-		Frustum fr(mvp);
+void Mesh::SetVertexData(SkinnedVertex* vertices, u32 size) {
+	VertexLayout<SkinnedVertex> layout;
+	// Vertex layout
+	layout.PushComponent("POSITION", sizeof(Math::vec3));
+	layout.PushComponent("TEXCOORD", sizeof(Math::vec2));
+	layout.PushComponent("NORMAL", sizeof(Math::vec3));
+	layout.PushComponent("TANGENT", sizeof(Math::vec3));
+	layout.PushComponent("BONEID", sizeof(Math::vec4i));
+	layout.PushComponent("BONEWEIGHT", sizeof(Math::vec4));
 
-		if (!fr.SphereIntersects(transform->GetTranslation(), _extremes.Max() * transform->GetScale().Max())) {
+	SetVertexData<SkinnedVertex>(vertices, size, layout);
+}
+
+void Mesh::Submit(Transform* transform, const mat4& world, const Camera* camera) {
+	if (transform != 0) {
+		Frustum fr(camera->GetViewMatrix());
+
+		if (!fr.SphereIntersects(transform->GetTranslation(), _extremes.Max() * (transform->GetScale().Max() * 1.3f))) {
 			return;
 		}
-	}*/
+	}
 
 	_worldMatrices.push_back(world);
-	_mvpMatrices.push_back(mvp);
+	_mvpMatrices.push_back(camera->GetViewMatrix() * world);
 }
 
 void Mesh::Flush(Shader* shader) {
-	_vao->Bind();
+	_vertexState->Bind();
 
 	i32 numInstances = _worldMatrices.size();
 	mat4* worlds = &_worldMatrices[0];
@@ -177,14 +220,15 @@ void Mesh::Flush(Shader* shader) {
 	for (i32 i = 0; i < numInstances; i++) {
 		//data.mvp = mvps[i];
 		//data.world = worlds[i];
-		//_ubo->UpdateData(data);
-		//shader->SetUniformBlock("instance_data", _ubo);
+		//_uniformBuffer->UpdateData(data);
+		//shader->SetUniformBlock("instance_data", _uniformBuffer);
 		shader->SetUniform("world", worlds[i]);
 		shader->SetUniform("MVP", mvps[i]);
-		glDrawElements((GLenum)Renderer::GetPrimitiveMode(), _indices->GetSize(), GL_UNSIGNED_INT, 0);
+		_vertexBuffer->Apply();
+		glDrawElements((GLenum)Renderer::GetPrimitiveMode(), _indexBuffer->GetSize(), GL_UNSIGNED_INT, 0);
 	}
 
-	_vao->Unbind();
+	_vertexState->Unbind();
 
 	_worldMatrices.clear();
 	_mvpMatrices.clear();

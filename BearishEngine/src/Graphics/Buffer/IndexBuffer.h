@@ -1,14 +1,14 @@
-#ifndef _BEARISH_GRAPHICS_IBO_H_
-#define _BEARISH_GRAPHICS_IBO_H_
+#ifndef _BEARISH_GRAPHICS_INDEXBUFFER_H_
+#define _BEARISH_GRAPHICS_INDEXBUFFER_H_
 
 #include "../../Core/IAllocatable.h"
 #include "../../Types.h"
 
 namespace Bearish { namespace Graphics {
-	class IBO : public Core::IAllocatable<IBO> {
+	class IndexBuffer : public Core::IAllocatable<IndexBuffer> {
 	public:
-		IBO();
-		~IBO();
+		IndexBuffer();
+		~IndexBuffer();
 
 		void Bind() const;
 		static void Unbind();

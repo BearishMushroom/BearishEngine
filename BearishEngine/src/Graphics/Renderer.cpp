@@ -52,6 +52,21 @@ void Renderer::SetAttribDivisor(const u32 num, const u32 divisor) {
 	glVertexAttribDivisor(num, divisor);
 }
 
+void Renderer::SetAttribValue(const u32 num, Math::vec2& value) {
+	glVertexAttrib2f(num, value.x, value.y);
+}
+
+void Renderer::SetAttribValue(const u32 num, Math::vec3& value) {
+	glVertexAttrib3f(num, value.x, value.y, value.z);
+}
+
+void Renderer::SetAttribValue(const u32 num, Math::vec4& value) {
+	glVertexAttrib4f(num, value.x, value.y, value.z, value.w);
+}
+
+void Renderer::SetAttribValue(const u32 num, Math::vec4i& value) {
+	glVertexAttribI4i(num, value.x, value.y, value.z, value.w);
+}
 
 void Renderer::Clear() const {
 	glClearColor(0, 0, 0, 0);

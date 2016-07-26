@@ -1,14 +1,14 @@
-#ifndef _BEARISH_GRAPHICS_VAO_H_
-#define _BEARISH_GRAPHICS_VAO_H_
+#ifndef _BEARISH_GRAPHICS_VERTEXSTATE_H_
+#define _BEARISH_GRAPHICS_VERTEXSTATE_H_
 
 #include "../../Core/IAllocatable.h"
 #include "../../Types.h"
 
 namespace Bearish { namespace Graphics {
-	class VAO : public Core::IAllocatable<VAO> {
+	class VertexState : public Core::IAllocatable<VertexState> {
 	public:
-		VAO();
-		~VAO();
+		VertexState();
+		~VertexState();
 
 		void Bind() const;
 		static void Unbind();
@@ -19,4 +19,4 @@ namespace Bearish { namespace Graphics {
 	};
 } }
 
-#endif // _BEARISH_GRAPHICS_VAO_H_
+#endif // _BEARISH_GRAPHICS_VERTEXSTATE_H_

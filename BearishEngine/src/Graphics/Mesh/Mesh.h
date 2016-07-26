@@ -5,10 +5,10 @@
 #include "../../Core/Model.h"
 #include "../../Core/Transform.h"
 #include "../Renderer.h"
-#include "../Buffer/VBO.h"
-#include "../Buffer/IBO.h"
-#include "../Buffer/VAO.h"
-#include "../Buffer/UBO.h"
+#include "../Buffer/VertexBuffer.h"
+#include "../Buffer/IndexBuffer.h"
+#include "../Buffer/VertexState.h"
+#include "../Buffer/UniformBuffer.h"
 #include "../../Math/mat4.h"
 #include "../../Math/vec2.h"
 #include "../../Math/vec3.h"
@@ -36,13 +36,13 @@ namespace Bearish {
 	namespace Graphics {	
 		class RenderingEngine;
 		class Shader;
+		class Camera;
 
 		class Mesh : public Core::IAllocatable<Mesh> {
 		private:
 			struct InstanceData {
 				Math::mat4 world;
 				Math::mat4 mvp;
-				f32 rigged;
 			};
 		public:
 			static Mesh* CreateQuad(Math::vec4 texCoords = Math::vec4(0, 0, 1, 1));
@@ -60,12 +60,12 @@ namespace Bearish {
 				_transform = transform;
 			}
 
-			void Submit(Core::Transform* transform, const Math::mat4& world, const Math::mat4& mvp);
+			void Submit(Core::Transform* transform, const Math::mat4& world, const Camera* camera);
 
 			void Flush(Shader* shader);
 			void CalculateNormals(std::vector<Vertex>& vertices, std::vector<u32>& indices) const;
 
-			u32 GetVAOID() { return _vao->GetID(); }
+			u32 GetVAOID() { return _vertexState->GetID(); }
 
 			MeshAnimation* GetAnimation(string name);
 
@@ -77,20 +77,29 @@ namespace Bearish {
 			MeshSkeleton* GetSkeleton() { return _skeleton; }
 
 			std::vector<Math::mat4>& GetBones() { if (_boneTransforms.size() == 0) Animate(0); return _boneTransforms; }
-
+			
 			void SetVertexData(Vertex* vertices, u32 size);
+			void SetVertexData(SkinnedVertex* vertices, u32 size);
 			void SetIndexData(u32* data, u32 size);
+
+			template<typename T>
+			void SetVertexData(T* vertices, u32 size, VertexLayout<T>& layout) {
+				_numVerts = size / sizeof(Vertex);
+				_vertexBuffer->SetData((void*)vertices, size);
+				_vertexBuffer->SetLayout(layout);
+			}
+
+			u32 GetNumVerts() const { return _numVerts; }
+			u32 GetNumFaces() const { return _numFaces; }
+			u32 GetQueued() const { return _mvpMatrices.size(); }
 		private:
 			void SetupBuffers();
 			
-			struct {
-				VBO* _attribs;
-				IBO* _indices;
-			};
+			VertexState* _vertexState;
+			VertexBuffer* _vertexBuffer;
+			IndexBuffer* _indexBuffer;
 
-
-			VAO* _vao;
-			UBO* _ubo;
+			UniformBuffer* _uniformBuffer;
 
 			std::vector<Math::mat4> _worldMatrices;
 			std::vector<Math::mat4> _mvpMatrices;
@@ -102,7 +111,8 @@ namespace Bearish {
 			std::vector<Math::mat4> _boneTransforms;
 			bool _firstAnim, _rigged;
 
-			Math::vec3 _extremes;
+			Math::vec3 _extremes, _min, _max;
+			u32 _numVerts, _numFaces;
 		};
 } }
 

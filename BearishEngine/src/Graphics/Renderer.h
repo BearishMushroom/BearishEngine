@@ -3,6 +3,9 @@
 
 #include "../Core/IAllocatable.h"
 #include "../Types.h"
+#include "../Math/vec2.h"
+#include "../Math/vec3.h"
+#include "../Math/vec4.h"
 #include "OpenGL.h"
 
 namespace Bearish { namespace Graphics {
@@ -71,6 +74,11 @@ namespace Bearish { namespace Graphics {
 		static void DisableAttribArray(const u32 num);
 		static void SetAttribPointer(const u32 num, const u32 numElements, const u32 vertexSize, const u32 offset, const AttributeType type = AttributeType::Float32);
 		static void SetAttribDivisor(const u32 num, const u32 divisor);
+
+		static void SetAttribValue(const u32 num, Math::vec2& value);
+		static void SetAttribValue(const u32 num, Math::vec3& value);
+		static void SetAttribValue(const u32 num, Math::vec4& value);
+		static void SetAttribValue(const u32 num, Math::vec4i& value);
 		
 		static void SetBlendMode(const BlendMode src, const BlendMode dst);
 		static void SetBlendState(const BlendState state);

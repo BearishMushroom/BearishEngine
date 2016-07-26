@@ -1,14 +1,14 @@
-#ifndef _BEARISH_GRAPHICS_UBO_H_
-#define _BEARISH_GRAPHICS_UBO_H_
+#ifndef _BEARISH_GRAPHICS_UNIFORMBUFFER_H_
+#define _BEARISH_GRAPHICS_UNIFORMBUFFER_H_
 
 #include "../../Types.h"
 #include "../../Core/IAllocatable.h"
 
 namespace Bearish { namespace Graphics {
-	class UBO : public Core::IAllocatable<UBO> {
+	class UniformBuffer : public Core::IAllocatable<UniformBuffer> {
 	public:
-		UBO();
-		~UBO();
+		UniformBuffer();
+		~UniformBuffer();
 
 		void SetData(void* data, u32 size);
 		
@@ -34,4 +34,4 @@ namespace Bearish { namespace Graphics {
 	};
 } }
 
-#endif // _BEARISH_GRAPHICS_UBO_H_
+#endif // _BEARISH_GRAPHICS_UNIFORMBUFFER_H_
