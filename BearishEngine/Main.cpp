@@ -1,5 +1,6 @@
 #include "src/Bearish.h"
 #include <vector>
+#include <crtdbg.h>
 
 using namespace Bearish;
 
@@ -246,6 +247,8 @@ void Update() {
 }
 
 i32 main(i32 argc, c8** argv) {
+	_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+
 	Scripting::InitLua();
 	Scripting::RunFile("scr/lib/init.lua");
 	Scripting::RunFile("scr/lib/class.lua");

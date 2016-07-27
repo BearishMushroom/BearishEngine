@@ -30,7 +30,7 @@ Model::Model(const string& filename) {
 }
 
 Model::~Model() {
-	//delete _data;
+	delete _data;
 }
 
 Mesh Model::ToMesh() {

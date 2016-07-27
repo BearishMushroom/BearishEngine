@@ -102,7 +102,7 @@ namespace Bearish { namespace Graphics {
 		// Temp variables used for pre-compilation data.
 		GLSLStructList _structs;
 		std::vector<string> _uniformsToAdd, _uniformBlocksToAdd;
-		std::vector<std::pair<string, u32>> _attributesToAdd;
+		std::vector<std::pair<string, size_t>> _attributesToAdd;
 		std::vector<string> _gsVaryings;
 
 		// Runtime variables.

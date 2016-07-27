@@ -115,7 +115,7 @@ Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::
 	_firstAnim = true;
 }
 
-Mesh::Mesh(Core::Model model) {
+Mesh::Mesh(Core::Model& model) {
 	*this = model.ToMesh();
 }
 

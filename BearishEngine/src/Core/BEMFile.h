@@ -142,15 +142,23 @@ namespace Bearish {
 		}
 
 		~BEMFile() {
-			free(indices);
-			free(positionData);
-			free(uvData);
-			free(normalData);
-			free(tangentData);
+			if(indices) free((u8*)indices);
+			if(positionData) free((u8*)positionData);
+			if(uvData) free((u8*)uvData);
+			if(normalData) free((u8*)normalData);
+			if(tangentData) free((u8*)tangentData);
 			if (skinned) {
-				free(boneIDData);
-				free(boneWeightData);
+				if(boneIDData) free((u8*)boneIDData);
+				if(boneWeightData) free((u8*)boneWeightData);
 			}
+
+			indices = 0;
+			positionData = 0;
+			uvData = 0;
+			normalData = 0;
+			tangentData = 0;
+			boneIDData = 0;
+			boneWeightData = 0;
 		}
 
 		void AllocateVertexData(bool skinned) {
@@ -173,7 +181,7 @@ namespace Bearish {
 		}
 
 		u8* ReadBytes(FILE* file, u32 size, u32 element) {
-			u8* buffer = (u8*)malloc(size * element);
+			u8* buffer = (u8*)malloc(size * element*2);
 			fread(buffer, element, size, file);
 			return buffer;
 		}
@@ -323,46 +331,74 @@ namespace Bearish {
 				boneIDData = (vec4i*)ReadBytes(file, numVertices, sizeof(vec4i));
 				boneWeightData = (vec4*)ReadBytes(file, numVertices, sizeof(vec4));
 
-				boneTransform = *(mat4*)ReadBytes(file, 1, sizeof(mat4));
-				numBones = *(u32*)ReadBytes(file, 1, sizeof(u32));
+				mat4* t = (mat4*)ReadBytes(file, 1, sizeof(mat4));
+				boneTransform = *t;
+				free(t);
+
+				u32* tu = (u32*)ReadBytes(file, 1, sizeof(u32));
+				numBones = *tu;
+				free(tu);
 				boneOffsets.resize(numBones);
 
 				for (i32 i = 0; i < numBones; i++) {
-					u8 len = *ReadBytes(file, 1, sizeof(u8));
+					u8* tl = ReadBytes(file, 1, sizeof(u8));
+					u8 len = *tl;
+					free(tl);
 					string name = string((char*)ReadBytes(file, len, sizeof(u8)), len);
-					u32 id = *(u32*)ReadBytes(file, 1, sizeof(u32));
-					mat4 offset = *(mat4*)ReadBytes(file, 1, sizeof(mat4));
+					u32* tid = (u32*)ReadBytes(file, 1, sizeof(u32));
+					u32 id = *tid;
+					free(tid);
+					mat4* toff = (mat4*)ReadBytes(file, 1, sizeof(mat4));
+					mat4 offset = *toff;
+					free(toff);
 					boneOffsets[id] = offset;
 					boneMap.insert(std::make_pair(name, id));
 				}
 
 				rootNode = ReadNode(file);
 
-				numAnimations = *(u32*)ReadBytes(file, 1, sizeof(u32));
+				u32* tnum = (u32*)ReadBytes(file, 1, sizeof(u32));
+				numAnimations = *tnum;
+				free(tnum);
 				for (i32 i = 0; i < numAnimations; i++) {
 					BEMAnimation anim;
-					u8 len = *ReadBytes(file, 1, sizeof(u8));
+					u8* tlen = ReadBytes(file, 1, sizeof(u8));
+					u8 len = *tlen;
+					free(tlen);
 					anim.name = string((char*)ReadBytes(file, len, sizeof(u8)), len);
-					anim.tickRate = *(f32*)ReadBytes(file, 1, sizeof(f32));
-					anim.duration = *(f32*)ReadBytes(file, 1, sizeof(f32));
-					anim.numChannels = *(u32*)ReadBytes(file, 1, sizeof(u32));
+					f32* tf = (f32*)ReadBytes(file, 1, sizeof(f32));
+					anim.tickRate = *tf;
+					free(tf);
+					tf = (f32*)ReadBytes(file, 1, sizeof(f32));
+					anim.duration = *tf;
+					free(tf);
+					u32* tu = (u32*)ReadBytes(file, 1, sizeof(u32));
+					anim.numChannels = *tu;
+					free(tu);
 
 					for (i32 j = 0; j < (i32)anim.numChannels; j++) {
 						BEMAnimationChannel ch;
-						u8 length = *ReadBytes(file, 1, sizeof(u8));
+						u8* t = ReadBytes(file, 1, sizeof(u8));
+						u8 length = *t;
+						free(t);
 						ch.name = string((char*)ReadBytes(file, length, sizeof(u8)), length);
 
-						ch.numPositions = *(u32*)ReadBytes(file, 1, sizeof(u32));
+						u32* tu = (u32*)ReadBytes(file, 1, sizeof(u32));
+						ch.numPositions = *tu;
+						free(tu);
 						auto pos = (std::pair<vec3, f32>*)ReadBytes(file, ch.numPositions, sizeof(std::pair<vec3, f32>));
 						ch.positions = std::vector<std::pair<vec3, f32>>(pos, pos + ch.numPositions);
+						free(pos);
 
 						ch.numScales = *(u32*)ReadBytes(file, 1, sizeof(u32));
 						auto scale = (std::pair<vec3, f32>*)ReadBytes(file, ch.numScales, sizeof(std::pair<vec3, f32>));
 						ch.scales = std::vector<std::pair<vec3, f32>>(scale, scale + ch.numScales);
+						free(scale);
 
 						ch.numRotations = *(u32*)ReadBytes(file, 1, sizeof(u32));
 						auto rot = (std::pair<vec4, f32>*)ReadBytes(file, ch.numRotations, sizeof(std::pair<vec4, f32>));
 						ch.rotations = std::vector<std::pair<vec4, f32>>(rot, rot + ch.numRotations);
+						free(rot);
 						anim.channels.push_back(ch);
 					}
 

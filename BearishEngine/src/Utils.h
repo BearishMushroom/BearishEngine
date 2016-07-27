@@ -51,7 +51,7 @@ namespace Bearish { namespace Util {
 		u32 initialPos = 0;
 		result.clear();
 
-		while (pos != string::npos) {
+		while (pos != string::npos && pos < text.length() - 1) {
 			result.push_back(text.substr(initialPos, pos - initialPos));
 			initialPos = pos + 1;
 

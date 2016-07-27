@@ -86,9 +86,16 @@ namespace Bearish { namespace Scripting {
 	}
 
 	static void InitMoonScript() {
-		luabind::object moon = luabind::call_function<luabind::object>(Scripting::L, "require", "moonscript");
-		moonToLua = luabind::rawget(moon, "to_lua");
-		moonDoFile = luabind::rawget(moon, "dofile");
+		try {
+			luabind::object moon = luabind::call_function<luabind::object>(Scripting::L, "require", "moonscript");
+			moonToLua = luabind::rawget(moon, "to_lua");
+			moonDoFile = luabind::rawget(moon, "dofile");
+		}
+		catch (luabind::error e) {
+			printf("%s\n", e.what());
+			printf("");
+		}
+			
 	}
 
 	static string CompileMoon(string moon) {

@@ -69,14 +69,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LibraryPath>$(SolutionDir)/deps/lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)/deps/lib/x86;$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir)/deps/include;$(IncludePath)</IncludePath>
     <IntDir>$(SolutionDir)Intermediates\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>$(SolutionDir)/deps/lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)/deps/lib/x86;$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir)/deps/include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Intermediates\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
@@ -84,14 +84,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir)/deps/include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)/deps/lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)/deps/lib/x86;$(LibraryPath)</LibraryPath>
     <IntDir>$(SolutionDir)Intermediates\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)/deps/include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)/deps/lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)/deps/lib/x86;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Intermediates\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>

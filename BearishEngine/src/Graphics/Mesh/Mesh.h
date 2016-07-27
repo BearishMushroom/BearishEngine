@@ -50,7 +50,7 @@ namespace Bearish {
 			Mesh(std::vector<Vertex>& vertices, std::vector<u32>& indices, bool calculateNormals = false);
 			Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::vec3* normals, Math::vec3* tangents, Math::vec4i* boneids, 
 				 Math::vec4* boneweights, u32 numIndices, u32* indices);
-			Mesh(Core::Model model);
+			Mesh(Core::Model& model);
 			~Mesh();
 
 			void SetBoneData(MeshSkeleton* skeleton, MeshNode* rootNode, std::vector<MeshAnimation> animations, Math::mat4 transform) {
