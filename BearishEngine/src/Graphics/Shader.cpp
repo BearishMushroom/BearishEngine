@@ -295,27 +295,27 @@ void Shader::Unbind() const {
 
 void Shader::AddAllStructs(const string& source) {
 	static string STRUCT_DIRECTIVE = "struct";
-	size_t structStartLocation = source.find(STRUCT_DIRECTIVE, 0);
+	usize structStartLocation = source.find(STRUCT_DIRECTIVE, 0);
 
 	while (structStartLocation != std::string::npos) {
-		size_t nameBegin = structStartLocation + STRUCT_DIRECTIVE.size() + 1;
-		size_t braceBegin = source.find("{", nameBegin);
-		size_t braceEnd = source.find("}", braceBegin);
+		usize nameBegin = structStartLocation + STRUCT_DIRECTIVE.size() + 1;
+		usize braceBegin = source.find("{", nameBegin);
+		usize braceEnd = source.find("}", braceBegin);
 
 		string structName(source.begin() + nameBegin, source.begin() + braceBegin - 1);
 
 		std::vector<GLSLStructComponent> structComponents;
 
-		size_t componentSemicolonPosition = source.find(";", braceBegin);
+		usize componentSemicolonPosition = source.find(";", braceBegin);
 		while (componentSemicolonPosition != string::npos && componentSemicolonPosition < braceEnd) {
-			size_t componentNameStart = componentSemicolonPosition;
+			usize componentNameStart = componentSemicolonPosition;
 
 			while (!isspace(source[componentNameStart - 1])) {
 				componentNameStart--;
 			}
 
-			size_t componentTypeEnd = componentNameStart - 1;
-			size_t componentTypeStart = componentTypeEnd;
+			usize componentTypeEnd = componentNameStart - 1;
+			usize componentTypeStart = componentTypeEnd;
 
 			while (!isspace(source[componentTypeStart - 1])) {
 				componentTypeStart--;
@@ -340,11 +340,11 @@ void Shader::AddAllUniforms(const string& source) {
 	// Format: uniform vec3...;
 	static string UNIFORM_DIRECTIVE = "uniform";
 
-	size_t offset = 0, position = 0;
+	usize offset = 0, position = 0;
 	while ((position = source.find(UNIFORM_DIRECTIVE, offset)) != string::npos) {
 		offset = position + UNIFORM_DIRECTIVE.length() + 1; // Add one to account for space "uniform sampler..."
-		size_t nameStartPos = source.find(" ", offset) + 1; // Add one to account for space  |-------|
-		size_t nameEndPos = source.find("=", offset) < source.find("\n", offset) ? source.find("=", offset) - 1 : source.find(";", offset);
+		usize nameStartPos = source.find(" ", offset) + 1; // Add one to account for space  |-------|
+		usize nameEndPos = source.find("=", offset) < source.find("\n", offset) ? source.find("=", offset) - 1 : source.find(";", offset);
 		string name = source.substr(nameStartPos, nameEndPos - nameStartPos);
 		string type = source.substr(offset, nameStartPos - offset - 1);
 
@@ -401,12 +401,12 @@ void Shader::AddAllAttributes(const string& source) {
 	// Look for attributes.
 	// Format: layout (location = 0) in vec2...;
 	static string ATTRIBUTE_DIRECTIVE = "layout";
-	size_t offset = 0, position = 0;
+	usize offset = 0, position = 0;
 
 	while ((position = source.find(ATTRIBUTE_DIRECTIVE, offset)) != string::npos) {
 		offset = position + ATTRIBUTE_DIRECTIVE.length() + 1; // Add one to account for space "uniform sampler..."
-		size_t nameStartPos = source.find(" ", offset) + 1; // Add one to account for space  |-------|
-		size_t nameEndPos = source.find(";", offset);
+		usize nameStartPos = source.find(" ", offset) + 1; // Add one to account for space  |-------|
+		usize nameEndPos = source.find(";", offset);
 		string name = source.substr(nameStartPos, nameEndPos - nameStartPos);
 		_gsVaryings.push_back(name);
 	}
@@ -414,18 +414,18 @@ void Shader::AddAllAttributes(const string& source) {
 
 void Shader::AddAllGSVaryings(const string& source) {
 	static string VARYING_DIRECTIVE = "out";
-	size_t offset = 0, position = 0;
+	usize offset = 0, position = 0;
 	while ((position = source.find(VARYING_DIRECTIVE, offset)) != string::npos) {
 		offset = position + VARYING_DIRECTIVE.length() + 1;
 
-		size_t positionStartPos = source.find("=", offset) + 2;
-		size_t positionEndPos = source.find(")", offset);
-		size_t attributePosition = std::stoi(source.substr(positionStartPos, positionEndPos - positionStartPos));
+		usize positionStartPos = source.find("=", offset) + 2;
+		usize positionEndPos = source.find(")", offset);
+		usize attributePosition = std::stoi(source.substr(positionStartPos, positionEndPos - positionStartPos));
 
-		size_t nameStartPos = source.find(" ", source.find("in", offset) + 3) + 1;
-		size_t nameEndPos = source.find(";", offset);
+		usize nameStartPos = source.find(" ", source.find("in", offset) + 3) + 1;
+		usize nameEndPos = source.find(";", offset);
 		string name = source.substr(nameStartPos, nameEndPos - nameStartPos);
 
-		_attributesToAdd.push_back(std::pair<string, size_t>(name, attributePosition));
+		_attributesToAdd.push_back(std::pair<string, usize>(name, attributePosition));
 	}
 }

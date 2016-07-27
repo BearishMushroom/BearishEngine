@@ -129,7 +129,7 @@ namespace Bearish { namespace Math {
 			return (x == other.x && y == other.y);
 		}
 
-		inline T operator[](const size_t index) const {
+		inline T operator[](const usize index) const {
 			return v[index];
 		}
 

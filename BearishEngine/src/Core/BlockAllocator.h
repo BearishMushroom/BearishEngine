@@ -5,7 +5,7 @@
 #include "Logger.h"
 
 namespace Bearish { namespace Core {
-	template <size_t CHUNK_SIZE>
+	template <usize CHUNK_SIZE>
 	class BlockAllocator {
 	private:
 		const u32 MAX_SIZE = 1024; // Allocate no more space than enough for 1024 objects at a time.

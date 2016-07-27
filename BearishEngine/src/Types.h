@@ -21,7 +21,17 @@ namespace Bearish {
 	typedef std::string        string;
 	typedef const char*        cstring;
 
-	typedef bool					b8;
+	typedef bool               b8;
+
+#ifdef BEARISH_X86
+	typedef i32                size;
+	typedef u32                usize;
+#elif BEARISH_X64
+	typedef i64                size;
+	typedef u64                usize;
+#else
+	#pragma(error, "Found no platform macro.")
+#endif
 
 	static const void* null = (void*)0;
 }

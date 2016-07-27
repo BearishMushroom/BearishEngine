@@ -8,11 +8,11 @@ namespace Bearish { namespace Core {
 	template<class T>
 	class IAllocatable {
 	public:
-		static void* operator new(size_t size) {
+		static void* operator new(usize size) {
 			return BlockAllocator<sizeof(T)>::Instance().Allocate();
 		}
 
-		static void operator delete(void* data, size_t size) {
+		static void operator delete(void* data, usize size) {
 			BlockAllocator<sizeof(T)>::Instance().Free(data);
 		}
 	};

@@ -20,11 +20,11 @@ namespace Bearish { namespace Math {
 			T _flat[16];
 		};
 	public:
-		inline const T* operator[](size_t index) const {
+		inline const T* operator[](usize index) const {
 			return _v[index];
 		}
 
-		inline T* operator[](size_t index) {
+		inline T* operator[](usize index) {
 			return _v[index];
 		}
 

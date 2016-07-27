@@ -11,11 +11,11 @@ namespace Bearish { namespace Core {
 		Callback() {}
 		~Callback() {}
 
-		inline void operator+= (const Function func) {
+		inline void operator+= (Function func) {
 			_functions.push_back(func);
 		}
 
-		inline void operator-= (const Function func) {
+		inline void operator-= (Function func) {
 			auto comp = func.target<Return(Args...)>();
 			for (std::vector<Function>::iterator it = _functions.begin(); it != _functions.end(); it++) {
 				auto comp2 = (*it).target<Return(Args...)>();
@@ -56,11 +56,11 @@ namespace Bearish { namespace Core {
 
 		~Action() {}
 
-		inline void operator+= (const Function func) {
+		inline void operator+= (Function func) {
 			_functions.push_back(func);
 		}
 
-		inline void operator-= (const Function func) {
+		inline void operator-= (Function func) {
 			auto comp = func.target<void(Args...)>();
 			for (std::vector<Function>::iterator it = _functions.begin(); it != _functions.end(); it++) {
 				auto comp2 = (*it).target<void(Args...)>();
