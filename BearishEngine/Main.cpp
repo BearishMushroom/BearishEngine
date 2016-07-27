@@ -608,11 +608,11 @@ for (i32 i = 0; i < 41; i++) {
 		for (i32 j = 0; j < 10; j++) {
 			Material* mat = new Material(pbrTest);
 			mat->Set("UsingNormalMap", 0.f);
-			mat->Set("AlbedoColor", vec4(0.2, 0.2, 0.2, 1));
+			mat->Set("AlbedoColor", vec4(0.2f, 0.2f, 0.2f, 1.f));
 			mat->Set("SpecularColor", vec3(1.f - (f32)i / 10 - 0.01f));
 			mat->Set("GlossColor", 1.f - (f32)j / 10.f - 0.01f);
 			Mesh* sphere = new Mesh(Model("res/models/sphere.bem").ToMesh());
-			Actor* a = new Actor(Transform(vec3(-5+i, 1.5, -5+j), vec3(0.09)));
+			Actor* a = new Actor(Transform(vec3(-5.f+i, 1.5f, -5.f+j), vec3(0.09f)));
 			a->AddComponent(new MeshRendererComponent(sphere, mat));
 			actors.push_back(a);
 		}

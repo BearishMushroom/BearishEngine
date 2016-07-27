@@ -9,7 +9,7 @@ void Win32WindowComponent::Create(void* parentHandle, i32 id) {
 
 	Register(parentHandle, id);
 
-	for (auto i = 0; i < _children.size(); i++) {
+	for (usize i = 0; i < _children.size(); i++) {
 		_children.at(i)->Create(_handle == 0 ? parentHandle : _handle, id * 100 + i);
 	}
 

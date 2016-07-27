@@ -81,8 +81,8 @@ void RenderingEngine::Load() {
 	};
 
 
-	_gbuffer = new Texture(vec2(Settings::Get<i32>("resolution_x"), Settings::Get<i32>("resolution_y")), TextureType::Texture2D, att, fmt, 4);
-	_ssaoBuffer = new Texture(vec2(Settings::Get<i32>("resolution_x"), Settings::Get<i32>("resolution_y")), TextureType::Texture2D, TextureFilter::Nearest, TextureAttachment::Color0, TextureFormat::R, 0);
+	_gbuffer = new Texture(vec2((f32)Settings::Get<i32>("resolution_x"), (f32)Settings::Get<i32>("resolution_y")), TextureType::Texture2D, att, fmt, 4);
+	_ssaoBuffer = new Texture(vec2((f32)Settings::Get<i32>("resolution_x"), (f32)Settings::Get<i32>("resolution_y")), TextureType::Texture2D, TextureFilter::Nearest, TextureAttachment::Color0, TextureFormat::R, 0);
 
 	_geomShader = new Shader("res/geometrypass.vert", "res/geometrypass.frag");
 	_geomShader->SetName("geom");
@@ -108,8 +108,8 @@ void RenderingEngine::Load() {
 	std::vector<vec3> ssaoNoise;
 	for (i32 i = 0; i < 16; i++) {
 		vec3 noise(
-			randomFloats(generator) * 2.0 - 1.0,
-			randomFloats(generator) * 2.0 - 1.0,
+			randomFloats(generator) * 2.0f - 1.0f,
+			randomFloats(generator) * 2.0f - 1.0f,
 			0.0f);
 		ssaoNoise.push_back(noise);
 	}
@@ -260,7 +260,7 @@ void RenderingEngine::Draw() {
 		_ssaoBuffer->BindAsRenderTarget();
 		_ssaoShader->Bind();
 		_ssaoShader->SetUniform("Noise", _ssaoNoise);
-		_ssaoShader->SetUniform("Screen", vec2(Settings::Get<i32>("resolution_x"), Settings::Get<i32>("resolution_y")));
+		_ssaoShader->SetUniform("Screen", vec2((f32)Settings::Get<i32>("resolution_x"), (f32)Settings::Get<i32>("resolution_y")));
 		_ssaoShader->SetUniform("Projection", _camera->GetViewMatrix());
 		_quad->Submit(0, mat4().CreateIdentity(), Camera::Identity);
 		_quad->Flush(_ssaoShader);
@@ -285,7 +285,7 @@ void RenderingEngine::Draw() {
 		_pbrShader->SetUniform("gSSAO", 7);
 		_ssaoBuffer->Bind(7);
 		_pbrShader->SetUniform("ssaoScale", (f32)_ssaoSetting);
-		_pbrShader->SetUniform("screen", vec2(Settings::Get<i32>("resolution_x"), Settings::Get<i32>("resolution_y")));
+		_pbrShader->SetUniform("screen", vec2((f32)Settings::Get<i32>("resolution_x"), (f32)Settings::Get<i32>("resolution_y")));
 		_pbrShader->SetUniform("eyePos", GetCamera()->GetTransform().GetTranslation());
 		_pbrShader->SetUniform("gPosition", 0);
 		_pbrShader->SetUniform("gNormal", 1);

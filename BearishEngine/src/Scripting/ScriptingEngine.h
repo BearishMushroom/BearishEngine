@@ -28,6 +28,8 @@ namespace Bearish { namespace Scripting {
 				Core::Logger::Error("Lua: %s\n", lua_tostring(Scripting::L, -1));
 				Core::Logger::Error(e.what());
 			}
+
+			return Ret();
 		}
 
 		inline bool HasFunction(string name) {
