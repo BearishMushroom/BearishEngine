@@ -34,7 +34,7 @@ namespace Bearish { namespace Graphics {
 			Math::vec3 normal = Math::vec3(0),
 			Math::vec3 tangent = Math::vec3(0),
 			Math::vec4i boneIDs = Math::vec4i(-1, -1, -1, -1),
-			Math::vec4 boneWeights = Math::vec4(0, 0, 0, 0)) :
+			const Math::vec4& boneWeights = Math::vec4(0, 0, 0, 0)) :
 			position(position), texCoord(texCoord), normal(normal), tangent(tangent), boneIDs(boneIDs), boneWeights(boneWeights) {}
 
 		void AddBoneID(i32 id, f32 weight) {

@@ -24,13 +24,19 @@ namespace Bearish {
 	typedef bool               b8;
 
 #ifdef BEARISH_X86
-	typedef i32                size;
+	typedef i32                isize;
 	typedef u32                usize;
 #elif BEARISH_X64
-	typedef i64                size;
+	typedef i64                isize;
 	typedef u64                usize;
 #else
 	#pragma(error, "Found no platform macro.")
+#endif
+
+#if !defined(BEARISH_SIMD) && (defined(BEARISH_X86) || defined(BEARISH_X64))
+	#define BEARISH_SIMD
+	#include <xmmintrin.h>
+	static const __m128 SIMD_SIGN32 = _mm_castsi128_ps(_mm_set1_epi32(0x80000000));
 #endif
 
 	static const void* null = (void*)0;

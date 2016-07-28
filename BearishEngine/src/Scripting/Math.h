@@ -96,10 +96,10 @@ namespace Bearish { namespace Scripting {
 				.def_readwrite("xyz", &vec4::xyz)
 				.def_readwrite("yzw", &vec4::yzw)
 
-				.def("__add", &vec4::Add)
-				.def("__sub", &vec4::Subtract)
-				.def("__mul", &vec4::Multiply)
-				.def("__div", &vec4::Divide)
+				//.def("__add", &vec4::Add)
+				//.def("__sub", &vec4::Subtract)
+				//.def("__mul", &vec4::Multiply)
+				//.def("__div", &vec4::Divide)
 				.def("__tostring", &vec4::ToString)
 
 				.def("Dot", &vec4::Dot)

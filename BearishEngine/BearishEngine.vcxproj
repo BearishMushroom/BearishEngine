@@ -268,6 +268,7 @@
     <ClInclude Include="src\Core\ButtonState.h" />
     <ClInclude Include="src\Core\Callback.h" />
     <ClInclude Include="src\Core\IActorComponent.h" />
+    <ClInclude Include="src\Core\IAligned.h" />
     <ClInclude Include="src\Core\IAllocatable.h" />
     <ClInclude Include="src\Core\Keyboard.h" />
     <ClInclude Include="src\Core\Logger.h" />

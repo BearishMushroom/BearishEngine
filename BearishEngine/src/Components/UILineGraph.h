@@ -10,7 +10,7 @@
 namespace Bearish { namespace Components {
 	class UILineGraph : public Core::IActorComponent {
 	public:
-		UILineGraph(f32 min = 0, f32 max = 1, i32 numDataPoints = 100, Math::vec4 color = vec4(1, 1, 1, 1)) : _min(min), _max(max), _numDataPoints(numDataPoints) {
+		UILineGraph(f32 min = 0, f32 max = 1, i32 numDataPoints = 100, const Math::vec4& color = vec4(1, 1, 1, 1)) : _min(min), _max(max), _numDataPoints(numDataPoints) {
 			_texture = new Graphics::Texture(color);
 			_line = 0;
 
