@@ -1,5 +1,5 @@
-#ifndef _BEARISH_MAf32H_VEC4_H_
-#define _BEARISH_MAf32H_VEC4_H_
+#ifndef _BEARISH_MATH_VEC4_H_
+#define _BEARISH_MATH_VEC4_H_
 
 #include "..\Core\IAllocatable.h"
 #include "..\Core\IAligned.h"
@@ -8,58 +8,58 @@
 #include "vec3.h"
 
 namespace Bearish { namespace Math {
-	template <class f32>
+	template <class T>
 	class vec2_t;
 
-	template<class f32>
-	class vec4_t : public Core::IAllocatable<vec4_t<f32>> {
+	template<class T>
+	class vec4_t : public Core::IAllocatable<vec4_t<T>> {
 	public:
 		union {
 			struct {
-				f32 x, y, z, w;
+				T x, y, z, w;
 			};
 
 			struct {
-				f32 r, g, b, a;
+				T r, g, b, a;
 			};
 
 			struct {
-				f32 s, t, z, w;
+				T s, t, z, w;
 			};
 
 			struct {
-				f32 v[4];
+				T v[4];
 			};
 
 			struct {
-				vec2_t<f32> xy, zw;
+				vec2_t<T> xy, zw;
 			};
 
 			struct {
-				f32 x;
-				vec2_t<f32> yz;
-				f32 w;
+				T x;
+				vec2_t<T> yz;
+				T w;
 			};
 
 			struct {
-				vec3_t<f32> xyz;
-				f32 w;
+				vec3_t<T> xyz;
+				T w;
 			};
 
 			struct {
-				f32 x;
-				vec3_t<f32> yzw;
+				T x;
+				vec3_t<T> yzw;
 			};
 		};
 
-		vec4_t(f32 x = 0, f32 y = 0, f32 z = 0, f32 w = 0) {
+		vec4_t(T x = 0, T y = 0, T z = 0, T w = 0) {
 			this->x = x;
 			this->y = y;
 			this->z = z;
 			this->w = w;
 		}
 
-		vec4_t(f32 x) {
+		vec4_t(T x) {
 			this->x = x;
 			this->y = x;
 			this->z = x;
@@ -67,62 +67,62 @@ namespace Bearish { namespace Math {
 		}
 
 		vec4_t(u32 color, bool normalize = true) {
-			f32 a = ((color & 0x000000FF)) / (normalize ? static_cast<f32>(255.0) : 1);
-			f32 b = ((color & 0x0000FF00) >> 8) / (normalize ? static_cast<f32>(255.0) : 1);
-			f32 g = ((color & 0x00FF0000) >> 16) / (normalize ? static_cast<f32>(255.0) : 1);
-			f32 r = ((color & 0xFF000000) >> 24) / (normalize ? static_cast<f32>(255.0) : 1);
+			T a = ((color & 0x000000FF)) / (normalize ? static_cast<T>(255.0) : 1);
+			T b = ((color & 0x0000FF00) >> 8) / (normalize ? static_cast<T>(255.0) : 1);
+			T g = ((color & 0x00FF0000) >> 16) / (normalize ? static_cast<T>(255.0) : 1);
+			T r = ((color & 0xFF000000) >> 24) / (normalize ? static_cast<T>(255.0) : 1);
 			x = r;
 			y = g;
 			z = b;
 			w = a;
 		}
 
-		inline vec4_t<f32> operator+(const vec4_t& other) const {
-			return vec4_t<f32>(x + other.x, y + other.y, z + other.z, w + other.w);
+		inline vec4_t<T> operator+(const vec4_t& other) const {
+			return vec4_t<T>(x + other.x, y + other.y, z + other.z, w + other.w);
 		}
 
-		vec4_t<f32> Add(vec4_t other) {
-			return vec4_t<f32>(x + other.x, y + other.y, z + other.z, w + other.w);
+		vec4_t<T> Add(vec4_t other) {
+			return vec4_t<T>(x + other.x, y + other.y, z + other.z, w + other.w);
 		}
 
-		inline vec4_t<f32> operator+(const f32 scalar) const {
-			return vec4_t<f32>(x + scalar, y + scalar, z + scalar, w + scalar);
+		inline vec4_t<T> operator+(const T scalar) const {
+			return vec4_t<T>(x + scalar, y + scalar, z + scalar, w + scalar);
 		}
 
-		inline vec4_t<f32> operator-(const vec4_t& other) const {
-			return vec4_t<f32>(x - other.x, y - other.y, z - other.z, w - other.w);
+		inline vec4_t<T> operator-(const vec4_t& other) const {
+			return vec4_t<T>(x - other.x, y - other.y, z - other.z, w - other.w);
 		}
 
-		vec4_t<f32> Subtract(vec4_t other) {
-			return vec4_t<f32>(x - other.x, y - other.y, z - other.z, w - other.w);
+		vec4_t<T> Subtract(vec4_t other) {
+			return vec4_t<T>(x - other.x, y - other.y, z - other.z, w - other.w);
 		}
 
-		inline vec4_t<f32> operator-(const f32 scalar) const {
-			return vec4_t<f32>(x - scalar, y - scalar, z - scalar, w - scalar);
+		inline vec4_t<T> operator-(const T scalar) const {
+			return vec4_t<T>(x - scalar, y - scalar, z - scalar, w - scalar);
 		}
 
-		inline vec4_t<f32> operator*(const vec4_t& other) const {
-			return vec4_t<f32>(x * other.x, y * other.y, z * other.z, w * other.w);
+		inline vec4_t<T> operator*(const vec4_t& other) const {
+			return vec4_t<T>(x * other.x, y * other.y, z * other.z, w * other.w);
 		}
 
-		vec4_t<f32> Multiply(vec4_t other) {
-			return vec4_t<f32>(x * other.x, y * other.y, z * other.z, w * other.w);
+		vec4_t<T> Multiply(vec4_t other) {
+			return vec4_t<T>(x * other.x, y * other.y, z * other.z, w * other.w);
 		}
 
-		inline vec4_t<f32> operator*(const f32 scalar) const {
-			return vec4_t<f32>(x * scalar, y * scalar, z * scalar, w * scalar);
+		inline vec4_t<T> operator*(const T scalar) const {
+			return vec4_t<T>(x * scalar, y * scalar, z * scalar, w * scalar);
 		}
 
-		inline vec4_t<f32> operator/(const vec4_t& other) const {
-			return vec4_t<f32>(x / other.x, y / other.y, z / other.z, w / other.w);
+		inline vec4_t<T> operator/(const vec4_t& other) const {
+			return vec4_t<T>(x / other.x, y / other.y, z / other.z, w / other.w);
 		}
 
-		vec4_t<f32> Divide(vec4_t other) {
-			return vec4_t<f32>(x / other.x, y / other.y, z / other.z, w / other.w);
+		vec4_t<T> Divide(vec4_t other) {
+			return vec4_t<T>(x / other.x, y / other.y, z / other.z, w / other.w);
 		}
 
-		inline vec4_t<f32> operator/(const f32 scalar) const {
-			return vec4_t<f32>(x / scalar, y / scalar, z / scalar, w / scalar);
+		inline vec4_t<T> operator/(const T scalar) const {
+			return vec4_t<T>(x / scalar, y / scalar, z / scalar, w / scalar);
 		}
 
 		inline void operator+=(const vec4_t& other) {
@@ -132,7 +132,7 @@ namespace Bearish { namespace Math {
 			w += other.w;
 		}
 
-		inline void operator+=(const f32 scalar) {
+		inline void operator+=(const T scalar) {
 			x += scalar;
 			y += scalar;
 			z += scalar;
@@ -146,7 +146,7 @@ namespace Bearish { namespace Math {
 			w -= other.w;
 		}
 
-		inline void operator-=(const f32 scalar) {
+		inline void operator-=(const T scalar) {
 			x -= scalar;
 			y -= scalar;
 			z -= scalar;
@@ -160,7 +160,7 @@ namespace Bearish { namespace Math {
 			w *= other.w;
 		}
 
-		inline void operator*=(const f32 scalar) {
+		inline void operator*=(const T scalar) {
 			x *= scalar;
 			y *= scalar;
 			z *= scalar;
@@ -174,7 +174,7 @@ namespace Bearish { namespace Math {
 			w /= other.w;
 		}
 
-		inline void operator/=(const f32 scalar) {
+		inline void operator/=(const T scalar) {
 			x /= scalar;
 			y /= scalar;
 			z /= scalar;
@@ -185,24 +185,24 @@ namespace Bearish { namespace Math {
 			return (x == other.x && y == other.y && z == other.z && w == other.w);
 		}
 
-		inline f32& operator[](const usize index) {
+		inline T& operator[](const usize index) {
 			return v[index];
 		}
 
-		inline f32 Max() const {
+		inline T Max() const {
 			return __max(x, __max(y, __max(z, w)));
 		}
 
-		inline f32 Min() const {
+		inline T Min() const {
 			return __min(x, __min(y, __min(z, w)));
 		}
 
-		inline f32 Length() const {
-			return static_cast<f32>(sqrt(x * x + y * y + z * z + w * w));
+		inline T Length() const {
+			return static_cast<T>(sqrt(x * x + y * y + z * z + w * w));
 		}
 
-		inline vec4_t<f32> Normalize() {
-			f32 length = Length();
+		inline vec4_t<T> Normalize() {
+			T length = Length();
 			x /= length;
 			y /= length;
 			z /= length;
@@ -210,15 +210,15 @@ namespace Bearish { namespace Math {
 			return (*this);
 		}
 
-		inline f32 Dot(const vec4_t& other) {
+		inline T Dot(const vec4_t& other) {
 			return x * other.x + y * other.y + z * other.z + w * other.w;
 		}
 
-		inline vec4_t<f32> Lerp(const vec4_t& destination, const f32 factor) const {
+		inline vec4_t<T> Lerp(const vec4_t& destination, const T factor) const {
 			return (destination - (*this)) * factor + (*this);
 		}
 
-		inline string f32oString() {
+		inline string ToString() {
 			return "{x: " + std::to_string(x) + " y: " + std::to_string(y) + " z: " + std::to_string(z) + " w: " + std::to_string(w) + "}";
 		}
 	};
