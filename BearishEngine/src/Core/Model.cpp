@@ -97,7 +97,7 @@ Mesh Model::ToMesh() {
 	return m;
 }
 
-MeshNode* Model::BEMToBENode(BEMNode node) {
+MeshNode* Model::BEMToBENode(const BEMNode& node) {
 	string name = string(node.name);
 	mat4 transform = node.transform;
 	std::vector<MeshNode*> nodes;

@@ -95,7 +95,7 @@ Font::Font(const string& filepath, i32 padding) {
 
 	_texture = new Texture(vec2((f32)FONT_TEXTURE_SIZE, (f32)FONT_TEXTURE_SIZE), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::None, TextureFormat::RGBA, textureData);
 	
-	//delete[] alphaBuffer;
+	delete[] alphaBuffer;
 	delete[] textureData;
 	//delete[] sdf;
 }

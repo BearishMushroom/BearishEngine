@@ -6,7 +6,7 @@ using namespace Bearish;
 using namespace Graphics;
 using namespace Math;
 
-void MeshNode::Animate(MeshAnimation* anim, MeshSkeleton* skeleton, f32 time, mat4 parent) {
+void MeshNode::Animate(MeshAnimation* anim, MeshSkeleton* skeleton, f32 time, const mat4& parent) {
 	MeshNodeAnimation* nodeAnim = anim->GetNodeAnimation(_nameHash);
 
 	mat4 nodeTransform = _transform;

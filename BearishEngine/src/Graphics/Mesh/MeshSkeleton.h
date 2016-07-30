@@ -8,8 +8,8 @@
 namespace Bearish { namespace Graphics {
 	class MeshSkeleton : public Core::IAllocatable<MeshSkeleton> {
 	public:
-		MeshSkeleton(std::unordered_map<string, i32> index, std::vector<MeshBone> bones, Math::mat4 transform) : 
-			_indexMap(index), _bones(bones), _numBones(bones.size()), _transform(transform) {}
+		MeshSkeleton(std::unordered_map<string, i32> index, std::vector<MeshBone> bones, const Math::mat4& transform) : 
+			_indexMap(index), _bones(bones), _numBones((u32)bones.size()), _transform(transform) {}
 
 		inline u32 GetNumBones() { return _numBones; }
 		inline u32 GetBoneIndex(string name) { if (_indexMap.find(name) != _indexMap.end()) return _indexMap.at(name); else return -1; }

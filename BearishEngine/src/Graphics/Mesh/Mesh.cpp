@@ -59,9 +59,9 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<u32>& indices, bool calcul
 	//SetBoneIDData(&boneIDs[0], sizeof(vec4i) * boneIDs.size());
 	//SetBoneWeightData(&boneWeights[0], sizeof(vec4) * boneWeights.size());
 
-	SetVertexData(&vertices[0], sizeof(Vertex) * vertices.size());
+	SetVertexData(&vertices[0], sizeof(Vertex) * (u32)vertices.size());
 
-	SetIndexData(&indices[0], indices.size());
+	SetIndexData(&indices[0], (u32)indices.size());
 
 	_vertexState->Unbind();
 	_firstAnim = true;
@@ -81,7 +81,7 @@ Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::
 			vertices.push_back(Vertex(positions[i], texCoords[i], normals[i], tangents[i]));
 		}
 		
-		SetVertexData(&vertices[0], sizeof(Vertex) * vertices.size());
+		SetVertexData(&vertices[0], sizeof(Vertex) * (u32)vertices.size());
 	}
 	else {
 		std::vector<SkinnedVertex> vertices;
@@ -90,7 +90,7 @@ Mesh::Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::
 				boneids ? boneids[i] : vec4i(-1, -1, -1, -1), boneids ? boneweights[i] : vec4(0, 0, 0, 0)));
 		}
 
-		SetVertexData(&vertices[0], sizeof(SkinnedVertex) * vertices.size());
+		SetVertexData(&vertices[0], sizeof(SkinnedVertex) * (u32)vertices.size());
 	}
 
 	for (i32 i = 0; i < (i32)numVertices; i++) {
@@ -213,7 +213,7 @@ void Mesh::Submit(Transform* transform, const mat4& world, const Camera* camera)
 void Mesh::Flush(Shader* shader) {
 	_vertexState->Bind();
 
-	i32 numInstances = _worldMatrices.size();
+	i32 numInstances = (i32)_worldMatrices.size();
 	mat4* worlds = &_worldMatrices[0];
 	mat4* mvps = &_mvpMatrices[0];
 

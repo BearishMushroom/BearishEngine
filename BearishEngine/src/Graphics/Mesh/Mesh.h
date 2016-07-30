@@ -53,7 +53,7 @@ namespace Bearish {
 			Mesh(Core::Model& model);
 			~Mesh();
 
-			void SetBoneData(MeshSkeleton* skeleton, MeshNode* rootNode, std::vector<MeshAnimation> animations, Math::mat4 transform) {
+			void SetBoneData(MeshSkeleton* skeleton, MeshNode* rootNode, std::vector<MeshAnimation> animations, const Math::mat4& transform) {
 				_skeleton = skeleton;
 				_rootNode = rootNode;
 				_animations = animations;

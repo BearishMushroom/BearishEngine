@@ -56,8 +56,8 @@ namespace Bearish { namespace Components {
 
 			if(!_line) _line = new Graphics::Mesh(vertices, indices);
 			else {
-				_line->SetVertexData(&vertices[0], sizeof(Graphics::Vertex) *vertices.size());
-				_line->SetIndexData(&indices[0], indices.size());
+				_line->SetVertexData(&vertices[0], sizeof(Graphics::Vertex) * (u32)vertices.size());
+				_line->SetIndexData(&indices[0], (i32)indices.size());
 			}
 		}
 

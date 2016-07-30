@@ -87,7 +87,7 @@ namespace luabind {
 		{
 		public:
 			// No need for dynamic_id / dynamic_ptr, since we always get the most derived type
-            value_holder(lua_State* /*L*/, ValueType val)
+            value_holder(lua_State* /*L*/, const ValueType& val)
 				: instance_holder(false), val_(std::move(val))
 			{}
 

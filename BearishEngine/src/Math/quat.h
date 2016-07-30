@@ -22,7 +22,7 @@ namespace Bearish { namespace Math {
 			this->w = w;
 		}
 
-		quat_t(mat4_t<T> m) {
+		quat_t(const mat4_t<T>& m) {
 			T trace = m[0][0] + m[1][1] + m[2][2];
 
 			if (trace > 0) {

@@ -40,7 +40,7 @@ namespace Bearish { namespace Scripting {
 				.def("SetUniformVec2", static_cast<void (Graphics::Shader::*)(const string&, const Math::vec2&)>(&Graphics::Shader::SetUniform))
 				.def("SetUniformVec3", static_cast<void (Graphics::Shader::*)(const string&, const Math::vec3&)>(&Graphics::Shader::SetUniform))
 				.def("SetUniformVec4", static_cast<void (Graphics::Shader::*)(const string&, const Math::vec4&)>(&Graphics::Shader::SetUniform))
-				.def("SetUniformMat4", static_cast<void (Graphics::Shader::*)(const string&, Math::mat4)>(&Graphics::Shader::SetUniform)),
+				.def("SetUniformMat4", static_cast<void (Graphics::Shader::*)(const string&, const Math::mat4&)>(&Graphics::Shader::SetUniform)),
 
 			class_<Mesh>("Mesh")
 				.scope [

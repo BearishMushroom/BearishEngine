@@ -142,7 +142,7 @@ void Shader::AddShader(const string& source, const ShaderType type) {
 			cstrs[i] = _gsVaryings[i].c_str();
 		}
 
-		glTransformFeedbackVaryings(_programID, _gsVaryings.size(), cstrs, GL_INTERLEAVED_ATTRIBS);
+		glTransformFeedbackVaryings(_programID, (isize)_gsVaryings.size(), cstrs, GL_INTERLEAVED_ATTRIBS);
 	}
 }
 
@@ -183,7 +183,7 @@ void Shader::Compile() {
 	_uniformBlocksToAdd.clear();
 
 	for (auto& attribute : _attributesToAdd) {
-		SetAttribLocation(attribute.first.c_str(), attribute.second);
+		SetAttribLocation(attribute.first.c_str(), (i32)attribute.second);
 	}
 	_attributesToAdd.clear();
 
@@ -226,7 +226,7 @@ void Shader::SetUniform(const string& name, const Math::vec3& value) {
 void Shader::SetUniform(const string& name, std::vector<Math::vec3>& value) {
 	i32 pos = _uniformLocations[name];
 	if (pos == -1) return;
-	glUniform3fv(pos, value.size(), (f32*)&value[0]);
+	glUniform3fv(pos, (isize)value.size(), (f32*)&value[0]);
 }
 
 
@@ -236,7 +236,7 @@ void Shader::SetUniform(const string& name, const Math::vec4& value) {
 	glUniform4f(pos, value.x, value.y, value.z, value.w);
 }
 
-void Shader::SetUniform(const string& name, Math::mat4 value) {
+void Shader::SetUniform(const string& name, const Math::mat4& value) {
 	i32 pos = _uniformLocations[name];
 	if (pos == -1) return;
 	glUniformMatrix4fv(pos, 1, GL_TRUE, &(value[0][0]));
@@ -272,7 +272,7 @@ void Shader::SetUniform(const string& name, const SpotLight& value) {
 }
 
 void Shader::SetUniform(const string& name, std::vector<Math::mat4>& value) {
-	glUniformMatrix4fv(_uniformLocations.at(name), value.size(), GL_TRUE, &((value[0])[0][0]));
+	glUniformMatrix4fv(_uniformLocations.at(name), (isize)value.size(), GL_TRUE, &((value[0])[0][0]));
 }
 
 void Shader::SetUniform(const string& name, const Texture* const value) {
@@ -378,9 +378,9 @@ void Shader::AddUniform(const string& name, const string& type) {
 	}
 
 	i32 arrNum = 0;
-	i32 arrPlace = 0;
+	usize arrPlace = 0;
 	if ((arrPlace = nameToAdd.find('[')) != string::npos) {
-		i32 arrEnd = nameToAdd.find(']');
+		usize arrEnd = nameToAdd.find(']');
 		arrPlace++;
 		arrNum = std::stoi(nameToAdd.substr(arrPlace, arrEnd));
 	}

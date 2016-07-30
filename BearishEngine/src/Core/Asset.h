@@ -18,7 +18,7 @@ namespace Bearish { namespace Core {
 
 			while (std::getline(assetfile, line)) {
 				string a = "", b = "";
-				i32 pos = -1;
+				usize pos = -1;
 				while (line.find('"') != -1) {
 					if (pos == -1) {
 						pos = line.find('"');

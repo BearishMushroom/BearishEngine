@@ -13,11 +13,18 @@ namespace Bearish { namespace Math {
 	class vec2_t;
 
 	template<class T>
+#ifdef BEARISH_SIMD
+	class alignas(16) mat4_t : public Core::IAllocatable<mat4_t<T>> {
+#else
 	class mat4_t : public Core::IAllocatable<mat4_t<T>> {
+#endif
 	private:
 		union {
 			T _v[4][4];
 			T _flat[16];
+#ifdef BEARISH_SIMD
+			__m128 _rows[4];
+#endif
 		};
 	public:
 		inline const T* operator[](usize index) const {
@@ -167,17 +174,7 @@ namespace Bearish { namespace Math {
 		}
 
 		inline void operator*=(const mat4_t& o) {
-			mat4_t<T> result;
-
-			for (i32 i = 0; i < 4; i++) {
-				for (i32 j = 0; j < 4; j++) {
-					result[i][j] = (_v[i][0] * o._v[0][j] +
-						_v[i][1] * o._v[1][j] +
-						_v[i][2] * o._v[2][j] +
-						_v[i][3] * o._v[3][j]);
-				}
-			}
-
+			mat4_t<T> result = operator*(*this, o);
 			(*this) = result;
 		}
 
@@ -355,6 +352,29 @@ namespace Bearish { namespace Math {
 				"  " + std::to_string(_v[3][0]) + " " + std::to_string(_v[3][1]) + " " + std::to_string(_v[3][2]) + " " + std::to_string(_v[3][3]) + " }";
 		}
 	};
+
+#ifdef BEARISH_SIMD
+	template<>
+	inline mat4_t<f32> mat4_t<f32>::operator*(const mat4_t& o) const {
+		mat4_t<f32> result;
+		for (i32 i = 0; i < 4; i++) {
+			__m128 brod1 = _mm_set1_ps(_v[i][0]);
+			__m128 brod2 = _mm_set1_ps(_v[i][1]);
+			__m128 brod3 = _mm_set1_ps(_v[i][2]);
+			__m128 brod4 = _mm_set1_ps(_v[i][3]);
+			__m128 row = _mm_add_ps(
+				_mm_add_ps(
+					_mm_mul_ps(brod1, o._rows[0]),
+					_mm_mul_ps(brod2, o._rows[1])),
+				_mm_add_ps(
+					_mm_mul_ps(brod3, o._rows[2]),
+					_mm_mul_ps(brod4, o._rows[3])));
+			result._rows[i] = row;
+		}
+
+		return result;
+	}
+#endif
 
 	typedef mat4_t<f32> mat4;
 	typedef mat4_t<f64> mat4d;

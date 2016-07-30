@@ -21,7 +21,7 @@ namespace Bearish {
 		~Model();
 
 		Graphics::Mesh ToMesh();
-		Graphics::MeshNode* BEMToBENode(BEMNode root);
+		Graphics::MeshNode* BEMToBENode(const BEMNode& root);
 		
 		string name;
 	private:

@@ -64,7 +64,7 @@ namespace Bearish { namespace Graphics {
 		void SetUniform(const string& name, const Math::vec3& value);
 		void SetUniform(const string& name, std::vector<Math::vec3>& value);
 		void SetUniform(const string& name, const Math::vec4& value);
-		void SetUniform(const string& name, Math::mat4 value);
+		void SetUniform(const string& name, const Math::mat4& value);
 		void SetUniform(const string& name, std::vector<Math::mat4>& value);
 		void SetUniform(const string& name, const Light& value);
 		void SetUniform(const string& name, const DirectionalLight& value);
@@ -97,7 +97,7 @@ namespace Bearish { namespace Graphics {
 		typedef std::map <string, std::vector<GLSLStructComponent>> GLSLStructList;
 
 		static std::vector<ShaderLoadInformation> _loaded;
-		i32 _loadID;
+		usize _loadID;
 
 		// Temp variables used for pre-compilation data.
 		GLSLStructList _structs;

@@ -6,7 +6,7 @@ using namespace Math;
 
 Transform::Transform(vec3 translation, vec3 scale, quat rotation) : _translation(translation), _scale(scale), _rotation(rotation) {}
 
-Transform::Transform(mat4 transformation) {
+Transform::Transform(const mat4& transformation) {
 	_translation = vec3(transformation[0][3], transformation[1][3], transformation[2][3]);
 	
 	f32 x = vec3(transformation[0][0], transformation[0][1], transformation[0][2]).Length();

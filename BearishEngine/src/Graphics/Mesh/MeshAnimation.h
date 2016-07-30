@@ -21,7 +21,7 @@ namespace Bearish { namespace Graphics {
 		bool Update(f32 frameTime, MeshNode* root);
 
 		MeshNodeAnimation* GetNodeAnimation(u32 nameHash);
-		inline void SetTransform(u32 index, Math::mat4 t) { _transforms.at(index) = t; }
+		inline void SetTransform(u32 index, const Math::mat4& t) { _transforms.at(index) = t; }
 		inline Math::mat4 GetTransform(u32 index) { return _transforms.at(index); }
 		inline string GetName() { return _name; }
 		inline u32 GetNameHash() { return _nameHash; }

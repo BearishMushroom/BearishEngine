@@ -110,7 +110,7 @@ namespace Bearish { namespace Scripting {
 				.def("Normalize", &vec4::Normalize),
 
 				class_<quat>("quat")
-				.def(constructor<mat4>())
+				.def(constructor<const mat4&>())
 				.def(constructor<f32, f32, f32, f32>())
 
 				.def_readwrite("x", &quat::x)

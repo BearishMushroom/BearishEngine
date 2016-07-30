@@ -8,7 +8,7 @@
 namespace Bearish { namespace Graphics {
 	class MeshBone : public Core::IAllocatable<MeshBone> {
 	public:
-		MeshBone(Math::mat4 offset, Math::mat4 transform) : offset(offset), transform(transform) {}
+		MeshBone(const Math::mat4& offset, const Math::mat4& transform) : offset(offset), transform(transform) {}
 		Math::mat4 offset, transform;
 	};
 } }

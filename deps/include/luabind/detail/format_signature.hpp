@@ -143,7 +143,7 @@ LUABIND_TYPE_TO_STRING(luabind::argument)
             size_t ncat = sz * 2 + 2;
             if (sz == 1)
                 ++ncat;
-            lua_concat(L, ncat);
+            lua_concat(L, (int)ncat);
 		}
 
 	} // namespace detail

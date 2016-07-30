@@ -47,8 +47,8 @@ namespace Bearish { namespace Util {
 
 	static std::vector<string> SplitString(const string &text, const string& delim) {
 		std::vector<string> result;
-		u32 pos = text.find(delim);
-		u32 initialPos = 0;
+		usize pos = text.find(delim);
+		usize initialPos = 0;
 		result.clear();
 
 		while (pos != string::npos && pos < text.length() - 1) {

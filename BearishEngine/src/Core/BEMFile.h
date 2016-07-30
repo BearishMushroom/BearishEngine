@@ -4,6 +4,7 @@
 #include "../Math/vec2.h"
 #include "../Math/vec3.h"
 #include "../Math/vec4.h"
+#include "../Math/quat.h"
 #include "../Math/mat4.h"
 
 #include <stdio.h>
@@ -95,7 +96,7 @@ namespace Bearish {
 		std::vector<std::pair<vec3, f32>> scales;
 
 		u32 numRotations;
-		std::vector<std::pair<vec4, f32>> rotations;
+		std::vector<std::pair<quat, f32>> rotations;
 	};
 
 	struct BEMAnimation {
@@ -186,7 +187,7 @@ namespace Bearish {
 			return buffer;
 		}
 
-		void WriteNode(FILE* file, BEMNode node) {
+		void WriteNode(FILE* file, const BEMNode& node) {
 			u8 len = (u8)node.name.length();
 			i32 num = (i32)node.children.size();
 			WriteBytes(file, &len, 1, sizeof(u8));
@@ -200,10 +201,19 @@ namespace Bearish {
 
 		BEMNode ReadNode(FILE* file) {
 			BEMNode res;
-			u8 len = *ReadBytes(file, 1, sizeof(u8));
+			u8* t = ReadBytes(file, 1, sizeof(u8));
+			u8 len = *t;
+			free(t);
+
 			res.name = string((char*)ReadBytes(file, len, sizeof(u8)), len);
-			res.transform = *(mat4*)ReadBytes(file, 1, sizeof(mat4));
-			i32 num = *(i32*)ReadBytes(file, 1, sizeof(i32));
+			
+			mat4* tm = (mat4*)ReadBytes(file, 1, sizeof(mat4));
+			res.transform = *tm;
+			free(tm);
+			
+			i32* tn = (i32*)ReadBytes(file, 1, sizeof(i32));
+			i32 num = *tn;
+			free(tn);
 			for (i32 i = 0; i < num; i++) {
 				res.children.push_back(ReadNode(file));
 			}
@@ -396,8 +406,8 @@ namespace Bearish {
 						free(scale);
 
 						ch.numRotations = *(u32*)ReadBytes(file, 1, sizeof(u32));
-						auto rot = (std::pair<vec4, f32>*)ReadBytes(file, ch.numRotations, sizeof(std::pair<vec4, f32>));
-						ch.rotations = std::vector<std::pair<vec4, f32>>(rot, rot + ch.numRotations);
+						auto rot = (std::pair<quat, f32>*)ReadBytes(file, ch.numRotations, sizeof(std::pair<quat, f32>));
+						ch.rotations = std::vector<std::pair<quat, f32>>(rot, rot + ch.numRotations);
 						free(rot);
 						anim.channels.push_back(ch);
 					}
