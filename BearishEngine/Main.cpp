@@ -704,5 +704,5 @@ for (i32 i = 0; i < 41; i++) {
 	}
 
 	//Scripting::KillLua();
-	return (i32)null;
+	return 0;
 }
