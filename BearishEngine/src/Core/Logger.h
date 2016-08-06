@@ -6,6 +6,7 @@
 #define BEARISH_WARNLEVEL 3  // 0 = Crashes only, 1 = Errors, 2 = Warnings, 3 = Info
 
 #include "../Types.h"
+#include <mutex>
 
 #if BEARISH_DEBUG
 #define BEARISH_ASSERT(x, m) \
@@ -33,6 +34,7 @@ namespace Bearish {
 	namespace Core {
 	class Logger {
 	private:
+		std::mutex _mutex;
 		std::ofstream* _file;
 		Logger();
 		~Logger();
@@ -46,6 +48,7 @@ namespace Bearish {
 
 		template<typename... Args>
 		void FormatLog(string format, Args&&... args) {
+			std::unique_lock<std::mutex> lock(_mutex);
 			c8 buffer[300000];
 			i32 length = sprintf_s(buffer, format.c_str(), args...);
 

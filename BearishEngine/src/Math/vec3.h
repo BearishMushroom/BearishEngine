@@ -228,6 +228,13 @@ namespace Bearish { namespace Math {
 			return (destination - (*this)) * factor + (*this);
 		}
 
+		inline vec3_t<T> Grow(const vec3_t& other) {
+			x = x > other.x ? x : other.x;
+			y = y > other.y ? y : other.y;
+			z = z > other.z ? z : other.z;
+			return *this;
+		}
+
 		inline string ToString() const {
 			return "{x: " + std::to_string(x) + " y: " + std::to_string(y) + " z: " + std::to_string(z) + "}";
 		}

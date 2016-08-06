@@ -16,6 +16,10 @@ namespace Bearish { namespace Components {
 		~MeshRendererComponent();
 
 		virtual void Draw(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) override;
+
+		virtual Math::vec3 GetBounds() override {
+			return _mesh->GetExtremes();
+		}
 	private:
 		Graphics::Mesh* _mesh;		
 		Graphics::Material* _material;
@@ -30,6 +34,10 @@ namespace Bearish { namespace Components {
 		virtual void Draw(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) override;
 		void SetMaterial(Graphics::Material* material) {
 			_material = material;
+		}
+
+		virtual Math::vec3 GetBounds() override {
+			return _mesh->GetExtremes();
 		}
 	private:
 		Graphics::MeshAnimation* _anim;

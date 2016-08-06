@@ -50,12 +50,12 @@ LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 		Core::Mouse::SetButtonState(Core::MouseButton::Middle, Core::ButtonState::Released);
 		break;
 	case WM_MOUSEMOVE:
-		TRACKMOUSEEVENT track;
-		track.cbSize = sizeof(TRACKMOUSEEVENT);
-		track.dwFlags = TME_LEAVE;
-		track.hwndTrack = hwnd;
-
-		TrackMouseEvent(&track);
+		//TRACKMOUSEEVENT track;
+		//track.cbSize = sizeof(TRACKMOUSEEVENT);
+		//track.dwFlags = TME_LEAVE;
+		//track.hwndTrack = hwnd;
+		//
+		//TrackMouseEvent(&track);
 
 		Core::Mouse::SetCursorPosition((i32)GET_X_LPARAM(lparam), (i32)GET_Y_LPARAM(lparam));
 		break;

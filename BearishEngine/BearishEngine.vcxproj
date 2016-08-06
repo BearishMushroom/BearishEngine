@@ -107,6 +107,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -131,6 +132,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -160,7 +162,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <OmitFramePointers>true</OmitFramePointers>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointModel>Precise</FloatingPointModel>
       <MinimalRebuild>false</MinimalRebuild>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
@@ -195,7 +197,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <OmitFramePointers>true</OmitFramePointers>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -276,11 +278,14 @@
     <ClInclude Include="src\Core\IActorComponent.h" />
     <ClInclude Include="src\Core\IAligned.h" />
     <ClInclude Include="src\Core\IAllocatable.h" />
+    <ClInclude Include="src\Core\JobFactory.h" />
+    <ClInclude Include="src\Core\ConcurrentQueue.h" />
     <ClInclude Include="src\Core\Keyboard.h" />
     <ClInclude Include="src\Core\Logger.h" />
     <ClInclude Include="src\Core\Model.h" />
     <ClInclude Include="src\Core\Mouse.h" />
     <ClInclude Include="src\Core\Settings.h" />
+    <ClInclude Include="src\Core\Shared.h" />
     <ClInclude Include="src\Core\Transform.h" />
     <ClInclude Include="src\Graphics\BETFile.h" />
     <ClInclude Include="src\Graphics\Buffer\IndexBuffer.h" />

@@ -119,6 +119,31 @@ Mesh::Mesh(Core::Model& model) {
 	*this = model.ToMesh();
 }
 
+Mesh::Mesh(Mesh& other) {
+	_vertexState = other._vertexState;
+	_vertexBuffer = other._vertexBuffer;
+	_indexBuffer = other._indexBuffer;
+
+	_uniformBuffer = other._uniformBuffer;
+
+	_skeleton = other._skeleton;
+	DecoupleSkeleton();
+
+	_rootNode = other._rootNode;
+	_animations = other._animations;
+	_transform = other._transform;
+	_boneTransforms = other._boneTransforms;
+	_firstAnim = true;
+	_rigged = other._rigged;
+
+	_extremes = other._extremes;
+	_min = other._min;
+	_max = other._max;
+	_numVerts = other._numVerts;
+	_numFaces = other._numFaces;
+}
+
+
 Mesh::~Mesh() {
 	//if(_uniformBuffer)     delete _uniformBuffer;
 	//if(_vertexBuffer) delete _vertexBuffer;

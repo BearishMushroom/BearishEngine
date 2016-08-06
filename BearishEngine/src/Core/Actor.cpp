@@ -5,8 +5,9 @@ using namespace Core;
 using namespace Graphics;
 using namespace Math;
 
-Actor::Actor(Transform transform) {
+Actor::Actor(Transform transform, AABB bounds) {
 	_transform = transform;
+	_bounds = bounds;
 	_alive = true;
 }
 
@@ -44,6 +45,9 @@ void Actor::Update() {
 			c->Update();
 		//}
 	}
+
+	_bounds.SetPosition(_transform.GetTranslation());
+	_bounds.SetScale(_transform.GetScale());
 }
 
 void Actor::FixedUpdate() {
@@ -166,7 +170,7 @@ vec3 Actor::GetScale() {
 	return _transform.GetScale();
 }
 
-std::vector<IActorComponent*> Actor::GetComponentsByID(string id) {
+std::vector<IActorComponent*> Actor::GetComponents(string id) {
 	std::vector<IActorComponent*> result;
 
 	for (auto& c : _components) {

@@ -12,6 +12,7 @@
 #include "Core\BlockAllocator.h"  
 #include "Core\IAllocatable.h"
 #include "Core\ButtonState.h"
+#include "Core\JobFactory.h"
 #include "Core\Transform.h"
 #include "Core\Keyboard.h"
 #include "Core\Callback.h"

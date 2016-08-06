@@ -8,11 +8,12 @@
 #include "IAllocatable.h"
 #include "Transform.h"
 #include "../Types.h"
+#include "AABB.h"
 
 namespace Bearish { namespace Core {
 	class Actor : public IAllocatable<Actor> {
 	public:
-		Actor(Transform transform = Transform());
+		Actor(Transform transform = Transform(), AABB bounds = AABB());
 		~Actor();
 
 		template<typename T>
@@ -20,6 +21,7 @@ namespace Bearish { namespace Core {
 			component->SetParent(this);
 			_components.push_back(component);
 			component->Init();
+			_bounds.Fit(component->GetBounds());
 			return component;
 		}
 
@@ -31,7 +33,7 @@ namespace Bearish { namespace Core {
 		}
 
 		template<typename T>
-		std::vector<T*> GetComponentsByType() {
+		std::vector<T*> GetComponents() {
 			std::vector<T*> result;
 			for (auto& c : _components) {
 				T* component = dynamic_cast<T*>(c);
@@ -44,7 +46,12 @@ namespace Bearish { namespace Core {
 			return result;
 		}
 
-		std::vector<IActorComponent*> GetComponentsByID(string id);
+		template<typename T>
+		T* GetComponent() {
+			return GetComponents<T>().at(0);
+		}
+
+		std::vector<IActorComponent*> GetComponents(string id);
 		std::vector<Actor*> GetChildren() { return _children; }
 
 		void Trigger(string id, void* data);
@@ -75,11 +82,13 @@ namespace Bearish { namespace Core {
 
 		bool IsDead() { return !_alive; }
 		void Kill() { _alive = false; }
+
+		const AABB& GetBounds() const { return _bounds; }
 	private:
 		bool _alive;
 		std::vector<IActorComponent*> _components;
 		Transform _transform;
-		Math::vec3 _min, _max;
+		AABB _bounds;
 		Actor* _parent;
 		std::vector<Actor*> _children;
 	};

@@ -1,6 +1,7 @@
 #include "src/Bearish.h"
 #include <vector>
 #include <crtdbg.h>
+#include <sstream>
 
 using namespace Bearish;
 
@@ -296,6 +297,17 @@ i32 main(i32 argc, c8** argv) {
 	for (auto& file : Util::GetFilesInFolder("./scr/run/", "moon")) {
 		Logger::Info("Running %s", file.c_str());
 		Scripting::DoMoonFile(file);
+	}
+
+	JobFactory fac;
+	auto get = fac.AddJob<int, int>([](int* a, int* b) { *b = *a * *a; }, 5);
+
+	try {
+		get.wait();
+		get.get();
+	}
+	catch (std::future_error e) {
+		throw;
 	}
 
 	renderer.Load();
@@ -640,6 +652,7 @@ for (i32 i = 0; i < 41; i++) {
 	f32 lastUpdateTime = 0;
 	bool updated = false;
 
+
 	while (testwin.IsOpen()) {
 		updated = false;
 		lastFrameTimer.LoopMS();
@@ -650,15 +663,21 @@ for (i32 i = 0; i < 41; i++) {
 			updateTimer -= UPDATE_TIME;
 
 			if (PANEL_OPEN) {
-				UI_GRAPH->GetChildren()[0]->GetComponentsByType<UILineGraph>()[0]->AddDataPoint(lastFrameTime);
-				UI_GRAPH->GetChildren()[1]->GetComponentsByType<UILineGraph>()[0]->AddDataPoint(lastUpdateTime);
-				UI_GRAPH->GetChildren()[2]->GetComponentsByType<UILineGraph>()[0]->AddDataPoint(lastDrawTime);
-				UI_GRAPH->GetChildren()[3]->GetComponentsByType<UILineGraph>()[0]->AddDataPoint(renderer.GetCPUTime());
+				UI_GRAPH->GetChildren()[0]->GetComponent<UILineGraph>()->AddDataPoint(lastFrameTime);
+				UI_GRAPH->GetChildren()[1]->GetComponent<UILineGraph>()->AddDataPoint(lastUpdateTime);
+				UI_GRAPH->GetChildren()[2]->GetComponent<UILineGraph>()->AddDataPoint(lastDrawTime);
+				UI_GRAPH->GetChildren()[3]->GetComponent<UILineGraph>()->AddDataPoint(renderer.GetCPUTime());
 			}
-		
+
 			updated = true;
 			//Shader::ReloadChanged();
 		}
+
+		fac.AddJob<f32>([](f32* i) { 
+			std::stringstream ss;
+			ss << std::this_thread::get_id();
+			Logger::Info("Thread ID: %s Number: %f.3", ss.str().c_str(), *i); 
+		}, lastUpdateTime);
 
 		lastUpdateTimer.LoopMS();
 
@@ -691,17 +710,19 @@ for (i32 i = 0; i < 41; i++) {
 		if (secondTimer >= 1) {
 			secondTimer = 0;
 			f32 d = (f32)(1.f / (f32)fps) * 1000.f;
-			fpsCounter->GetComponentsByType<UILabel>().at(0)->SetText("FPS: " + std::to_string(fps), 48);
+			fpsCounter->GetComponent<UILabel>()->SetText("FPS: " + std::to_string(fps), 48);
 
-			vertCounter->GetComponentsByType<UILabel>().at(0)->SetText("Verts: "     + std::to_string(renderer.GetVertsPerFrame()),     16);
-			faceCounter->GetComponentsByType<UILabel>().at(0)->SetText("Faces: "     + std::to_string(renderer.GetFacesPerFrame()),     16);
-			passCounter->GetComponentsByType<UILabel>().at(0)->SetText("Passes: "    + std::to_string(renderer.GetPassesPerFrame()),    16);
-			callCounter->GetComponentsByType<UILabel>().at(0)->SetText("Drawcalls: " + std::to_string(renderer.GetDrawcallsPerFrame()), 16);
+			vertCounter->GetComponent<UILabel>()->SetText("Verts: "     + std::to_string(renderer.GetVertsPerFrame()),     16);
+			faceCounter->GetComponent<UILabel>()->SetText("Faces: "     + std::to_string(renderer.GetFacesPerFrame()),     16);
+			passCounter->GetComponent<UILabel>()->SetText("Passes: "    + std::to_string(renderer.GetPassesPerFrame()),    16);
+			callCounter->GetComponent<UILabel>()->SetText("Drawcalls: " + std::to_string(renderer.GetDrawcallsPerFrame()), 16);
 			//Scripting::UpdateScripts();
 			fps = 0;
 		}
 		
 	}
+
+	fac.Terminate();
 
 	//Scripting::KillLua();
 	return 0;

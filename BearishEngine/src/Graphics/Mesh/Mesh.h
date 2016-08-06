@@ -3,6 +3,7 @@
 
 #include "../../Core/IAllocatable.h"
 #include "../../Core/Model.h"
+#include "../../Core/Shared.h"
 #include "../../Core/Transform.h"
 #include "../Renderer.h"
 #include "../Buffer/VertexBuffer.h"
@@ -51,6 +52,8 @@ namespace Bearish {
 			Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::vec3* normals, Math::vec3* tangents, Math::vec4i* boneids, 
 				 Math::vec4* boneweights, u32 numIndices, u32* indices);
 			Mesh(Core::Model& model);
+			Mesh(Mesh& other);
+
 			~Mesh();
 
 			void SetBoneData(MeshSkeleton* skeleton, MeshNode* rootNode, std::vector<MeshAnimation> animations, const Math::mat4& transform) {
@@ -89,17 +92,21 @@ namespace Bearish {
 				_vertexBuffer->SetLayout(layout);
 			}
 
+			Math::vec3 GetExtremes() const { return _extremes; }
+			Math::vec3 GetMin() const { return _min; }
+			Math::vec3 GetMax() const { return _max; }
+
 			u32 GetNumVerts() const { return _numVerts; }
 			u32 GetNumFaces() const { return _numFaces; }
 			u32 GetQueued() const { return _mvpMatrices.size(); }
 		private:
 			void SetupBuffers();
 			
-			VertexState* _vertexState;
-			VertexBuffer* _vertexBuffer;
-			IndexBuffer* _indexBuffer;
+			Core::Shared<VertexState>  _vertexState;
+			Core::Shared<VertexBuffer> _vertexBuffer;
+			Core::Shared<IndexBuffer>  _indexBuffer;
 
-			UniformBuffer* _uniformBuffer;
+			Core::Shared<UniformBuffer> _uniformBuffer;
 
 			std::vector<Math::mat4> _worldMatrices;
 			std::vector<Math::mat4> _mvpMatrices;

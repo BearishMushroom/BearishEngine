@@ -32,7 +32,7 @@ namespace Bearish { namespace Scripting {
 
 			class_<Actor>("Actor")
 				.def(constructor<Transform>())
-				.def("GetComponentsByID", &Actor::GetComponentsByID)
+				.def("GetComponentsByID", &Actor::GetComponents)
 				.def("GetTransform", &Actor::GetTransform)
 				.def("GetTransformation", &Actor::GetTransformation)
 				.def("GetTranslation", &Actor::GetTranslation)

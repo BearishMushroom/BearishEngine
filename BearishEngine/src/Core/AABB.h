@@ -8,7 +8,7 @@
 namespace Bearish { namespace Core {
 	class AABB : IAllocatable<AABB> {
 	public:
-		AABB(Math::vec3 position, Math::vec3 halfBounds) : _position(position), _halfBounds(halfBounds) {}
+		AABB(Math::vec3 position = vec3(0.f), Math::vec3 halfBounds = vec3(0.01f)) : _position(position), _halfBounds(halfBounds), _scale(vec3(1.f)) {}
 		~AABB() {}
 
 		bool Intersects(const AABB& other) const {
@@ -22,11 +22,14 @@ namespace Bearish { namespace Core {
 
 		Math::vec3 GetPosition() const { return _position; }
 		Math::vec3 GetHalfBounds() const { return _halfBounds; }
+		Math::vec3 GetScale() const { return _scale; }
 
 		void SetPosition(Math::vec3 position) { _position = position; }
-		void SetPosition(Math::vec3 halfBounds) { _halfBounds = halfBounds; }
+		void SetHalfBounds(Math::vec3 halfBounds) { _halfBounds = halfBounds; }
+		void SetScale(Math::vec3 scale) { _scale = scale; }
+		void Fit(Math::vec3 max) { _halfBounds.Grow(max); }
 	private:
-		Math::vec3 _position, _halfBounds;
+		Math::vec3 _position, _halfBounds, _scale;
 	};
 } }
 
