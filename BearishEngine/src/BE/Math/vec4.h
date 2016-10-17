@@ -74,6 +74,14 @@ namespace Bearish { namespace Math {
 			w = a;
 		}
 
+		template<typename C>
+		vec4_t(const vec4_t<C>& other) {
+			this->x = (T)other.x;
+			this->y = (T)other.y;
+			this->z = (T)other.z;
+			this->w = (T)other.w;
+		}
+
 		inline vec4_t<T> operator+(const vec4_t& other) const {
 			return vec4_t<T>(x + other.x, y + other.y, z + other.z, w + other.w);
 		}

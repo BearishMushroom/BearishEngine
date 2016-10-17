@@ -57,6 +57,12 @@ namespace Bearish { namespace Math {
 			this->z = z;
 		}
 
+		vec3_t(const vec3_t& other) {
+			this->x = (T)other.x;
+			this->y = (T)other.y;
+			this->z = (T)other.z;
+		}
+
 		vec3_t(u32 color, bool normalize) {
 			T b = ((color & 0x0000FF00) >>  8) / (normalize ? static_cast<T>(255.0) : 1);
 			T g = ((color & 0x00FF0000) >> 16) / (normalize ? static_cast<T>(255.0) : 1);

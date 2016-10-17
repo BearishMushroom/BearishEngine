@@ -38,6 +38,12 @@ namespace Bearish { namespace Math {
 			this->y = x;
 		}
 
+		template<typename C>
+		vec2_t(const vec2_t<C>& other) {
+			this->x = (T)other.x;
+			this->y = (T)other.y;
+		}
+
 		inline vec2_t<T> operator+(const vec2_t<T>& other) const {
 			return vec2_t<T>(x + other.x, y + other.y);
 		}

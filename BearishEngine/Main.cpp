@@ -303,22 +303,11 @@ i32 main(i32 argc, c8** argv) {
 	Timer timer;
 	timer.Start();
 
-	std::vector<mat4> test{
-		mat4().CreateIdentity(),
-		mat4().CreateTranslation(10, -5, 0),
-		mat4().CreateProjection(30, 16/9, 0.1, 100)
-	};
-
-	std::stringstream ss;
-
-	Logger::Info(ss.str());
-
 	Resource::LoadAssetDefinitions();
 
 	Scripting::RegisterMath();
 	Scripting::RegisterCore();
 	Scripting::RegisterGraphics();
-
 
 	for (auto& file : Util::GetFilesInFolder("./scr/run/", "lua")) {
 		Logger::Info("Running %s", file.c_str());
