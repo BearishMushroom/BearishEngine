@@ -15,7 +15,11 @@ uniform sampler2D gNormal;
 uniform sampler2D gDiffuse;
 uniform sampler2D gSpecRoughness;
 
-uniform sampler2D shadowMap;
+uniform sampler2D shadowMap[3];
+
+uniform float shadowBounds[3];
+
+in mat4 lightMat[3];
 
 uniform DirectionalLight dLight = { { {0, 0, 0}, 0, 0}, {0, 0, 0}};
 uniform PointLight pLight = { { {0, 0, 0}, 0, 0}, {0, 0, 0}, {0, 0, 0}};
@@ -24,10 +28,9 @@ uniform int light;
 uniform vec2 screen;
 uniform vec3 eyePos;
 
-in mat4 lightMat;
-
 // Material uniforms.
 // PBR Inputs
+
 uniform sampler2D PreintegratedFG;
 uniform samplerCube EnvironmentMap;
 
@@ -75,23 +78,31 @@ void main() {
 
 	vec3 position = texture(gPosition, tc).xyz;
 	vec3 normal = (texture(gNormal, tc).xyz);
-  vec3 eye = normalize(eyePos - position);
+	vec3 eye = normalize(eyePos - position);
 
-  vec4 albedo = vec4(GammaCorrectTextureRGB(gDiffuse, tc), 1);
+	vec4 albedo = vec4(GammaCorrectTextureRGB(gDiffuse, tc), 1);
 
 	vec4 specRough = GammaCorrectTexture(gSpecRoughness, tc);
-  vec3 specular = specRough.rgb;
-  float roughness = specRough.a;
+	vec3 specular = specRough.rgb;
+	float roughness = specRough.a;
 
 	if (light == LIGHT_DIRECTIONAL) {
-	  vec4 lp = (lightMat * vec4(position, 1));
-
 		float NdotL = dot(normal, dLight.direction);
 
-	  float visibility = CalculateShadow(shadowMap, lp, NdotL);
-	  vec4 final = vec4(PBR(visibility, albedo, specular, roughness, position, normal, eye, dLight.direction, dLight.base.color, dLight.base.diffuseIntensity), albedo.a);
+	  float visibility = 1;
+		float dist = texture(gPosition, tc).a;
+
+		if(dist <= shadowBounds[0]) {
+			visibility = CalculateShadow(shadowMap[0], lightMat[0] * vec4(position, 1), NdotL);
+		} else if(dist <= shadowBounds[1]) {
+			visibility = CalculateShadow(shadowMap[1], lightMat[1] * vec4(position, 1), NdotL);
+		} else if(dist <= shadowBounds[2]) {
+			visibility = CalculateShadow(shadowMap[2], lightMat[2] * vec4(position, 1), NdotL);
+		}
+
+		vec4 final = vec4(PBR(visibility, albedo, specular, roughness, position, normal, eye, dLight.direction, dLight.base.color, dLight.base.diffuseIntensity), albedo.a);
 		final += ssaoScale > 0 ? albedo * dLight.base.ambientIntensity * texture(gSSAO, tc).r : vec4(0);
-	  fragcolor = final;
+	  fragcolor = final;// + vec4(ttint, 0);
 	}
 
 	if (light == LIGHT_POINT) {

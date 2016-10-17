@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "BETFile.h"
+#include <SOIL.h>
 
 int main(int argc, char** argv) {
 	if (argc < 3) {
@@ -8,13 +9,13 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 
-	string inputPath = string(argv[1]);
-	string outputPath = string(argv[2]);
+	std::string inputPath = std::string(argv[1]);
+	std::string outputPath = std::string(argv[2]);
 
-	i32 width, height;
-	u8* image = SOIL_load_image(inputPath.c_str(), &width, &height, 0, SOIL_LOAD_RGBA | SOIL_FLAG_INVERT_Y);
+	int width, height;
+	unsigned char* image = SOIL_load_image(inputPath.c_str(), &width, &height, 0, SOIL_LOAD_RGBA | SOIL_FLAG_INVERT_Y);
 
-	BETFile output;
+	Bearish::Core::BET::BETFile output;
 	output.data = image;
 	output.dataSize = width * height * 4;
 	output.width = width;

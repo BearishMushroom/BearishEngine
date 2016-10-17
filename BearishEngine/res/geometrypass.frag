@@ -62,9 +62,8 @@ void main() {
   Out_World = vec4(worldPos0, LinearizeDepth(gl_FragCoord.z));
 
   // Calculate normalmap
-  vec3 tangent = normalize(tangent0 - dot(tangent0, normal0) * normal0);
-  vec3 biTangent = cross(tangent, normal0);
-  mat3 tbn = mat3(tangent, biTangent, normal0);
+  vec3 biTangent = cross(tangent0, normal0);
+  mat3 tbn = mat3(tangent0, biTangent, normal0);
 
   vec3 normal = (1 - UsingNormalMap) * normal0 + UsingNormalMap * normalize(tbn * (2 * texture(NormalMap, texCoord0).xyz - 1));
 

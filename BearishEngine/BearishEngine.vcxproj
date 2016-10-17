@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AA510CC3-20F4-4475-9A0A-CAAE73E1E1C1}</ProjectGuid>
     <RootNamespace>BearishEngine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -67,7 +67,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)/deps/include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)/deps/include;$(ProjectDir)/src;$(SolutionDir)/BETBuild;$(SolutionDir)/BEMBuild;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)/deps/lib/x86;$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>NativeMinimumRules.ruleset</CodeAnalysisRuleSet>
     <IntDir>$(SolutionDir)Intermediates\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
@@ -75,7 +75,7 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)/deps/include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)/deps/include;$(ProjectDir)/src;$(SolutionDir)/BETBuild;$(SolutionDir)/BEMBuild;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)/deps/lib/x64;$(LibraryPath)</LibraryPath>
     <CodeAnalysisRuleSet>NativeMinimumRules.ruleset</CodeAnalysisRuleSet>
     <IntDir>$(SolutionDir)Intermediates\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
@@ -83,14 +83,14 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)/deps/include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)/deps/include;$(ProjectDir)/src;$(SolutionDir)/BETBuild;$(SolutionDir)/BEMBuild;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)/deps/lib/x86;$(LibraryPath)</LibraryPath>
     <IntDir>$(SolutionDir)Intermediates\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)/deps/include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)/deps/include;$(ProjectDir)/src;$(SolutionDir)/BETBuild;$(SolutionDir)/BEMBuild;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)/deps/lib/x64;$(LibraryPath)</LibraryPath>
     <IntDir>$(SolutionDir)Intermediates\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
@@ -102,7 +102,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>BEARISH_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BEARISH_X86;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
@@ -153,7 +153,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>BEARISH_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BEARISH_X86;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
@@ -215,38 +215,43 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="src\Components\MeshRendererComponent.cpp" />
-    <ClCompile Include="src\Core\Actor.cpp" />
-    <ClCompile Include="src\Core\Keyboard.cpp" />
-    <ClCompile Include="src\Core\Logger.cpp" />
-    <ClCompile Include="src\Core\Model.cpp" />
-    <ClCompile Include="src\Core\Mouse.cpp" />
-    <ClCompile Include="src\Core\Transform.cpp" />
-    <ClCompile Include="src\Graphics\Buffer\UniformBuffer.cpp" />
-    <ClCompile Include="src\Graphics\Camera.cpp" />
-    <ClCompile Include="src\Graphics\Buffer\IndexBuffer.cpp" />
-    <ClCompile Include="src\Graphics\Font.cpp" />
-    <ClCompile Include="src\Graphics\Frustum.cpp" />
-    <ClCompile Include="src\Graphics\ImageBuffer.cpp" />
-    <ClCompile Include="src\Graphics\Mesh\Mesh.cpp" />
-    <ClCompile Include="src\Graphics\Mesh\MeshAnimation.cpp" />
-    <ClCompile Include="src\Graphics\Mesh\MeshNode.cpp" />
-    <ClCompile Include="src\Graphics\Mesh\MeshNodeAnimation.cpp" />
-    <ClCompile Include="src\Graphics\OpenGL.cpp" />
-    <ClCompile Include="src\Graphics\ParticleSytem.cpp" />
-    <ClCompile Include="src\Graphics\Renderer.cpp" />
-    <ClCompile Include="src\Graphics\RenderingEngine.cpp" />
-    <ClCompile Include="src\Graphics\Shader.cpp" />
-    <ClCompile Include="src\Core\Timer.cpp" />
-    <ClCompile Include="src\Graphics\Texture\Texture.cpp" />
-    <ClCompile Include="src\Graphics\Buffer\VertexState.cpp" />
-    <ClCompile Include="src\Graphics\Buffer\VertexBuffer.cpp" />
-    <ClCompile Include="src\GUI\Win32Window.cpp" />
-    <ClCompile Include="src\GUI\Win32WindowButton.cpp" />
-    <ClCompile Include="src\GUI\Win32WindowComponent.cpp" />
-    <ClCompile Include="src\GUI\Win32WindowGLViewport.cpp" />
-    <ClCompile Include="src\GUI\Win32WindowMenuBar.cpp" />
-    <ClCompile Include="src\GUI\Win32WindowSubMenu.cpp" />
+    <ClCompile Include="src\BE\Components\MeshRendererComponent.cpp" />
+    <ClCompile Include="src\BE\Core\Actor.cpp" />
+    <ClCompile Include="src\BE\Core\Asset.cpp" />
+    <ClCompile Include="src\BE\Core\JobFactory.cpp" />
+    <ClCompile Include="src\BE\Core\Keyboard.cpp" />
+    <ClCompile Include="src\BE\Core\Logger.cpp" />
+    <ClCompile Include="src\BE\Core\Model.cpp" />
+    <ClCompile Include="src\BE\Core\Mouse.cpp" />
+    <ClCompile Include="src\BE\Core\Settings.cpp" />
+    <ClCompile Include="src\BE\Core\Transform.cpp" />
+    <ClCompile Include="src\BE\Graphics\Buffer\UniformBuffer.cpp" />
+    <ClCompile Include="src\BE\Graphics\Buffer\VertexLayout.cpp" />
+    <ClCompile Include="src\BE\Graphics\Camera.cpp" />
+    <ClCompile Include="src\BE\Graphics\Buffer\IndexBuffer.cpp" />
+    <ClCompile Include="src\BE\Graphics\Font.cpp" />
+    <ClCompile Include="src\BE\Graphics\Frustum.cpp" />
+    <ClCompile Include="src\BE\Graphics\ImageBuffer.cpp" />
+    <ClCompile Include="src\BE\Graphics\Mesh\Mesh.cpp" />
+    <ClCompile Include="src\BE\Graphics\Mesh\MeshAnimation.cpp" />
+    <ClCompile Include="src\BE\Graphics\Mesh\MeshNode.cpp" />
+    <ClCompile Include="src\BE\Graphics\Mesh\MeshNodeAnimation.cpp" />
+    <ClCompile Include="src\BE\Graphics\OpenGL.cpp" />
+    <ClCompile Include="src\BE\Graphics\ParticleSytem.cpp" />
+    <ClCompile Include="src\BE\Graphics\Renderer.cpp" />
+    <ClCompile Include="src\BE\Graphics\RenderingEngine.cpp" />
+    <ClCompile Include="src\BE\Graphics\Shader.cpp" />
+    <ClCompile Include="src\BE\Core\Timer.cpp" />
+    <ClCompile Include="src\BE\Graphics\Texture\Texture.cpp" />
+    <ClCompile Include="src\BE\Graphics\Buffer\VertexState.cpp" />
+    <ClCompile Include="src\BE\Graphics\Buffer\VertexBuffer.cpp" />
+    <ClCompile Include="src\BE\GUI\Win32Window.cpp" />
+    <ClCompile Include="src\BE\GUI\Win32WindowButton.cpp" />
+    <ClCompile Include="src\BE\GUI\Win32WindowComponent.cpp" />
+    <ClCompile Include="src\BE\GUI\Win32WindowGLViewport.cpp" />
+    <ClCompile Include="src\BE\GUI\Win32WindowMenuBar.cpp" />
+    <ClCompile Include="src\BE\GUI\Win32WindowSubMenu.cpp" />
+    <ClCompile Include="src\BE\Scripting\ScriptingEngine.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -256,92 +261,96 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Bearish.h" />
-    <ClInclude Include="src\Components\CameraComponent.h" />
-    <ClInclude Include="src\Components\FreeLookComponent.h" />
-    <ClInclude Include="src\Components\FreeMoveComponent.h" />
-    <ClInclude Include="src\Components\SkyboxComponent.h" />
-    <ClInclude Include="src\Components\LightComponents.h" />
-    <ClInclude Include="src\Components\MeshRendererComponent.h" />
-    <ClInclude Include="src\Components\UIButton.h" />
-    <ClInclude Include="src\Components\UIDraggable.h" />
-    <ClInclude Include="src\Components\UILabel.h" />
-    <ClInclude Include="src\Components\UILineGraph.h" />
-    <ClInclude Include="src\Components\UIPanel.h" />
-    <ClInclude Include="src\Components\UITextArea.h" />
-    <ClInclude Include="src\Core\AABB.h" />
-    <ClInclude Include="src\Core\Actor.h" />
-    <ClInclude Include="src\Core\Asset.h" />
-    <ClInclude Include="src\Core\BEMFile.h" />
-    <ClInclude Include="src\Core\BlockAllocator.h" />
-    <ClInclude Include="src\Core\ButtonState.h" />
-    <ClInclude Include="src\Core\Callback.h" />
-    <ClInclude Include="src\Core\IActorComponent.h" />
-    <ClInclude Include="src\Core\IAligned.h" />
-    <ClInclude Include="src\Core\IAllocatable.h" />
-    <ClInclude Include="src\Core\JobFactory.h" />
-    <ClInclude Include="src\Core\ConcurrentQueue.h" />
-    <ClInclude Include="src\Core\Keyboard.h" />
-    <ClInclude Include="src\Core\Logger.h" />
-    <ClInclude Include="src\Core\Model.h" />
-    <ClInclude Include="src\Core\Mouse.h" />
-    <ClInclude Include="src\Core\Settings.h" />
-    <ClInclude Include="src\Core\Shared.h" />
-    <ClInclude Include="src\Core\Transform.h" />
-    <ClInclude Include="src\Graphics\BETFile.h" />
-    <ClInclude Include="src\Graphics\Buffer\IndexBuffer.h" />
+    <ClInclude Include="src\BE\Components\CameraComponent.h" />
+    <ClInclude Include="src\BE\Components\FreeLookComponent.h" />
+    <ClInclude Include="src\BE\Components\FreeMoveComponent.h" />
+    <ClInclude Include="src\BE\Components\SkyboxComponent.h" />
+    <ClInclude Include="src\BE\Components\LightComponents.h" />
+    <ClInclude Include="src\BE\Components\MeshRendererComponent.h" />
+    <ClInclude Include="src\BE\Components\UIButton.h" />
+    <ClInclude Include="src\BE\Components\UIDraggable.h" />
+    <ClInclude Include="src\BE\Components\UILabel.h" />
+    <ClInclude Include="src\BE\Components\UILineGraph.h" />
+    <ClInclude Include="src\BE\Components\UIPanel.h" />
+    <ClInclude Include="src\BE\Components\UITextArea.h" />
+    <ClInclude Include="src\BE\Components\UITweakBar.h" />
+    <ClInclude Include="src\BE\Core\AABB.h" />
+    <ClInclude Include="src\BE\Core\Actor.h" />
+    <ClInclude Include="src\BE\Core\Asset.h" />
+    <ClInclude Include="src\BE\Core\BEMFile.h" />
+    <ClInclude Include="src\BE\Core\BlockAllocator.h" />
+    <ClInclude Include="src\BE\Core\ButtonState.h" />
+    <ClInclude Include="src\BE\Core\Callback.h" />
+    <ClInclude Include="src\BE\Core\IActorComponent.h" />
+    <ClInclude Include="src\BE\Core\IAligned.h" />
+    <ClInclude Include="src\BE\Core\IAllocatable.h" />
+    <ClInclude Include="src\BE\Core\JobFactory.h" />
+    <ClInclude Include="src\BE\Core\ConcurrentQueue.h" />
+    <ClInclude Include="src\BE\Core\Keyboard.h" />
+    <ClInclude Include="src\BE\Core\Logger.h" />
+    <ClInclude Include="src\BE\Core\Model.h" />
+    <ClInclude Include="src\BE\Core\Mouse.h" />
+    <ClInclude Include="src\BE\Core\Settings.h" />
+    <ClInclude Include="src\BE\Core\Shared.h" />
+    <ClInclude Include="src\BE\Core\Transform.h" />
+    <ClInclude Include="src\BE\Graphics\Buffer\IndexBuffer.h" />
+    <ClInclude Include="src\BE\Serialization\Database.h" />
+    <ClInclude Include="src\BE\Serialization\Field.h" />
+    <ClInclude Include="src\BE\Serialization\Object.h" />
+    <ClInclude Include="src\BE\Serialization\Type.h" />
     <ClInclude Include="src\Graphics\Buffer\UBO.h" />
-    <ClInclude Include="src\Graphics\Buffer\UniformBuffer.h" />
-    <ClInclude Include="src\Graphics\Buffer\VertexBuffer.h" />
-    <ClInclude Include="src\Graphics\Buffer\VertexLayout.h" />
-    <ClInclude Include="src\Graphics\Buffer\VertexState.h" />
-    <ClInclude Include="src\Graphics\Camera.h" />
+    <ClInclude Include="src\BE\Graphics\Buffer\UniformBuffer.h" />
+    <ClInclude Include="src\BE\Graphics\Buffer\VertexBuffer.h" />
+    <ClInclude Include="src\BE\Graphics\Buffer\VertexLayout.h" />
+    <ClInclude Include="src\BE\Graphics\Buffer\VertexState.h" />
+    <ClInclude Include="src\BE\Graphics\Camera.h" />
     <ClInclude Include="src\Graphics\Buffer\IBO.h" />
-    <ClInclude Include="src\Graphics\Font.h" />
-    <ClInclude Include="src\Graphics\Frustum.h" />
-    <ClInclude Include="src\Graphics\ImageBuffer.h" />
-    <ClInclude Include="src\Graphics\Lights.h" />
-    <ClInclude Include="src\Graphics\Material.h" />
-    <ClInclude Include="src\Graphics\Mesh\Mesh.h" />
-    <ClInclude Include="src\Graphics\Mesh\MeshAnimation.h" />
-    <ClInclude Include="src\Graphics\Mesh\MeshBone.h" />
-    <ClInclude Include="src\Graphics\Mesh\MeshNode.h" />
-    <ClInclude Include="src\Graphics\Mesh\MeshNodeAnimation.h" />
-    <ClInclude Include="src\Graphics\Mesh\MeshNodeAnimationKeyframe.h" />
-    <ClInclude Include="src\Graphics\Mesh\MeshSkeleton.h" />
-    <ClInclude Include="src\Graphics\Particle.h" />
-    <ClInclude Include="src\Graphics\ParticleSystem.h" />
-    <ClInclude Include="src\Graphics\Renderer.h" />
-    <ClInclude Include="src\Graphics\RenderingEngine.h" />
-    <ClInclude Include="src\Graphics\Shader.h" />
-    <ClInclude Include="src\Graphics\Texture\Texture.h" />
+    <ClInclude Include="src\BE\Graphics\Font.h" />
+    <ClInclude Include="src\BE\Graphics\Frustum.h" />
+    <ClInclude Include="src\BE\Graphics\ImageBuffer.h" />
+    <ClInclude Include="src\BE\Graphics\Lights.h" />
+    <ClInclude Include="src\BE\Graphics\Material.h" />
+    <ClInclude Include="src\BE\Graphics\Mesh\Mesh.h" />
+    <ClInclude Include="src\BE\Graphics\Mesh\MeshAnimation.h" />
+    <ClInclude Include="src\BE\Graphics\Mesh\MeshBone.h" />
+    <ClInclude Include="src\BE\Graphics\Mesh\MeshNode.h" />
+    <ClInclude Include="src\BE\Graphics\Mesh\MeshNodeAnimation.h" />
+    <ClInclude Include="src\BE\Graphics\Mesh\MeshNodeAnimationKeyframe.h" />
+    <ClInclude Include="src\BE\Graphics\Mesh\MeshSkeleton.h" />
+    <ClInclude Include="src\BE\Graphics\Particle.h" />
+    <ClInclude Include="src\BE\Graphics\ParticleSystem.h" />
+    <ClInclude Include="src\BE\Graphics\Renderer.h" />
+    <ClInclude Include="src\BE\Graphics\RenderingEngine.h" />
+    <ClInclude Include="src\BE\Graphics\Shader.h" />
+    <ClInclude Include="src\BE\Graphics\Texture\Texture.h" />
     <ClInclude Include="src\Graphics\Buffer\VAO.h" />
     <ClInclude Include="src\Graphics\Buffer\VBO.h" />
-    <ClInclude Include="src\Graphics\Texture\Texture1D.h" />
-    <ClInclude Include="src\Graphics\Texture\Texture2D.h" />
-    <ClInclude Include="src\Graphics\Texture\Texture3D.h" />
-    <ClInclude Include="src\Graphics\Texture\TextureCube.h" />
-    <ClInclude Include="src\Graphics\Vertex.h" />
-    <ClInclude Include="src\GUI\Win32Window.h" />
-    <ClInclude Include="src\GUI\Win32WindowButton.h" />
-    <ClInclude Include="src\GUI\Win32WindowComponent.h" />
-    <ClInclude Include="src\GUI\Win32WindowGLViewport.h" />
-    <ClInclude Include="src\GUI\Win32WindowMenuBar.h" />
-    <ClInclude Include="src\GUI\Win32WindowSubMenu.h" />
-    <ClInclude Include="src\Math\mat4.h" />
-    <ClInclude Include="src\Math\Math.h" />
-    <ClInclude Include="src\Math\quat.h" />
-    <ClInclude Include="src\Math\vec4.h" />
+    <ClInclude Include="src\BE\Graphics\Texture\Texture1D.h" />
+    <ClInclude Include="src\BE\Graphics\Texture\Texture2D.h" />
+    <ClInclude Include="src\BE\Graphics\Texture\Texture3D.h" />
+    <ClInclude Include="src\BE\Graphics\Texture\TextureCube.h" />
+    <ClInclude Include="src\BE\Graphics\Vertex.h" />
+    <ClInclude Include="src\BE\GUI\Win32Window.h" />
+    <ClInclude Include="src\BE\GUI\Win32WindowButton.h" />
+    <ClInclude Include="src\BE\GUI\Win32WindowComponent.h" />
+    <ClInclude Include="src\BE\GUI\Win32WindowGLViewport.h" />
+    <ClInclude Include="src\BE\GUI\Win32WindowMenuBar.h" />
+    <ClInclude Include="src\BE\GUI\Win32WindowSubMenu.h" />
+    <ClInclude Include="src\BE\Math\mat4.h" />
+    <ClInclude Include="src\BE\Math\Math.h" />
+    <ClInclude Include="src\BE\Math\quat.h" />
+    <ClInclude Include="src\BE\Math\vec4.h" />
     <ClInclude Include="src\pch.h" />
-    <ClInclude Include="src\Scripting\Core.h" />
-    <ClInclude Include="src\Scripting\Graphics.h" />
-    <ClInclude Include="src\Scripting\Math.h" />
-    <ClInclude Include="src\Scripting\ScriptingEngine.h" />
-    <ClInclude Include="src\Utils.h" />
-    <ClInclude Include="src\Math\vec2.h" />
-    <ClInclude Include="src\Graphics\OpenGL.h" />
-    <ClInclude Include="src\Types.h" />
-    <ClInclude Include="src\Math\vec3.h" />
-    <ClInclude Include="src\Core\Timer.h" />
+    <ClInclude Include="src\BE\Scripting\Core.h" />
+    <ClInclude Include="src\BE\Scripting\Graphics.h" />
+    <ClInclude Include="src\BE\Scripting\Math.h" />
+    <ClInclude Include="src\BE\Scripting\ScriptingEngine.h" />
+    <ClInclude Include="src\BE\Utils.h" />
+    <ClInclude Include="src\BE\Math\vec2.h" />
+    <ClInclude Include="src\BE\Graphics\OpenGL.h" />
+    <ClInclude Include="src\BE\Types.h" />
+    <ClInclude Include="src\BE\Math\vec3.h" />
+    <ClInclude Include="src\BE\Core\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\TestShader.frag">

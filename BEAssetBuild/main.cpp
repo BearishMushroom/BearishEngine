@@ -4,6 +4,105 @@
 #include <vector>
 #include <fstream>
 #include <map>
+#include <regex>
+
+void ReplaceAll(std::string& str, const std::string& from, const std::string& to) {
+	if (from.empty())
+		return;
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+	}
+}
+
+bool MatchTextWithWildcards(const string& text, string wildcardPattern) {
+	// Escape all regex special chars
+	EscapeRegex(wildcardPattern);
+
+	// Convert chars '*?' back to their regex equivalents
+	ReplaceAll(wildcardPattern, "\\?", ".");
+	ReplaceAll(wildcardPattern, "\\*", ".*");
+
+	std::regex pattern(wildcardPattern);
+
+	return std::regex_match(text, pattern);
+}
+
+void EscapeRegex(string &regex) {
+	ReplaceAll(regex, "\\", "\\\\");
+	ReplaceAll(regex, "^", "\\^");
+	ReplaceAll(regex, ".", "\\.");
+	ReplaceAll(regex, "$", "\\$");
+	ReplaceAll(regex, "|", "\\|");
+	ReplaceAll(regex, "(", "\\(");
+	ReplaceAll(regex, ")", "\\)");
+	ReplaceAll(regex, "[", "\\[");
+	ReplaceAll(regex, "]", "\\]");
+	ReplaceAll(regex, "*", "\\*");
+	ReplaceAll(regex, "+", "\\+");
+	ReplaceAll(regex, "?", "\\?");
+	ReplaceAll(regex, "/", "\\/");
+}
+
+#include <Windows.h>
+std::vector<string> GetFilesInFolder(string folder, bool subfolders = true) {
+	std::vector<string> names;
+	c8 searchPath[MAX_PATH];
+	sprintf_s(searchPath, "%s", folder.c_str());
+
+	WIN32_FIND_DATA fd;
+	HANDLE hFind = FindFirstFile(searchPath, &fd);
+	if (hFind != INVALID_HANDLE_VALUE) {
+		do {
+			names.push_back(folder + fd.cFileName);
+		} while (FindNextFile(hFind, &fd));
+
+		FindClose(hFind);
+	}
+
+	if (subfolders) {
+		strcpy_s(searchPath, MAX_PATH, folder.c_str());
+		strcat_s(searchPath, MAX_PATH, "\\*");
+		hFind = FindFirstFile(searchPath, &fd);
+		if (hFind != INVALID_HANDLE_VALUE) {
+			do {
+				if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY && string(fd.cFileName) != "." && string(fd.cFileName) != "..") {
+					auto dir = GetFilesInFolder(folder + string(fd.cFileName) + "/", subfolders);
+					for (auto d : dir) {
+						names.push_back(d);
+					}
+				}
+			} while (FindNextFile(hFind, &fd));
+
+			FindClose(hFind);
+		}
+	}
+
+	return names;
+}
+
+void CreateFolder(string name) {
+	CreateDirectory(name.c_str(), 0);
+}
+
+bool FileExists(string name) {
+	DWORD dwAttrib = GetFileAttributes(name.c_str());
+
+	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
+		!(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+}
+
+bool DirectoryExists(string name) {
+	DWORD dwAttrib = GetFileAttributes(name.c_str());
+
+	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
+		(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+}
+
+std::vector<string> GetFiles(std::string expression) {
+
+}
 
 i32 main(i32 argc, c8** argv) {
 	std::map<string, u64> timestamps;

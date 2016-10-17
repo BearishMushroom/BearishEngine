@@ -1,7 +1,9 @@
-#include "src/Bearish.h"
+#include <Bearish.h>
 #include <vector>
 #include <crtdbg.h>
 #include <sstream>
+
+#include <BE/Components/UITweakBar.h>
 
 using namespace Bearish;
 
@@ -10,12 +12,13 @@ using namespace Graphics;
 using namespace Core;
 using namespace Math;
 using namespace Util;
+using namespace Serilization;
 
 #define UPDATE_TIME 1.0 / 60.0
 
-Actor* object1 = new Actor(Transform(vec3( 0,    0, 0), vec3(0.1f)));
-Actor* object2 = new Actor(Transform(vec3( 1.5f, 0, 0), vec3(0.1f)));
-Actor* object3 = new Actor(Transform(vec3(-1.5f, 0, 0), vec3(0.1f)));
+Actor* object1 = new Actor(Transform(vec3( 0,    2, 0), vec3(0.1f)));
+Actor* object2 = new Actor(Transform(vec3( 1.5f, 2, 0), vec3(0.1f)));
+Actor* object3 = new Actor(Transform(vec3(-1.5f, 2, 0), vec3(0.1f)));
 
 Actor* player;
 
@@ -29,8 +32,6 @@ Actor* callCounter = new Actor(Transform(vec3(1775, 985, -2)));
 std::vector<Actor*> actors;
 RenderingEngine renderer;
 
-std::unordered_map<string, string> Asset::_values;
-Bearish::Scripting::LuaObject Settings::_map;
 
 Font* UI_FONT;
 
@@ -58,6 +59,8 @@ void Update() {
 
 		actors.at(i)->FixedUpdate();
 	}
+
+	renderer.Update();
 
 	if (Keyboard::IsKeyPressed(Key::U)) {
 		Logger::Info(player->GetTransform().GetTranslation().ToString());
@@ -126,7 +129,7 @@ void Update() {
 			UI_GRAPH->AddChild(graph4);
 
 			Actor* glb1 = new Actor(Transform(vec3(-150, -386, 0)));
-			glb1->AddComponent(new IActorComponent("UILabel", UI_FONT, "16ms", 18));
+			glb1->AddComponent(new IActorComponent("UILabel", *UI_FONT, "16ms", 18));
 			UI_GRAPH->AddChild(glb1);
 
 			Actor* glb2 = new Actor(Transform(vec3(-150, -200, 0)));
@@ -234,6 +237,7 @@ void Update() {
 
 			actors.push_back(UI_PANEL);
 			actors.push_back(UI_GRAPH);
+
 			PANEL_OPEN = true;
 		}
 		else {
@@ -242,13 +246,30 @@ void Update() {
 			UI_GRAPH->Kill();
 		}
 	}
-
-	renderer.testPart->Emit(1, vec3(-12, -4, -8));
-	renderer.testPart->Update(renderer.GetCamera(), 1.f / 60.f);
 }
 
+std::map<std::string, std::function<void*()>> TypeFactory::_factories;
+
+struct Test {
+	int x;
+
+	void Save(Database& db) {
+		db.Start<Test>();
+		db.Push(x);
+		db.End();
+	}
+};
+
+BE_SERILIZATION_TYPE(i32);
+BE_SERILIZATION_TYPE(i64);
+BE_SERILIZATION_TYPE(f32);
+BE_SERILIZATION_TYPE(f64);
+BE_SERILIZATION_TYPE(Test);
+
 i32 main(i32 argc, c8** argv) {
-	_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+	//Database db("name");
+	//Test t = { 100 };
+	//t.Save(db);
 
 	Scripting::InitLua();
 	Scripting::RunFile("scr/lib/init.lua");
@@ -258,9 +279,9 @@ i32 main(i32 argc, c8** argv) {
 	Settings::Load();
 
 	GUI::Win32Window testwin("TEST", Settings::Get<i32>("resolution_x"), Settings::Get<i32>("resolution_y"));
-	
+
 	GUI::Win32WindowMenuBar menu;
-	
+
 	GUI::Win32WindowSubMenu file("&File");
 	file.AddChild(new GUI::Win32WindowSubMenuItem("&Do nothing", []() {}));
 	file.AddChild(new GUI::Win32WindowSubMenuItem("&Close", [&testwin]() { testwin.Close(); }));
@@ -278,11 +299,21 @@ i32 main(i32 argc, c8** argv) {
 
 	PANEL_OPEN = false;
 	SeedRandom();
-	
+
 	Timer timer;
 	timer.Start();
 
-	Asset::LoadAssetDefinitions();
+	std::vector<mat4> test{
+		mat4().CreateIdentity(),
+		mat4().CreateTranslation(10, -5, 0),
+		mat4().CreateProjection(30, 16/9, 0.1, 100)
+	};
+
+	std::stringstream ss;
+
+	Logger::Info(ss.str());
+
+	Resource::LoadAssetDefinitions();
 
 	Scripting::RegisterMath();
 	Scripting::RegisterCore();
@@ -299,16 +330,7 @@ i32 main(i32 argc, c8** argv) {
 		Scripting::DoMoonFile(file);
 	}
 
-	JobFactory fac;
-	auto get = fac.AddJob<int, int>([](int* a, int* b) { *b = *a * *a; }, 5);
-
-	try {
-		get.wait();
-		get.get();
-	}
-	catch (std::future_error e) {
-		throw;
-	}
+	JobFactory::Initialize();
 
 	renderer.Load();
 
@@ -317,39 +339,39 @@ i32 main(i32 argc, c8** argv) {
 
 	UI_FONT = new Font("res/Roboto.ttf");
 
-	Mesh mesh = Model(Asset::Get("man")).ToMesh();
-	Mesh mesh2 = Model(Asset::Get("plane")).ToMesh();
+	Mesh mesh = Asset<Model>::Get("man")->ToMesh();
+	Mesh mesh2 = Asset<Model>::Get("plane")->ToMesh();
 	
-	Texture2D texture(Asset::Get("bricks"));
-	Texture2D normalMap(Asset::Get("bricksNormal"));
+	Texture2D* texture = Asset<Texture2D>::Get("bricks");
+	Texture2D* normalMap = Asset<Texture2D>::Get("bricksNormal");
 
-	Texture2D texture2(Asset::Get("defaultNormal"));
+	Texture2D* texture2 = Asset<Texture2D>::Get("defaultNormal");
 
-	TextureCube* skybox = new TextureCube(Asset::Get("right"), Asset::Get("left"), Asset::Get("top"),
-											Asset::Get("bottom"), Asset::Get("front"), Asset::Get("back"));
+	TextureCube* skybox = new TextureCube(Asset<string>::GetPath("right"), Asset<string>::GetPath("left"), Asset<string>::GetPath("top"),
+										  Asset<string>::GetPath("bottom"), Asset<string>::GetPath("front"), Asset<string>::GetPath("back"));
 
 	Mesh cp1(mesh);
 	Mesh cp2(mesh);
 	Mesh cp3(mesh);
 	
 	Material dude("Dude", new Shader("res/phong.vert", "res/phong.frag"));
-	dude.Set("diffuse", &texture2, 5);
-	dude.Set("normalMap", &texture2, 6);
+	dude.Set("diffuse", texture2);
+	dude.Set("normalMap", texture2);
 
 	Material red("red", new Shader("res/phong.vert", "res/red.frag"));
 
 	Material brickMaterial("Bricks", new Shader("res/phong.vert", "res/phong.frag"));
-	brickMaterial.Set("diffuse", &texture, 5);
-	brickMaterial.Set("normalMap", &normalMap, 6);
+	brickMaterial.Set("diffuse", texture);
+	brickMaterial.Set("normalMap", normalMap);
 
 	Material pbrTest("PBR", new Shader("res/PBR.vert", "res/PBR.frag"));
 	pbrTest.Set("AlbedoColor", vec4(0.7, 0.7, 0.7, 1.0f));
 	pbrTest.Set("SpecularColor", vec3(0.2f));
 	pbrTest.Set("GlossColor", 0.25f);
-	pbrTest.Set("NormalMap", &texture2, 10);
+	pbrTest.Set("NormalMap", texture2);
 	pbrTest.Set("UsingNormalMap", 1.f);
 
-	renderer.SetPreFG(new Texture2D(Asset::Get("PreFG")));
+	renderer.SetPreFG(Asset<Texture2D>::Get("PreFG"));
 	renderer.SetEnvironmentMap(skybox);
 
 	object1->AddComponent(new AnimatedMeshRendererComponent("animation", 0.5f, &cp1, &pbrTest));
@@ -359,6 +381,8 @@ i32 main(i32 argc, c8** argv) {
 	object3->GetTransform().Rotate(vec3(1, 0, 0), AsRadians(-90.f));
 	object1->GetTransform().Rotate(vec3(1, 0, 0), AsRadians(-90.f));
 	object2->GetTransform().Rotate(vec3(1, 0, 0), AsRadians(-90.f));
+
+	Shader::Set("PBR", new Shader("res/PBR.vert", "res/PBR.frag"));
 
 #if 0
 	for (i32 i = 0; i < 10; i++) {
@@ -423,131 +447,133 @@ i32 main(i32 argc, c8** argv) {
 	actors.push_back(ples);
 
 	actors.push_back(player);
-	//actors.push_back(object1);
+	actors.push_back(object1);
 	//
-	//actors.push_back(object2);
-	//actors.push_back(object3);
+	actors.push_back(object2);
+	actors.push_back(object3);
 	actors.push_back(dir);
 
-#if 1
+#if 0
 	Material* thornMaterial = new Material(pbrTest);
 	thornMaterial->Set("UsingAlbedoMap", 1.f);
 	thornMaterial->Set("UsingSpecularMap", 1.f);
-	thornMaterial->Set("AlbedoMap", new Texture("asset/sponza2/thorn.bet"), 7);
-	thornMaterial->Set("SpecularMap", new Texture("asset/sponza2/thorn_spec.bet"), 8);
-	thornMaterial->Set("NormalMap", new Texture("asset/sponza2/thorn_bump.bet"), 10);
+	thornMaterial->Set("AlbedoMap", new Texture("asset/sponza2/thorn.bet"));
+	thornMaterial->Set("SpecularMap", new Texture("asset/sponza2/thorn_spec.bet"));
+	thornMaterial->Set("NormalMap", new Texture("asset/sponza2/thorn_bump.bet"));
 
-	Material* colAMaterial = new Material(pbrTest);
-	colAMaterial->Set("UsingAlbedoMap", 1.f);
-	colAMaterial->Set("UsingSpecularMap", 1.f);
-	colAMaterial->Set("AlbedoMap", new Texture("asset/sponza2/cola.bet"), 7);
-	colAMaterial->Set("SpecularMap", new Texture("asset/sponza2/cola_spec.bet"), 8);
-	colAMaterial->Set("NormalMap", new Texture("asset/sponza2/cola_bump.bet"), 10);
+	//Material* colAMaterial = new Material(pbrTest);
+	//colAMaterial->Set("UsingAlbedoMap", 1.f);
+	//colAMaterial->Set("UsingSpecularMap", 1.f);
+	//colAMaterial->Set("AlbedoMap", Asset<Texture>::Get("@asset/sponza2/cola.bet"));
+	//colAMaterial->Set("SpecularMap", new Texture("asset/sponza2/cola_spec.bet"));
+	//colAMaterial->Set("NormalMap", new Texture("asset/sponza2/cola_bump.bet"));
+	Material* colAMaterial = Asset<Material>::Get("@asset/material.bemat");
+
 
 	Material* colBMaterial = new Material(pbrTest);
 	colBMaterial->Set("UsingAlbedoMap", 1.f);
 	colBMaterial->Set("UsingSpecularMap", 1.f);
-	colBMaterial->Set("AlbedoMap", new Texture("asset/sponza2/colb.bet"), 7);
-	colBMaterial->Set("SpecularMap", new Texture("asset/sponza2/colb_spec.bet"), 8);
-	colBMaterial->Set("NormalMap", new Texture("asset/sponza2/colb_bump.bet"), 10);
+	colBMaterial->Set("AlbedoMap", new Texture("asset/sponza2/colb.bet"));
+	colBMaterial->Set("SpecularMap", new Texture("asset/sponza2/colb_spec.bet"));
+	colBMaterial->Set("NormalMap", new Texture("asset/sponza2/colb_bump.bet"));
 
 	Material* colCMaterial = new Material(pbrTest);
 	colCMaterial->Set("UsingAlbedoMap", 1.f);
 	colCMaterial->Set("UsingSpecularMap", 1.f);
-	colCMaterial->Set("AlbedoMap", new Texture("asset/sponza2/colc.bet"), 7);
-	colCMaterial->Set("SpecularMap", new Texture("asset/sponza2/colc_spec.bet"), 8);
-	colCMaterial->Set("NormalMap", new Texture("asset/sponza2/colc_bump.bet"), 10);
+	colCMaterial->Set("AlbedoMap", new Texture("asset/sponza2/colc.bet"));
+	colCMaterial->Set("SpecularMap", new Texture("asset/sponza2/colc_spec.bet"));
+	colCMaterial->Set("NormalMap", new Texture("asset/sponza2/colc_bump.bet"));
 
 	Material* ceilAMaterial = new Material(pbrTest);
 	ceilAMaterial->Set("UsingAlbedoMap", 1.f);
 	ceilAMaterial->Set("UsingSpecularMap", 1.f);
-	ceilAMaterial->Set("AlbedoMap", new Texture("asset/sponza2/ceila.bet"), 7);
-	ceilAMaterial->Set("SpecularMap", new Texture("asset/sponza2/ceila_spec.bet"), 8);
+	ceilAMaterial->Set("AlbedoMap", new Texture("asset/sponza2/ceila.bet"));
+	ceilAMaterial->Set("SpecularMap", new Texture("asset/sponza2/ceila_spec.bet"));
 
 	Material* archMaterial = new Material(pbrTest);
 	archMaterial->Set("UsingAlbedoMap", 1.f);
 	archMaterial->Set("UsingSpecularMap", 1.f);
-	archMaterial->Set("AlbedoMap", new Texture("asset/sponza2/arch.bet"), 7);
-	archMaterial->Set("SpecularMap", new Texture("asset/sponza2/arch_spec.bet"), 8);
-	archMaterial->Set("NormalMap", new Texture("asset/sponza2/arch_bump.bet"), 10);
+	archMaterial->Set("AlbedoMap", new Texture("asset/sponza2/arch.bet"));
+	archMaterial->Set("SpecularMap", new Texture("asset/sponza2/arch_spec.bet"));
+	archMaterial->Set("NormalMap", new Texture("asset/sponza2/arch_bump.bet"));
 
 	Material* bricksAMaterial = new Material(pbrTest);
 	bricksAMaterial->Set("UsingAlbedoMap", 1.f);
 	bricksAMaterial->Set("UsingSpecularMap", 1.f);
-	bricksAMaterial->Set("AlbedoMap", new Texture("asset/sponza2/bricksa.bet"), 7);
-	bricksAMaterial->Set("SpecularMap", new Texture("asset/sponza2/bricksa_spec.bet"), 8);
-	bricksAMaterial->Set("NormalMap", new Texture("asset/sponza2/bricksa_bump.bet"), 10);
+	bricksAMaterial->Set("AlbedoMap", new Texture("asset/sponza2/bricksa.bet"));
+	bricksAMaterial->Set("SpecularMap", new Texture("asset/sponza2/bricksa_spec.bet"));
+	bricksAMaterial->Set("NormalMap", new Texture("asset/sponza2/bricksa_bump.bet"));
 
 	Material* floorAMaterial = new Material(pbrTest);
 	floorAMaterial->Set("UsingAlbedoMap", 1.f);
 	floorAMaterial->Set("UsingSpecularMap", 1.f);
-	floorAMaterial->Set("AlbedoMap", new Texture("asset/sponza2/floora.bet"), 7);
-	floorAMaterial->Set("SpecularMap", new Texture("asset/sponza2/floora_spec.bet"), 8);
+	floorAMaterial->Set("AlbedoMap", new Texture("asset/sponza2/floora.bet"));
+	floorAMaterial->Set("SpecularMap", new Texture("asset/sponza2/floora_spec.bet"));
 
 	Material* detailMaterial = new Material(pbrTest);
 	detailMaterial->Set("UsingAlbedoMap", 1.f);
 	detailMaterial->Set("UsingSpecularMap", 1.f);
-	detailMaterial->Set("AlbedoMap", new Texture("asset/sponza2/details.bet"), 7);
-	detailMaterial->Set("SpecularMap", new Texture("asset/sponza2/details_spec.bet"), 8);
+	detailMaterial->Set("AlbedoMap", new Texture("asset/sponza2/details.bet"));
+	detailMaterial->Set("SpecularMap", new Texture("asset/sponza2/details_spec.bet"));
 
 	Material* vaseMaterial = new Material(pbrTest);
 	vaseMaterial->Set("UsingAlbedoMap", 1.f);
-	vaseMaterial->Set("AlbedoMap", new Texture("asset/sponza2/vase.bet"), 7);
+	vaseMaterial->Set("AlbedoMap", new Texture("asset/sponza2/vase.bet"));
 
 	Material* chainMaterial = new Material(pbrTest);
 	chainMaterial->Set("UsingAlbedoMap", 1.f);
-	chainMaterial->Set("AlbedoMap", new Texture("asset/sponza2/chain.bet"), 7);
-	chainMaterial->Set("NormalMap", new Texture("asset/sponza2/chain_bump.bet"), 10);
+	chainMaterial->Set("AlbedoMap", new Texture("asset/sponza2/chain.bet"));
+	chainMaterial->Set("NormalMap", new Texture("asset/sponza2/chain_bump.bet"));
 
 	Material* backgroundMaterial = new Material(pbrTest);
 	backgroundMaterial->Set("UsingAlbedoMap", 1.f);
-	backgroundMaterial->Set("AlbedoMap", new Texture("asset/sponza2/background.bet"), 7);
-	backgroundMaterial->Set("NormalMap", new Texture("asset/sponza2/background_bump.bet"), 10);
+	backgroundMaterial->Set("AlbedoMap", new Texture("asset/sponza2/background.bet"));
+	backgroundMaterial->Set("NormalMap", new Texture("asset/sponza2/background_bump.bet"));
 
 	Material* lionMaterial = new Material(pbrTest);
 	lionMaterial->Set("UsingAlbedoMap", 1.f);
-	lionMaterial->Set("AlbedoMap", new Texture("asset/sponza2/lion.bet"), 7);
-	lionMaterial->Set("NormalMap", new Texture("asset/sponza2/lion_bump.bet"), 10);
+	lionMaterial->Set("AlbedoMap", new Texture("asset/sponza2/lion.bet"));
+	lionMaterial->Set("NormalMap", new Texture("asset/sponza2/lion_bump.bet"));
 
 	Material* flagpoleMaterial = new Material(pbrTest);
 	flagpoleMaterial->Set("UsingAlbedoMap", 1.f);
 	flagpoleMaterial->Set("UsingSpecularMap", 1.f);
-	flagpoleMaterial->Set("AlbedoMap", new Texture("asset/sponza2/flagpole.bet"), 7);
-	flagpoleMaterial->Set("SpecularMap", new Texture("asset/sponza2/flagpole_spec.bet"), 8);
+	flagpoleMaterial->Set("AlbedoMap", new Texture("asset/sponza2/flagpole.bet"));
+	flagpoleMaterial->Set("SpecularMap", new Texture("asset/sponza2/flagpole_spec.bet"));
 
 	Material* roofMaterial = new Material(pbrTest);
 	roofMaterial->Set("UsingAlbedoMap", 1.f);
-	roofMaterial->Set("AlbedoMap", new Texture("asset/sponza2/roof.bet"), 7);
+	roofMaterial->Set("AlbedoMap", new Texture("asset/sponza2/roof.bet"));
 
 	Material* curtRedMaterial = new Material(pbrTest);
 	curtRedMaterial->Set("UsingAlbedoMap", 1.f);
-	curtRedMaterial->Set("AlbedoMap", new Texture("asset/sponza2/curtain.bet"), 7);
+	curtRedMaterial->Set("AlbedoMap", new Texture("asset/sponza2/curtain.bet"));
 
 	Material* curtBlueMaterial = new Material(pbrTest);
 	curtBlueMaterial->Set("UsingAlbedoMap", 1.f);
-	curtBlueMaterial->Set("AlbedoMap", new Texture("asset/sponza2/curtain_blue.bet"), 7);
+	curtBlueMaterial->Set("AlbedoMap", new Texture("asset/sponza2/curtain_blue.bet"));
 
 	Material* curtGreenMaterial = new Material(pbrTest);
 	curtGreenMaterial->Set("UsingAlbedoMap", 1.f);
-	curtGreenMaterial->Set("AlbedoMap", new Texture("asset/sponza2/curtain_green.bet"), 7);
+	curtGreenMaterial->Set("AlbedoMap", new Texture("asset/sponza2/curtain_green.bet"));
 
 	Material* fabRedMaterial = new Material(pbrTest);
 	fabRedMaterial->Set("UsingAlbedoMap", 1.f);
 	fabRedMaterial->Set("UsingSpecularMap", 1.f);
-	fabRedMaterial->Set("AlbedoMap", new Texture("asset/sponza2/fabric.bet"), 7);
-	fabRedMaterial->Set("SpecularMap", new Texture("asset/sponza2/fabric_spec.bet"), 8);
+	fabRedMaterial->Set("AlbedoMap", new Texture("asset/sponza2/fabric.bet"));
+	fabRedMaterial->Set("SpecularMap", new Texture("asset/sponza2/fabric_spec.bet"));
 
 	Material* fabBlueMaterial = new Material(pbrTest);	
 	fabBlueMaterial->Set("UsingAlbedoMap", 1.f);
 	fabBlueMaterial->Set("UsingSpecularMap", 1.f);
-	fabBlueMaterial->Set("AlbedoMap", new Texture("asset/sponza2/fabric_blue.bet"), 7);
-	fabBlueMaterial->Set("SpecularMap", new Texture("asset/sponza2/fabric_spec.bet"), 8);
+	fabBlueMaterial->Set("AlbedoMap", new Texture("asset/sponza2/fabric_blue.bet"));
+	fabBlueMaterial->Set("SpecularMap", new Texture("asset/sponza2/fabric_spec.bet"));
 
 	Material* fabGreenMaterial = new Material(pbrTest);
 	fabGreenMaterial->Set("UsingAlbedoMap", 1.f);
 	fabGreenMaterial->Set("UsingSpecularMap", 1.f);
-	fabGreenMaterial->Set("AlbedoMap", new Texture("asset/sponza2/fabric_green.bet"), 7);
-	fabGreenMaterial->Set("SpecularMap", new Texture("asset/sponza2/fabric_spec.bet"), 8);
+	fabGreenMaterial->Set("AlbedoMap", new Texture("asset/sponza2/fabric_green.bet"));
+	fabGreenMaterial->Set("SpecularMap", new Texture("asset/sponza2/fabric_spec.bet"));
 
 
 	std::vector<std::pair<std::vector<i32>, Material*>> materials = {
@@ -575,17 +601,17 @@ i32 main(i32 argc, c8** argv) {
 	};
 
 	for (i32 i = 0; i < 393; i++) {
-		auto model = Model("asset/sponza2/sponza_" + std::to_string(i) + ".bem");
+		auto model = Asset<Model>::Get("@asset/sponza2/sponza_" + std::to_string(i) + ".bem");
 		Actor* a = new Actor(Transform(vec3(0, 0, 0), vec3(0.01)));
 		Material* mat = &pbrTest;
 
-		if (model.name.find("Mesh", 0) == string::npos) {
+		if (model->name.find("Mesh", 0) == string::npos) {
 			mat = thornMaterial;
 		}
 		else {
 			for (auto& material : materials) {
 				for (auto& num : material.first) {
-					if (model.name == std::string("Mesh") + (num == 0 ? "" : "_") + 
+					if (model->name == std::string("Mesh") + (num == 0 ? "" : "_") + 
 						(num > 0 && num < 100 ? "0" : "") +
 						(num > 0 && num < 10 ? "0" : "") + std::to_string(num))
 						mat = material.second;
@@ -602,7 +628,7 @@ for (i32 i = 0; i < 1087; i++) {
 	Actor* a = new Actor(Transform(vec3(0), vec3(1)));
 	Material* mat = &pbrTest;
 
-	a->AddComponent(new MeshRendererComponent(new Mesh(model), mat));
+	a->AddComponent(new MeshRendererComponent(new Mesh(&model), mat));
 	actors.push_back(a);
 }
 #elif 0
@@ -673,12 +699,6 @@ for (i32 i = 0; i < 41; i++) {
 			//Shader::ReloadChanged();
 		}
 
-		fac.AddJob<f32>([](f32* i) { 
-			std::stringstream ss;
-			ss << std::this_thread::get_id();
-			Logger::Info("Thread ID: %s Number: %f.3", ss.str().c_str(), *i); 
-		}, lastUpdateTime);
-
 		lastUpdateTimer.LoopMS();
 
 		for (auto& a : actors) {
@@ -691,7 +711,6 @@ for (i32 i = 0; i < 41; i++) {
 
 		lastDrawTimer.LoopMS();
 		renderer.Draw();
-		glFlush();
 
 		if (updated) {
 			lastFrameTime = lastFrameTimer.LoopMS();
@@ -722,7 +741,7 @@ for (i32 i = 0; i < 41; i++) {
 		
 	}
 
-	fac.Terminate();
+	JobFactory::Terminate();
 
 	//Scripting::KillLua();
 	return 0;

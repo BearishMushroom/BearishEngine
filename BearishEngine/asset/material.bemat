@@ -1,0 +1,8 @@
+#PBR
+UsingAlbedoMap float 1
+UsingSpecularMap float 1
+UsingNormalMap float 1
+GlossColor float 0.25
+AlbedoMap texture @asset/sponza2/cola.bet
+SpecularMap texture @asset/sponza2/cola_spec.bet
+NormalMap texture @asset/sponza2/cola_bump.bet
