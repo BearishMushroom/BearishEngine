@@ -18,6 +18,9 @@ export class UIDraggable
     @dragPos = vec2 0, 0
     @id = "UIDraggable"
 
+  Serialize: =>
+    {"pos", "margin"}
+
   FixedUpdate: =>
     offset = if @actor\HasParent! then @actor\GetParent!\GetTranslation! else vec3 0, 0, 0
     model = @actor\GetTransform!

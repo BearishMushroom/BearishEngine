@@ -14,9 +14,9 @@ std::unordered_map<string, Texture*> Asset<Texture>::_loaded;
 std::unordered_map<string, Model*>     Asset<Model>::_loaded;
 std::unordered_map<string, Material*>  Asset<Material>::_loaded;
 
-std::unordered_map<string, string> Resource::_values;
+std::unordered_map<string, string> ResourceMap::_values;
 /*
-void Resource::LoadAssetDefinitions() {
+void ResourceMap::LoadAssetDefinitions() {
 	static string filename = "asset/assets.def";
 
 	std::ifstream assetfile(filename);

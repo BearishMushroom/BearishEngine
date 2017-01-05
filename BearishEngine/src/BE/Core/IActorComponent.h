@@ -6,6 +6,8 @@
 #include <BE/Graphics/Shader.h>
 #include <BE/Types.h>
 
+#include <BE/Serialization/Serialization.h>
+
 #include <BE/Scripting/ScriptingEngine.h>
 
 namespace Bearish { namespace Core {
@@ -32,7 +34,12 @@ namespace Bearish { namespace Core {
 			GetLuaFuncs();
 		}
 
-		IActorComponent() {}
+		IActorComponent() {
+			_hasInit = _hasUpdate = _hasFixedUpdate =
+				_hasPreDraw = _hasDraw = _hasPostDraw =
+				_hasPreDraw2D = _hasDraw2D = _hasPostDraw2D =
+				_hasGetBounds = _isLua = false;
+		}
 
 		virtual ~IActorComponent() {}
 
@@ -86,11 +93,44 @@ namespace Bearish { namespace Core {
 
 		string GetID() { return _id; }
 		void SetID(string id) { _id = id; }
+
+		template <typename Archive>
+		void serialize(Archive& ar) {
+			ar(CEREAL_NVP(_transform), CEREAL_NVP(_id), _isLua);
+			if (_isLua) {
+				if (!_lua.Valid()) {
+					// We're loading:
+					_lua = Scripting::CreateInstance(_id + "()");
+					GetLuaFuncs();
+
+					std::vector<Scripting::LuaValue> vals;
+					ar(CEREAL_NVP(vals));
+					for (auto val : vals) {
+						_lua.Set(val);
+					}
+				}
+				else {
+					//	We're saving:
+					luabind::object table;
+					std::vector<Scripting::LuaValue> vals;
+
+					if (_lua.HasFunction("Serialize")) {
+						table = _lua.CallFunction<luabind::object>("Serialize");
+						for (luabind::raw_iterator i(table), end; i != end; i++) {
+							vals.push_back(_lua.Get(luabind::object_cast<string>((*i))));
+						}
+					}
+
+					ar(CEREAL_NVP(vals));
+				}
+			}
+		}
 	protected:
 
 		Actor* _actor;
 		Transform _transform;
 		string _id;
+		bool _isLua;
 		Scripting::LuaObject _lua;
 		bool _hasInit, _hasUpdate, _hasFixedUpdate, 
 			_hasPreDraw, _hasDraw, _hasPostDraw,
@@ -98,7 +138,9 @@ namespace Bearish { namespace Core {
 			_hasGetBounds;
 	private:
 		void GetLuaFuncs() {
+			_isLua = false;
 			if (_lua.Valid()) {
+				_isLua = true;
 				_hasInit = _lua.HasFunction("Init");
 				_hasUpdate = _lua.HasFunction("Update");
 				_hasFixedUpdate = _lua.HasFunction("FixedUpdate");

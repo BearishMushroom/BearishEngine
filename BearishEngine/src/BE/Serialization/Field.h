@@ -11,7 +11,7 @@ namespace Bearish { namespace Serilization {
 		Field(T& data) {
 			_elements = 1;
 			_size = sizeof(T);
-			_data = new T(data);
+			_data = (void*)new T(data);
 			_type = Type<T>::name;
 		}
 		
@@ -75,6 +75,24 @@ namespace Bearish { namespace Serilization {
 			_type = Type<T>::name;
 		}
 
+		Field(const Field& o) {
+			_elements = o._elements;
+			_size = o._size;
+			_data = new u8[_size * _elements];
+			memcpy(_data, o._data, _size * _elements);
+			_type = o._type;
+			_name = o._name;
+		}
+
+		Field(Field& o) {
+			_elements = o._elements;
+			_size = o._size;
+			_data = new u8[_size * _elements];
+			memcpy(_data, o._data, _size * _elements);
+			_type = o._type;
+			_name = o._name;
+		}
+		
 		~Field() {
 			if (_elements > 1) {
 				delete[] _data;

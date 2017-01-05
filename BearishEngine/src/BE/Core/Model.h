@@ -14,7 +14,7 @@ namespace Bearish {
 	}
 
 	namespace Core {
-	class BEARISH_API Model : public IAllocatable<Model> {
+	class BEARISH_API Model {
 	public:
 		Model(const string& filename);
 		~Model();

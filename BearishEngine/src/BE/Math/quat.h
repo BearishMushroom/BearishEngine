@@ -222,7 +222,7 @@ namespace Bearish { namespace Math {
 
 		template<class Archive>
 		void serialize(Archive& ar) {
-			ar(x, y, z, w);
+			ar(CEREAL_NVP(x), CEREAL_NVP(y), CEREAL_NVP(z), CEREAL_NVP(w));
 		}
 	};
 

@@ -9,11 +9,13 @@ namespace Bearish { namespace Core {
 	class BEARISH_API IAllocatable {
 	public:
 		static void* operator new(usize size) {
-			return BlockAllocator<sizeof(T)>::Instance().Allocate();
+			//return BlockAllocator<sizeof(T)>::Instance().Allocate();
+			return malloc(size);
 		}
 
 		static void operator delete(void* data, usize size) {
-			BlockAllocator<sizeof(T)>::Instance().Free(data);
+			//BlockAllocator<sizeof(T)>::Instance().Free(data);
+			free(data);
 		}
 	};
 }}

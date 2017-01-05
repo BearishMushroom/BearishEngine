@@ -9,6 +9,7 @@
 #include <BE/Types.h>
 #include "Texture/Texture.h"
 #include "Shader.h"
+#include <BE\Core\Resource.h>
 
 #include <fstream>
 
@@ -46,7 +47,7 @@ namespace Bearish {namespace Graphics {
 		void Set(string name, Math::vec2 value) { _vec2Map[name] = value; }
 		void Set(string name, Math::vec3 value) { _vec3Map[name] = value; }
 		void Set(string name, Math::vec4 value) { _vec4Map[name] = value; }
-		void Set(string name, Texture* value) { _textureMap[name] = value; }
+		void Set(string name, Core::Resource<Texture> value) { _textureMap[name] = value; }
 
 		void Bind(Shader* shader) {
 			for (auto& i : _floatMap) {
@@ -70,7 +71,9 @@ namespace Bearish {namespace Graphics {
 			}
 
 			for (auto& i : _textureMap) {
-				shader->SetUniform(i.first, i.second);
+				if (i.second.IsLoaded()) {
+					shader->SetUniform(i.first, i.second.Get());
+				}
 			}
 		}
 
@@ -138,7 +141,7 @@ namespace Bearish {namespace Graphics {
 				else if (type == "texture") {
 					string name;
 					stream >> name;
-					mat._textureMap[attrName] = Core::Asset<Texture>::Get(name);
+					mat._textureMap[attrName] = Core::Resource<Texture>::Get(name);
 				}
 			}
 
@@ -182,7 +185,7 @@ namespace Bearish {namespace Graphics {
 		std::map<string, Math::vec2> _vec2Map;
 		std::map<string, Math::vec3> _vec3Map;
 		std::map<string, Math::vec4> _vec4Map;
-		std::map<string, Texture*>   _textureMap;
+		std::map<string, Core::Resource<Texture>>   _textureMap;
 		string _name, _assetname, _shadername;
 		Shader* _shader;
 		i32 _copies;

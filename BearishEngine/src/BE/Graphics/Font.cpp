@@ -123,11 +123,17 @@ Mesh* Font::GenerateMesh(const string& text, f32 glyphScale) const {
 		f32 thisx = xpos + current.offsetX * glyphScale;
 		f32 thisy = ypos + current.offsetY * glyphScale;
 		
-		vertices.push_back(Vertex(vec3(thisx, thisy, 0), current.texMin));
-		vertices.push_back(Vertex(vec3(thisx + current.sizeX * glyphScale, thisy, 0), vec2(current.texMax.x, current.texMin.y)));
-		vertices.push_back(Vertex(vec3(thisx + current.sizeX * glyphScale, thisy + current.sizeY * glyphScale, 0), current.texMax));
-		vertices.push_back(Vertex(vec3(thisx, thisy + current.sizeY * glyphScale, 0), vec2(current.texMin.x, current.texMax.y)));
-		
+		try {
+			vertices.push_back(Vertex(vec3(thisx, thisy, 0), current.texMin));
+			vertices.push_back(Vertex(vec3(thisx + current.sizeX * glyphScale, thisy, 0), vec2(current.texMax.x, current.texMin.y)));
+			vertices.push_back(Vertex(vec3(thisx + current.sizeX * glyphScale, thisy + current.sizeY * glyphScale, 0), current.texMax));
+			vertices.push_back(Vertex(vec3(thisx, thisy + current.sizeY * glyphScale, 0), vec2(current.texMin.x, current.texMax.y)));
+		}
+		catch (std::exception e) {
+		//	//printf("Oops.\n");
+		//	throw;
+		}
+
 		indices.push_back(currentIndex);
 		indices.push_back(currentIndex + 1);
 		indices.push_back(currentIndex + 2);

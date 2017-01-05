@@ -10,6 +10,7 @@ namespace Bearish { namespace Core {
 	public:
 		Shared() { _refs = 0; _data = 0; }
 		Shared(Shared<T>&& other) { _data = other._data; _refs = ++other._refs; }
+		
 		Shared(const Shared<T>& other) {
 			Shared<T>& o = const_cast<Shared<T>&>(other);
 			_data = o._data;
@@ -27,9 +28,12 @@ namespace Bearish { namespace Core {
 			}
 		}
 
+		bool IsLast() { return _refs == 1; }
+
 		void operator=(Shared& other) { _data = other._data; _refs = ++other._refs; }
 		void operator=(T* data) { _data = data; _refs = 1; }
 
+		T* Get() const { return _data; }
 		T* operator->() { return _data; }
 	private:
 		T* _data;

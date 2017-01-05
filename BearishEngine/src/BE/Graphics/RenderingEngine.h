@@ -7,6 +7,8 @@
 #include <BE/Graphics/Mesh/Mesh.h>
 #include <BE/Graphics/ParticleSystem.h>
 #include <BE/Graphics/Font.h>
+#include <BE/Graphics/Texture/TextureCube.h>
+#include <BE/Core/Resource.h>
 
 namespace Bearish { 
 	namespace Core {
@@ -60,7 +62,7 @@ namespace Bearish {
 
 		void Update();
 
-		void SetActorReference(std::vector<Core::Actor*>* actors);
+		void SetActorReference(std::vector<std::shared_ptr<Core::Actor>>* actors);
 		void SetCamera(Camera* const camera);
 
 		void Submit(Light* light);
@@ -71,7 +73,7 @@ namespace Bearish {
 
 		void DrawGuiQuad(Core::Transform t, Texture* tex, u32 subid = 0);
 
-		std::vector<Core::Actor*>* GetActors() { return _actors; }
+		std::vector<std::shared_ptr<Core::Actor>>* GetActors() { return _actors; }
 		Camera* GetCamera() { return _camera; }
 		i32 PushMaterial(Material* material);
 
@@ -80,7 +82,7 @@ namespace Bearish {
 
 		void SetDebugMode(i32 mode) { _debugMode = mode; }
 
-		void SetEnvironmentMap(Texture* tex) { _environmentMap = tex; }
+		void SetEnvironmentMap(Core::Resource<TextureCube> tex) { _environmentMap = tex; }
 		void SetPreFG(Texture* tex) { _preFG = tex; }
 
 		f32 GetCPUTime() const { return _cpuRenderTime; }
@@ -104,12 +106,12 @@ namespace Bearish {
 		Shader* _currentShader;
 
 		Camera* _camera;
-		std::vector<Core::Actor*>* _actors;
+		std::vector<std::shared_ptr<Core::Actor>>* _actors;
 		i32 _debugMode;
 
 		std::vector<MeshEntry> _meshesToRender;
 
-		Texture* _environmentMap;
+		Core::Resource<TextureCube> _environmentMap;
 		Texture* _preFG;
 
 		Texture* _shadowMap[SHADOW_NUM_CASCADES];
@@ -138,7 +140,7 @@ namespace Bearish {
 		Camera* GetShadowMapProjections(Math::vec3 position, DirectionalLight* light);
 		void GenerateShadowMaps();
 
-		Core::Actor* _debugUI;
+		std::shared_ptr<Core::Actor> _debugUI;
 	public:
 		Shader* _shadowShader, *_geomShader, *_guiShader, *_pbrShader;
 	};

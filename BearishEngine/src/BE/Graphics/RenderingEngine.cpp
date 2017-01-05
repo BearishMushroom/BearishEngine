@@ -119,7 +119,7 @@ void RenderingEngine::Load() {
 	SetSSAOSetting(/*(SSAOSetting)Settings::Get<i32>("ssao")*/SSAOSetting::Off);
 	
 	_shadowCascadeBounds[1] = 10;
-	_shadowCascadeBounds[2] = 35;
+	_shadowCascadeBounds[2] = 25;
 }
 
 void RenderingEngine::Unload() {
@@ -131,7 +131,7 @@ void RenderingEngine::Unload() {
 	delete _shadowMap;
 }
 
-void RenderingEngine::SetActorReference(std::vector<Core::Actor*>* actors) {
+void RenderingEngine::SetActorReference(std::vector<std::shared_ptr<Core::Actor>>* actors) {
 	_actors = actors;
 }
 
@@ -165,7 +165,7 @@ void RenderingEngine::Draw() {
 	}
 
 	_shadowCascadeBounds[0] = _camera->GetNear();
-	_shadowCascadeBounds[3] = _camera->GetFar();
+	_shadowCascadeBounds[3] = _camera->GetFar() / 2;
 
 	//glFinish();
 	_preTime += frameTimer.LoopMS();
@@ -275,7 +275,9 @@ void RenderingEngine::Draw() {
 
 		_pbrShader->SetUniform("PreintegratedFG", 5);
 		_pbrShader->SetUniform("EnvironmentMap", 6);
-		_environmentMap->Bind(6);
+		if (_environmentMap.IsLoaded()) {
+			_environmentMap->Bind(6);
+		}
 		_preFG->Bind(5);
 
 		for (Light* l : _lights) {
@@ -373,9 +375,9 @@ void RenderingEngine::Draw() {
 		if(_debugMode == 4) DrawGuiQuad(Transform(vec3(0.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _gbuffer, 3);
 		
 		if (_shadowMap[0]) {
-			//if (_debugMode == 3) DrawGuiQuad(Transform(vec3(2.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _shadowMap[0], 0);
-			//if (_debugMode == 2) DrawGuiQuad(Transform(vec3(2.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _shadowMap[1], 0);
-			if(_debugMode == 5) DrawGuiQuad(Transform(vec3(2.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _shadowMap[2], 0);
+			if (_debugMode == 5) DrawGuiQuad(Transform(vec3(2.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _shadowMap[0], 0);
+			//if (_debugMode == 5) DrawGuiQuad(Transform(vec3(2.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _shadowMap[1], 0);
+			//if(_debugMode == 5) DrawGuiQuad(Transform(vec3(2.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _shadowMap[2], 0);
 		}
 		
 		if (_debugMode == 6) DrawGuiQuad(Transform(vec3(2.5, 1.5, 0.0), vec3(0.5, 0.5, 1)), _ssaoBuffer, 0);
@@ -553,7 +555,7 @@ void RenderingEngine::GenerateShadowMaps() {
 	for (i32 i = 0; i < SHADOW_NUM_CASCADES; i++) {
 		if (_shadowMap[i]) delete _shadowMap[i];
 
-		_shadowMap[i] = new Texture(vec2i(_shadowMapSize), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::RG32, 0, TextureDataFormat::Float);
+		_shadowMap[i] = new Texture(vec2i(_shadowMapSize), TextureType::Texture2D, TextureFilter::Linear, TextureAttachment::Color0, TextureFormat::R32, 0, TextureDataFormat::Float);
 	}
 }
 
@@ -632,21 +634,21 @@ void RenderingEngine::SetSSAOSetting(SSAOSetting setting) {
 }
 
 void RenderingEngine::Update() {
-	if (Keyboard::IsKeyPressed(Key::One) && !_debugUI) {
-		_debugUI = new Actor();
+	if (Keyboard::IsKeyPressed(Key::Four) && !_debugUI) {
+		_debugUI = std::make_shared<Actor>();
 
-		Actor* bar1 = new Actor(Transform(vec3(110, 120, 0), vec3(200, 30, 1)));
-		Actor* bar2 = new Actor(Transform(vec3(110, 170, 0), vec3(200, 30, 1)));
+		std::shared_ptr<Actor> bar1 = std::make_shared<Actor>(Transform(vec3(110, 120, 0), vec3(200, 30, 1)));
+		std::shared_ptr<Actor> bar2 = std::make_shared<Actor>(Transform(vec3(110, 170, 0), vec3(200, 30, 1)));
 		
-		bar1->AddComponent(new UITweakBar(_camera->GetNear(), _camera->GetFar(), testFont));
-		bar2->AddComponent(new UITweakBar(_camera->GetNear(), _camera->GetFar(), testFont));
+		bar1->AddComponent(std::make_shared<UITweakBar>(_camera->GetNear(), _camera->GetFar(), testFont));
+		bar2->AddComponent(std::make_shared<UITweakBar>(_camera->GetNear(), _camera->GetFar(), testFont));
 
 		_debugUI->AddChild(bar1);
 		_debugUI->AddChild(bar2);
 		_actors->push_back(_debugUI);
-	} else if (Keyboard::IsKeyPressed(Key::One) && _debugUI) {
+	} else if (Keyboard::IsKeyPressed(Key::Four) && _debugUI) {
 		_debugUI->Kill();
-		delete _debugUI;
+		//delete _debugUI;
 		_debugUI = 0;
 	}
 

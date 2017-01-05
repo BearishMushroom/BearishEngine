@@ -9,17 +9,18 @@ Actor::Actor(Transform transform, AABB bounds) {
 	_transform = transform;
 	_bounds = bounds;
 	_alive = true;
+	_parent = 0;
 }
 
 Actor::~Actor() {
-	for (i32 i = 0; i < (i32)_children.size(); i++) {
-		delete _children.at(i);
-	}
+	//for (i32 i = 0; i < (i32)_children.size(); i++) {
+	//	delete _children.at(i);
+	//}
 	_children.clear();
 
-	for (i32 i = 0; i < (i32)_components.size(); i++) {
-		delete _components.at(i);
-	}
+	//for (i32 i = 0; i < (i32)_components.size(); i++) {
+	//	delete _components.at(i);
+	//}
 	_components.clear();
 }
 
@@ -170,8 +171,8 @@ vec3 Actor::GetScale() {
 	return _transform.GetScale();
 }
 
-std::vector<IActorComponent*> Actor::GetComponents(string id) {
-	std::vector<IActorComponent*> result;
+std::vector<std::shared_ptr<IActorComponent>> Actor::GetComponents(string id) {
+	std::vector<std::shared_ptr<IActorComponent>> result;
 
 	for (auto& c : _components) {
 		if (c->GetID() == id) {
@@ -182,7 +183,7 @@ std::vector<IActorComponent*> Actor::GetComponents(string id) {
 	return result;
 }
 
-void Actor::AddChild(Actor* child) {
+void Actor::AddChild(std::shared_ptr<Actor> child) {
 	_children.push_back(child);
 	child->SetParent(this);
 }

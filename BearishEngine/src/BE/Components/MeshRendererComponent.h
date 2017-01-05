@@ -8,20 +8,21 @@
 #include <BE/Graphics/Mesh/Mesh.h>
 #include <BE/Types.h>
 #include <BE/Graphics/Material.h>
+#include <BE\Core\Resource.h>
 
 namespace Bearish { namespace Components {
 	class BEARISH_API MeshRendererComponent : public Core::IActorComponent, public Core::IAllocatable<MeshRendererComponent> {
 	public:
-		MeshRendererComponent(Graphics::Mesh* mesh, Graphics::Material* material);
+		MeshRendererComponent(Core::Resource<Graphics::Mesh> mesh = Core::Resource<Graphics::Mesh>(), Graphics::Material* material = 0);
 		~MeshRendererComponent();
 
 		virtual void Draw(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) override;
 
 		virtual Math::vec3 GetBounds() override {
-			return _mesh->GetExtremes();
+			return _mesh.IsLoaded() ? _mesh->GetExtremes() : Math::vec3(0);
 		}
 	private:
-		Graphics::Mesh* _mesh;		
+		Core::Resource<Graphics::Mesh> _mesh;		
 		Graphics::Material* _material;
 	};
 

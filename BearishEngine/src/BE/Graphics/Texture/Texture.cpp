@@ -7,6 +7,13 @@ using namespace Graphics;
 using namespace Math;
 using namespace Core;
 
+Texture::Texture(BET::BETFile* file, const TextureType type, const TextureFormat format, const TextureFilter filter) {
+	_filter = filter;
+	_wrap = TextureWrapMode::Repeat;
+	_dataFormats = std::vector<TextureDataFormat>{ TextureDataFormat::Byte };
+	Load(file, type, format);
+}
+
 Texture::Texture(const string filename, const TextureType type, const TextureFormat format, const TextureFilter filter) {
 	_filter = filter;
 	_wrap = TextureWrapMode::Repeat;
@@ -70,6 +77,17 @@ Texture::Texture(const string posX, const string negX, const string posY, const 
 	Load(posX, negX, posY, negY, posZ, negZ);
 }
 
+Texture::Texture(BET::BETFile* posX, BET::BETFile* negX, BET::BETFile* posY, BET::BETFile* negY, BET::BETFile* posZ, BET::BETFile* negZ, const TextureFormat format, const TextureFilter filter) {
+	_formats = std::vector<TextureFormat>{ format };
+	_type = TextureType::CubeMap;
+	_filter = filter;
+	_dataFormats = std::vector<TextureDataFormat>{ TextureDataFormat::Byte };
+	_multisamples = 0;
+	_wrap = TextureWrapMode::Repeat;
+
+	Load(posX, negX, posY, negY, posZ, negZ);
+}
+
 Texture::Texture(const vec4& color) {
 	u8* data = new u8[4] {
 		(u8)(color.r * 255.f), (u8)(color.g * 255.f), (u8)(color.b * 255.f), (u8)(color.a * 255.f)
@@ -119,7 +137,7 @@ void Texture::Load(const string filename, const TextureType type, TextureFormat 
 	Timer time;
 	time.Start();
 	_type = type;
-	_formats = std::vector<TextureFormat> { format };
+	_formats = std::vector<TextureFormat>{ format };
 	_filename = filename;
 
 	BET::BETFile file;
@@ -131,6 +149,16 @@ void Texture::Load(const string filename, const TextureType type, TextureFormat 
 
 	free(file.data);
 	Logger::Info("Texture %s loaded in %.3fms", filename.c_str(), time.DeltaMS());
+}
+
+void Texture::Load(BET::BETFile* file, const TextureType type, TextureFormat format) {
+	_type = type;
+	_formats = std::vector<TextureFormat>{ format };
+	_filename = "";
+
+	_size = vec2i(file->width, file->height);
+
+	InitTextures(type, std::vector<TextureFormat> { format }, &file->data);
 }
 
 void Texture::Load(const string posX, const string negX, const string posY, const string negY, const string posZ, const string negZ) {
@@ -169,6 +197,37 @@ void Texture::Load(const string posX, const string negX, const string posY, cons
 	Logger::Info("Cubemap %s loaded in %.3fms", posX.c_str(), time.DeltaMS());
 }
 
+void Texture::Load(BET::BETFile* posX, BET::BETFile* negX, BET::BETFile* posY, BET::BETFile* negY, BET::BETFile* posZ, BET::BETFile* negZ) {
+	Timer time;
+	time.Start();
+	std::vector<BET::BETFile*> images {
+		posX, negX, posY, negY, posZ, negZ
+	};
+
+	_ids = new u32;
+	glGenTextures(1, _ids);
+	_numTextures = 1;
+	//Bind(0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, _ids[0]);
+
+	for (i32 i = 0; i < 6; i++) {
+		_size = vec2i(images[i]->width, images[i]->height);
+
+		InitCubeMapFace(CubeMapFaces[i], images[i]->data);
+	}
+
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	glTexParameteri((GLenum)_type, GL_TEXTURE_MAG_FILTER, (GLenum)_filter);
+	glTexParameteri((GLenum)_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	glTexParameteri((GLenum)_type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri((GLenum)_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri((GLenum)_type, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	Unbind(0);
+	Logger::Info("Cubemap loaded in %.3fms", time.DeltaMS());
+}
+
 void Texture::Unload() {
 	glDeleteTextures(_numTextures, _ids);
 	_type = (TextureType)0;
@@ -204,7 +263,7 @@ void Texture::InitTextures(const TextureType type, std::vector<TextureFormat> fo
 				glTexParameteri((GLenum)_type, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 				glTexParameteri((GLenum)_type, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 			}
-			else if (formats[i] != TextureFormat::RG32) {
+			else if (formats[i] != TextureFormat::RG32 && formats[i] != TextureFormat::R32) {
 				glGenerateMipmap((GLenum)_type);
 			}
 			else {

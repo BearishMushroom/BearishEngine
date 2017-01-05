@@ -3,6 +3,9 @@ export class FreeLookComponent
     @divisor = 100
     @id = "FreeLook"
 
+  Serialize: =>
+    {"sensitivity"}
+
   Init: =>
     Mouse.LockToCentre!
 

@@ -26,7 +26,7 @@ namespace Bearish { namespace Core {
 		static void Initialize();
 
 		template<typename TIn, typename TOut>
-		static std::future<TOut> AddJob(Action<TIn*, TOut*> fn, TIn params) {
+		static std::future<TOut> AddJob(Action<TIn*, TOut*> fn, TIn params, Action<> end = []() {}) {
 			std::future<TOut> fut;
 			try {
 				auto p = Shared<std::promise<TOut>>(new std::promise<TOut>);
@@ -44,6 +44,7 @@ namespace Bearish { namespace Core {
 				job.in = malloc(sizeof(TIn));
 				memcpy(job.in, &params, sizeof(TIn));
 				job.out = malloc(sizeof(TOut));
+				job.onEnd = end;
 
 				_queue.Push(job);
 			}
@@ -55,7 +56,7 @@ namespace Bearish { namespace Core {
 		}
 
 		template<typename TIn>
-		static void AddJob(Action<TIn*> fn, TIn params) {
+		static void AddJob(Action<TIn*> fn, TIn params, Action<> end = []() {}) {
 			Job job;
 			job.function = [fn](void* in, void* out) -> void {
 				fn((TIn*)in);
@@ -64,26 +65,30 @@ namespace Bearish { namespace Core {
 			job.in = malloc(sizeof(TIn));
 			memcpy(job.in, &params, sizeof(TIn));
 			job.out = 0;
+			job.onEnd = end;
 
 			_queue.Push(job);
 		}
 
-		static void AddJob(Action<> fn);
+		static void AddJob(Action<> fn, Action<> end = [](){});
 
 		static void Terminate();
 		
+		static void Update();
+
 		struct Job {
 			Action<void*, void*> function;
 			void* in, *out;
+			Action<> onEnd;
 		};
 	private:
-
 		static void DoWork();
 
 		static std::atomic<bool> _active;
 		static i32 _numWorkers;
 		static std::vector<std::thread> _workers;
 		static ConcurrentQueue<Job> _queue;
+		static ConcurrentQueue<Action<>> _done;
 	};
 } }
 

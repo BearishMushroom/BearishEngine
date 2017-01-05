@@ -1,6 +1,7 @@
 #ifndef _BEARISH_CORE_ACTOR_H_
 #define _BEARISH_CORE_ACTOR_H_
 
+#include <BE/Serialization/Serialization.h>
 #include <BE/Graphics/Shader.h>
 #include <BE/Graphics/Camera.h>
 #include <BE\Core\IActorComponent.h>
@@ -11,13 +12,13 @@
 #include <BE\Core\AABB.h>
 
 namespace Bearish { namespace Core {
-	class BEARISH_API Actor : public IAllocatable<Actor> {
+	class BEARISH_API Actor /*: public IAllocatable<Actor>*/ {
 	public:
 		Actor(Transform transform = Transform(), AABB bounds = AABB());
 		~Actor();
 
 		template<typename T>
-		T* AddComponent(T* component) {
+		std::shared_ptr<T> AddComponent(std::shared_ptr<T> component) {
 			component->SetParent(this);
 			_components.push_back(component);
 			component->Init();
@@ -26,17 +27,17 @@ namespace Bearish { namespace Core {
 		}
 
 		template<typename T>
-		T* AddComponent() {
-			T* toAdd = new T;
+		std::shared_ptr<T> AddComponent() {
+			std::shared_ptr<T> toAdd = std::make_shared<T>;
 			AddComponent(toAdd);
 			return toAdd;
 		}
 
 		template<typename T>
-		std::vector<T*> GetComponents() {
-			std::vector<T*> result;
+		std::vector<std::shared_ptr<T>> GetComponents() {
+			std::vector<std::shared_ptr<T>> result;
 			for (auto& c : _components) {
-				T* component = dynamic_cast<T*>(c);
+				std::shared_ptr<T> component = std::dynamic_pointer_cast<T>(c);
 
 				if (component) {
 					result.push_back(component);
@@ -47,12 +48,12 @@ namespace Bearish { namespace Core {
 		}
 
 		template<typename T>
-		T* GetComponent() {
+		std::shared_ptr<T> GetComponent() {
 			return GetComponents<T>().at(0);
 		}
 
-		std::vector<IActorComponent*> GetComponents(string id);
-		std::vector<Actor*> GetChildren() { return _children; }
+		std::vector<std::shared_ptr<IActorComponent>> GetComponents(string id);
+		std::vector<std::shared_ptr<Actor>> GetChildren() { return _children; }
 
 		void Trigger(string id, void* data);
 
@@ -78,19 +79,34 @@ namespace Bearish { namespace Core {
 		bool HasParent() const { return !(_parent == nullptr); }
 
 		void SetParent(Actor* const parent);
-		void AddChild(Actor* child);
+		void AddChild(std::shared_ptr<Actor> child);
 
 		bool IsDead() { return !_alive; }
 		void Kill() { _alive = false; }
 
 		const AABB& GetBounds() const { return _bounds; }
+
+		template<typename Archive>
+		void save(Archive& ar) const {
+			ar(CEREAL_NVP(_transform), CEREAL_NVP(_children), CEREAL_NVP(_components));
+		}
+
+		template<typename Archive>
+		void load(Archive& ar) {
+			ar(_transform, _children, _components);
+			for (auto& component : _components) {
+				component->SetParent(this);
+				component->Init();
+				_bounds.Fit(component->GetBounds());
+			}
+		}
 	private:
 		bool _alive;
-		std::vector<IActorComponent*> _components;
+		Actor* _parent;
 		Transform _transform;
 		AABB _bounds;
-		Actor* _parent;
-		std::vector<Actor*> _children;
+		std::vector<std::shared_ptr<Actor>> _children;
+		std::vector<std::shared_ptr<IActorComponent>> _components;
 	};
 } }
 

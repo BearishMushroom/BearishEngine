@@ -8,11 +8,47 @@
 
 #include <BE/Types.h>
 #include <BE/Core/Logger.h>
+#include <BE/Serialization/Serialization.h>
 
 #include <lua.hpp>
 #include <luabind\luabind.hpp>
 
 namespace Bearish { namespace Scripting {
+	struct LuaValue {
+		LuaValue() {}
+		~LuaValue() {}
+
+		LuaValue(const LuaValue& o) {
+			name = o.name;
+			type = o.type;
+			if (type == LUA_TBOOLEAN)
+				boolean = o.boolean;
+			if (type == LUA_TNUMBER)
+				number = o.number;
+			if (type == LUA_TSTRING)
+				str = o.str;
+		}
+
+		string name;
+		u8 type;
+		union {
+			u8 boolean;
+			f64 number;
+			string str;
+		};
+
+		template<typename Archive>
+		void serialize(Archive& ar) {
+			ar(CEREAL_NVP(name), CEREAL_NVP(type));
+			if (type == LUA_TBOOLEAN)
+				ar(boolean);
+			if (type == LUA_TNUMBER)
+				ar(number);
+			if (type == LUA_TSTRING)
+				ar(str);
+		}
+	};
+
 	class BEARISH_API LuaObject {
 	public:
 		LuaObject() {}
@@ -48,12 +84,48 @@ namespace Bearish { namespace Scripting {
 			return luabind::object_cast<T>(luabind::rawget(_self, name));
 		}
 
+		inline LuaValue Get(string name) {
+			LuaValue ret;
+			ret.name = name;
+			auto val = _self[name.c_str()];
+			if (luabind::type(val) == LUA_TNUMBER) {
+				ret.type = LUA_TNUMBER;
+				ret.number = luabind::object_cast<f64>(val);
+			}
+			else if (luabind::type(val) == LUA_TBOOLEAN) {
+				ret.type = LUA_TBOOLEAN;
+				ret.boolean = luabind::object_cast<bool>(val);
+			}
+			else if (luabind::type(val) == LUA_TSTRING) {
+				ret.type = LUA_TSTRING;
+				ret.str = luabind::object_cast<string>(val);
+			}
+			else {
+				ret.type = LUA_TNIL;
+			}
+
+			return ret;
+		}
+
+		inline void Set(LuaValue val) {
+			if (val.type == LUA_TNUMBER) {
+				_self[val.name] = val.number;
+			}
+			if (val.type == LUA_TBOOLEAN) {
+				_self[val.name] = val.boolean;
+			}
+			if (val.type == LUA_TSTRING) {
+				_self[val.name] = val.str;
+			}
+		}
+
 		inline bool Valid() {
 			return _self.interpreter() && luabind::type(_self) != LUA_TNIL;
 		}
 	private:
 		luabind::object _self;
 	};
+
 
 	static lua_State* L;
 	static luabind::adl::object moonToLua, moonDoFile;

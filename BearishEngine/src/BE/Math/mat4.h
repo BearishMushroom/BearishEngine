@@ -367,7 +367,7 @@ namespace Bearish { namespace Math {
 
 		template<class Archive>
 		void serialize(Archive& ar) {
-			ar(_flat);
+			ar(CEREAL_NVP(_flat));
 		}
 	};
 
@@ -387,14 +387,6 @@ namespace Bearish { namespace Math {
 			__m128 add1 = _mm_add_ps(mul1, mul2);
 			__m128 add2 = _mm_add_ps(mul3, mul4);
 			__m128 row = _mm_add_ps(add1, add2);
-
-			//__m128 row = _mm_add_ps(
-			//	_mm_add_ps(
-			//		_mm_mul_ps(brod1, o._rows[0]),
-			//		_mm_mul_ps(brod2, o._rows[1])),
-			//	_mm_add_ps(
-			//		_mm_mul_ps(brod3, o._rows[2]),
-			//		_mm_mul_ps(brod4, o._rows[3])));
 			result._rows[i] = row;
 		}
 

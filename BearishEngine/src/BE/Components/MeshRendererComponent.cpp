@@ -5,8 +5,9 @@
 using namespace Bearish;
 using namespace Components;
 using namespace Graphics;
+using namespace Core;
 
-MeshRendererComponent::MeshRendererComponent(Graphics::Mesh* mesh, Graphics::Material* material) {
+MeshRendererComponent::MeshRendererComponent(Resource<Mesh> mesh, Graphics::Material* material) {
 	_mesh = mesh;
 	_id = "MeshRenderer";
 	_material = material;
@@ -15,9 +16,11 @@ MeshRendererComponent::MeshRendererComponent(Graphics::Mesh* mesh, Graphics::Mat
 MeshRendererComponent::~MeshRendererComponent() { }
 
 void MeshRendererComponent::Draw(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) {
-	auto trans = _actor->GetTransform().GetTransformation();
-	_mesh->Submit(&_actor->GetTransform(), trans, camera);
-	renderer->Submit(_mesh, _material);
+	if (_mesh.IsLoaded()) {
+		auto trans = _actor->GetTransform().GetTransformation();
+		_mesh->Submit(&_actor->GetTransform(), trans, camera);
+		renderer->Submit(_mesh.Get(), _material);
+	}
 }
 
 AnimatedMeshRendererComponent::AnimatedMeshRendererComponent(string name, f32 speed, Graphics::Mesh* mesh, Graphics::Material* material) {

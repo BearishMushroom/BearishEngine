@@ -6,6 +6,7 @@
 #include <BE/Math/vec4.h>
 #include <BE/Types.h>
 #include <BE/Graphics/OpenGL.h>
+#include <BETFile.h>
 
 namespace Bearish { namespace Graphics {
 	enum class TextureType : u32 {
@@ -64,6 +65,9 @@ namespace Bearish { namespace Graphics {
 
 	class BEARISH_API Texture : public Core::IAllocatable<Texture> {
 	public:
+		Texture(Core::BET::BETFile* file, const TextureType type = TextureType::Texture2D,
+				const TextureFormat format = TextureFormat::RGBA, const TextureFilter filter = TextureFilter::Linear);
+
 		Texture(const string filename, const TextureType type = TextureType::Texture2D, 
 				const TextureFormat format = TextureFormat::RGBA, const TextureFilter filter = TextureFilter::Linear);
 
@@ -77,7 +81,10 @@ namespace Bearish { namespace Graphics {
 		Texture(const Math::vec2i size, const TextureType type, std::vector<TextureAttachment> attachments, std::vector<TextureFormat> formats, u32 num, 
 				const TextureFilter filter = TextureFilter::Nearest, i32 multisamples = 0);
 
-		Texture(const string posX, const string negX, const string posY, const string negY, const string posZ, const string negZ, 
+		Texture(const string posX, const string negX, const string posY, const string negY, const string posZ, const string negZ,
+			const TextureFormat format = TextureFormat::RGBA, const TextureFilter filter = TextureFilter::Nearest);
+
+		Texture(Core::BET::BETFile* posX, Core::BET::BETFile* negX, Core::BET::BETFile* posY, Core::BET::BETFile* negY, Core::BET::BETFile* posZ, Core::BET::BETFile* negZ,
 			const TextureFormat format = TextureFormat::RGBA, const TextureFilter filter = TextureFilter::Nearest);
 
 		Texture(const Math::vec4& color);
@@ -87,7 +94,11 @@ namespace Bearish { namespace Graphics {
 		~Texture();
 
 		void Load(const string filename, const TextureType type, TextureFormat format);
+		void Load(Core::BET::BETFile* file, const TextureType type, TextureFormat format);
+
 		void Load(const string posX, const string negX, const string posY, const string negY, const string posZ, const string negZ);
+		void Load(Core::BET::BETFile* posX, Core::BET::BETFile* negX, Core::BET::BETFile* posY, Core::BET::BETFile* negY, Core::BET::BETFile* posZ, Core::BET::BETFile* negZ);
+
 		void Unload();
 
 		void InitCubeMapFace(const i32 face, const u8* data);

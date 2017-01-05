@@ -1,5 +1,11 @@
 export class UILabel
   new: (@font, @text, @scale) =>
+    @id = "UILabel"
+
+  Serialize: =>
+    {"mesh", "text", "scale", "font"}
+
+  Init: =>
     @mesh = @font\GenerateMesh @text, @scale
 
   Draw2D: (renderer, shader, camera) =>

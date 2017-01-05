@@ -25,6 +25,11 @@ namespace Bearish { namespace Core {
 			return val;
 		}
 
+		bool Empty() {
+			std::unique_lock<std::mutex> mlock(_mutex);
+			return _queue.empty();
+		}
+
 		void Push(const T& item) {
 			std::unique_lock<std::mutex> mlock(_mutex);
 			_queue.push(item);

@@ -14,7 +14,6 @@ namespace Bearish { namespace Components {
 		UIPanel(Graphics::Texture* texture) : _texture(texture), _mesh(Graphics::Mesh::CreateQuad()) {}
 		~UIPanel() {
 			delete _mesh;
-			delete _texture;
 		}
 
 		virtual void Draw2D(Graphics::RenderingEngine* renderer, Graphics::Shader* shader, Graphics::Camera* camera) override {

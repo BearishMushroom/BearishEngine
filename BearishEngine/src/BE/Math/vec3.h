@@ -57,7 +57,8 @@ namespace Bearish { namespace Math {
 			this->z = z;
 		}
 
-		vec3_t(const vec3_t& other) {
+		template<typename C>
+		vec3_t(const vec3_t<C>& other) {
 			this->x = (T)other.x;
 			this->y = (T)other.y;
 			this->z = (T)other.z;
@@ -246,7 +247,7 @@ namespace Bearish { namespace Math {
 
 		template<class Archive>
 		void serialize(Archive& ar) {
-			ar(x, y, z);
+			ar(CEREAL_NVP(x), CEREAL_NVP(y), CEREAL_NVP(z));
 		}
 	};
 

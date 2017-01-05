@@ -9,6 +9,7 @@
 #include <BE/Math/mat4.h>
 
 #include <BE/Core/IActorComponent.h>
+#include <BE/Core/ResourceManager.h>
 #include <BE/Core/BlockAllocator.h>  
 #include <BE/Core/IAllocatable.h>
 #include <BE/Core/ButtonState.h>
@@ -17,6 +18,7 @@
 #include <BE/Core/Keyboard.h>
 #include <BE/Core/Callback.h>
 #include <BE/Core/Settings.h>
+#include <BE/Core/Resource.h>
 #include <BE/Core/Logger.h>
 #include <BE/Core/Asset.h>
 #include <BE/Core/Model.h>
@@ -65,14 +67,16 @@
 #include <BE/Components/SkyboxComponent.h>
 #include <BE/Components/LightComponents.h>
 #include <BE/Components/CameraComponent.h>
+
 #include <BE/Components/UIDraggable.h>
 #include <BE/Components/UILineGraph.h>
+#include <BE/Components/UITweakBar.h>
 #include <BE/Components/UITextArea.h>
 #include <BE/Components/UIButton.h>
 #include <BE/Components/UIPanel.h>
 #include <BE/Components/UILabel.h>
 
-#include <BE/GUI/Win32WindowGLVIewport.h>
+#include <BE/GUI/Win32WindowGLViewport.h>
 #include <BE/GUI/Win32WindowComponent.h>
 #include <BE/GUI/Win32WindowMenuBar.h>
 #include <BE/GUI/Win32WindowSubMenu.h>

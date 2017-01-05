@@ -10,12 +10,22 @@
 *.fbx
 
 *.ttf
+*.xml
+*.bin
+*.json
+*~
+*.bemat
+*.lnk
+
+ipch/
+.vs/
 
 */Release/*
 */Debug/*
 
 WorkingCopy/*
-
+Build/
+Intermediates/
 
 /Release/*
 /Debug/*

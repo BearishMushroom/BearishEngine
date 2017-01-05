@@ -4,7 +4,7 @@
 #include "..\Types.h"
 #include <BE/Math/Math.h>
 
-#include <cereal\archives\json.hpp>
+#include <BE\Serialization\Serialization.h>
 
 namespace Bearish { namespace Math {
 	template<class T>
@@ -184,7 +184,7 @@ namespace Bearish { namespace Math {
 
 		template<class Archive>
 		void serialize(Archive& ar) {
-			ar(x, y);
+			ar(CEREAL_NVP(x), CEREAL_NVP(y));
 		}
 	};
 

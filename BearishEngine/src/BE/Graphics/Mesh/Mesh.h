@@ -52,6 +52,8 @@ namespace Bearish {
 		public:
 			static Mesh* CreateQuad(Math::vec4 texCoords = Math::vec4(0, 0, 1, 1), f32 scale = 1, bool winding = true);
 
+			Mesh() {}
+
 			Mesh(std::vector<Vertex>& vertices, std::vector<u32>& indices, bool calculateNormals = false);
 			Mesh(u32 numVertices, Math::vec3* positions, Math::vec2* texCoords, Math::vec3* normals, Math::vec3* tangents, Math::vec4i* boneids, 
 				 Math::vec4* boneweights, u32 numIndices, u32* indices);

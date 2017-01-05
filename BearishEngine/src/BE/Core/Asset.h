@@ -7,7 +7,7 @@
 #include <unordered_map>
 
 namespace Bearish { namespace Core {
-	class BEARISH_API Resource {
+	class BEARISH_API ResourceMap {
 	public:
 		static std::unordered_map<string, string> _values;
 		static void LoadAssetDefinitions() {
@@ -64,7 +64,7 @@ namespace Bearish { namespace Core {
 		static string GetPath(string assetName) {
 			if (assetName.at(0) == '@') return assetName.substr(1);
 
-			return Resource::_values.at(assetName);
+			return ResourceMap::_values.at(assetName);
 		}
 	private:
 		Asset() {}

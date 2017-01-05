@@ -3,9 +3,11 @@ export class UIButton
     point.x >= rect.x and point.x <= rect.z and
       point.y <= rect.w and point.y >= rect.y
 
-  new: (@texture, @action) =>
-    @mesh = Mesh.CreateQuad vec4 0, 0, 1, 1
+  new: (@texture, @action = nil) =>
     @id = "UIButton"
+
+  Init: =>
+    @mesh = Mesh.CreateQuad vec4 0, 0, 1, 1
 
   FixedUpdate: =>
     offset = if @actor\HasParent! then @actor\GetParent!\GetTranslation! else vec3 0, 0, 0
@@ -17,7 +19,7 @@ export class UIButton
     rect = vec4 position.x - size.x / 2, position.y - size.y / 2, position.x + size.x / 2, position.y + size.y / 2
 
     if Mouse.IsButtonReleased(MouseButton.Left) and pointInVec4 rect, Mouse.GetPosition!
-      @action @
+      @action @ if @action
 
   Draw2D: (renderer, shader, camera) =>
     offset = if @actor\HasParent! then @actor\GetParent!\GetTransform!\GetTranslation! else vec3 0, 0, 0

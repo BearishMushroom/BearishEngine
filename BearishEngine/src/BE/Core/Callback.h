@@ -54,6 +54,10 @@ namespace Bearish { namespace Core {
 		template<class Fn>
 		Action(Fn func) { _functions.push_back(func); }
 
+		Action(const Action<Args...>& o) {
+			_functions = o._functions;
+		}
+
 		~Action() {}
 
 		inline void operator+= (Function func) {

@@ -7,6 +7,7 @@ std::atomic<bool>                JobFactory::_active;
 i32                              JobFactory::_numWorkers;
 std::vector<std::thread>         JobFactory::_workers;
 ConcurrentQueue<JobFactory::Job> JobFactory::_queue;
+ConcurrentQueue<Action<>>        JobFactory::_done;
 
 void JobFactory::Initialize() {
 	_active = true;
@@ -26,6 +27,7 @@ void JobFactory::DoWork() {
 				job.function(job.in, job.out);
 				if (job.in) free(job.in);
 				if (job.out) free(job.out);
+				_done.Push(job.onEnd);
 			}
 		}
 		catch (std::exception e) {
@@ -45,7 +47,7 @@ void JobFactory::Terminate() {
 	}
 }
 
-void JobFactory::AddJob(Action<> fn) {
+void JobFactory::AddJob(Action<> fn, Action<> end) {
 	Job job;
 	job.function = [fn](void* in, void* out) -> void {
 		fn();
@@ -53,6 +55,14 @@ void JobFactory::AddJob(Action<> fn) {
 
 	job.in = 0;
 	job.out = 0;
+	job.onEnd = end;
 
 	_queue.Push(job);
+}
+
+void JobFactory::Update() {
+	if (!_done.Empty()) {
+		Action<> todo = _done.Pop();
+		todo();
+	}
 }

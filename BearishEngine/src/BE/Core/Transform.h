@@ -6,6 +6,7 @@
 #include <BE/Math/quat.h>
 #include <BE/Math/mat4.h>
 #include <BE/Types.h>
+#include <BE/Serialization/Serialization.h>
 
 namespace Bearish {	namespace Core {
 	class BEARISH_API Transform : public IAllocatable<Transform> {
@@ -29,6 +30,11 @@ namespace Bearish {	namespace Core {
 		
 		Math::mat4 GetTransformation() const;
 		Math::mat4 GetCameraTransformation() const;
+
+		template <typename Archive>
+		void serialize(Archive& ar) {
+			ar(CEREAL_NVP(_translation), CEREAL_NVP(_scale), CEREAL_NVP(_rotation));
+		}
 	private:
 		Math::vec3 _translation;
 		Math::vec3 _scale;

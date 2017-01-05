@@ -1,9 +1,10 @@
+
 #include <Bearish.h>
 #include <vector>
 #include <crtdbg.h>
 #include <sstream>
 
-#include <BE/Components/UITweakBar.h>
+#include "src\BE\Util\SerialPort.h"
 
 using namespace Bearish;
 
@@ -14,29 +15,35 @@ using namespace Math;
 using namespace Util;
 using namespace Serilization;
 
+CEREAL_REGISTER_TYPE(MeshRendererComponent);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(IActorComponent, MeshRendererComponent);
+
 #define UPDATE_TIME 1.0 / 60.0
 
-Actor* object1 = new Actor(Transform(vec3( 0,    2, 0), vec3(0.1f)));
-Actor* object2 = new Actor(Transform(vec3( 1.5f, 2, 0), vec3(0.1f)));
-Actor* object3 = new Actor(Transform(vec3(-1.5f, 2, 0), vec3(0.1f)));
+std::shared_ptr<Actor> object1 = std::make_shared<Actor>(Transform(vec3( 0,    2, 0), vec3(0.1f)));
+std::shared_ptr<Actor> object2 = std::make_shared<Actor>(Transform(vec3( 1.5f, 2, 0), vec3(0.1f)));
+std::shared_ptr<Actor> object3 = std::make_shared<Actor>(Transform(vec3(-1.5f, 2, 0), vec3(0.1f)));
 
-Actor* player;
+std::shared_ptr<Actor> player;
 
-Actor* fpsCounter = new Actor(Transform(vec3(10, 40, -2)));
+std::shared_ptr<Actor> fpsCounter = std::make_shared<Actor>(Transform(vec3(10, 40, -2)));
 
-Actor* vertCounter = new Actor(Transform(vec3(1775, 925, -2)));
-Actor* faceCounter = new Actor(Transform(vec3(1775, 945, -2)));
-Actor* passCounter = new Actor(Transform(vec3(1775, 965, -2)));
-Actor* callCounter = new Actor(Transform(vec3(1775, 985, -2)));
+std::shared_ptr<Actor> vertCounter = std::make_shared<Actor>(Transform(vec3(1775, 925, -2)));
+std::shared_ptr<Actor> faceCounter = std::make_shared<Actor>(Transform(vec3(1775, 945, -2)));
+std::shared_ptr<Actor> passCounter = std::make_shared<Actor>(Transform(vec3(1775, 965, -2)));
+std::shared_ptr<Actor> callCounter = std::make_shared<Actor>(Transform(vec3(1775, 985, -2)));
 
-std::vector<Actor*> actors;
+std::vector<std::shared_ptr<Actor>> actors;
 RenderingEngine renderer;
 
 
 Font* UI_FONT;
 
-Actor* UI_PANEL;
-Actor* UI_GRAPH;
+std::shared_ptr<Actor> UI_PANEL;
+std::shared_ptr<Actor> UI_GRAPH;
+Texture2D* UI_PANEL_TEX;
+Texture2D* UI_GRAPH_TEX;
+Texture2D* UI_BUTTON_TEX;
 
 bool PANEL_OPEN;
 
@@ -44,14 +51,15 @@ bool PANEL_OPEN;
 void Update() {
 	for (i32 i = 0; i < (i32)actors.size(); i++) {
 		if (actors.at(i)->IsDead()) {
-			Actor* todel = actors.at(i);
+			std::shared_ptr<Actor> todel = actors.at(i);
 
 			if (i < (i32)actors.size() - 1) {
-				actors.insert(actors.begin() + i, actors.at(actors.size() - 1));
+				*(actors.begin() + i) = actors.at(actors.size() - 1);
 			}
 
+
 			actors.resize(actors.size() - 1);
-			delete todel;
+			//delete todel;
 			todel = nullptr;
 			i--;
 			continue;
@@ -60,6 +68,8 @@ void Update() {
 		actors.at(i)->FixedUpdate();
 	}
 
+	JobFactory::Update();
+	ResourceManager::Update();
 	renderer.Update();
 
 	if (Keyboard::IsKeyPressed(Key::U)) {
@@ -109,129 +119,129 @@ void Update() {
 	if (Keyboard::IsKeyPressed(Key::L)) {
 		// DEBUG MENU CREATION!!!?!
 		if (!PANEL_OPEN) {
-			UI_GRAPH = new Actor(Transform(vec3(1920 - 150, 400, -1), vec3(300, 800, 1)));
-			UI_GRAPH->AddComponent(new UIPanel(new Texture2D(vec4(0.2, 0.2, 0.2, 0.65))));
+			UI_GRAPH = std::make_shared<Actor>(Transform(vec3(1920 - 150, 400, -1), vec3(300, 800, 1)));
+			UI_GRAPH->AddComponent(std::make_shared<UIPanel>(UI_GRAPH_TEX));
 
-			Actor* graph = new Actor(Transform(vec3(0, -300, 0), vec3(1, 0.25, 1)));
-			graph->AddComponent(new UILineGraph(0, 16, 60));
+			std::shared_ptr<Actor> graph = std::make_shared<Actor>(Transform(vec3(0, -300, 0), vec3(1, 0.25, 1)));
+			graph->AddComponent(std::make_shared<UILineGraph>(0, 16, 60));
 			UI_GRAPH->AddChild(graph);
 
-			Actor* graph2 = new Actor(Transform(vec3(0, -100, 0), vec3(1, 0.25, 1)));
-			graph2->AddComponent(new UILineGraph(0, 16, 60, vec4(1, 0.4, 0.4, 1)));
+			std::shared_ptr<Actor> graph2 = std::make_shared<Actor>(Transform(vec3(0, -100, 0), vec3(1, 0.25, 1)));
+			graph2->AddComponent(std::make_shared<UILineGraph>(0, 16, 60, vec4(1, 0.4, 0.4, 1)));
 			UI_GRAPH->AddChild(graph2);
 
-			Actor* graph3 = new Actor(Transform(vec3(0, 100, 0), vec3(1, 0.25, 1)));
-			graph3->AddComponent(new UILineGraph(0, 16, 60, vec4(0.4, 0.4, 1, 1)));
+			std::shared_ptr<Actor> graph3 = std::make_shared<Actor>(Transform(vec3(0, 100, 0), vec3(1, 0.25, 1)));
+			graph3->AddComponent(std::make_shared<UILineGraph>(0, 16, 60, vec4(0.4, 0.4, 1, 1)));
 			UI_GRAPH->AddChild(graph3);
 
-			Actor* graph4 = new Actor(Transform(vec3(0, 300, 0), vec3(1, 0.25, 1)));
-			graph4->AddComponent(new UILineGraph(0, 16, 60, vec4(1, 0.4, 1, 1)));
+			std::shared_ptr<Actor> graph4 = std::make_shared<Actor>(Transform(vec3(0, 300, 0), vec3(1, 0.25, 1)));
+			graph4->AddComponent(std::make_shared<UILineGraph>(0, 16, 60, vec4(1, 0.4, 1, 1)));
 			UI_GRAPH->AddChild(graph4);
 
-			Actor* glb1 = new Actor(Transform(vec3(-150, -386, 0)));
-			glb1->AddComponent(new IActorComponent("UILabel", *UI_FONT, "16ms", 18));
+			std::shared_ptr<Actor> glb1 = std::make_shared<Actor>(Transform(vec3(-150, -386, 0)));
+			glb1->AddComponent(std::make_shared<IActorComponent>("UILabel", *UI_FONT, "16ms", 18));
 			UI_GRAPH->AddChild(glb1);
 
-			Actor* glb2 = new Actor(Transform(vec3(-150, -200, 0)));
-			glb2->AddComponent(new IActorComponent("UILabel", UI_FONT, "0ms", 18));
+			std::shared_ptr<Actor> glb2 = std::make_shared<Actor>(Transform(vec3(-150, -200, 0)));
+			glb2->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "0ms", 18));
 			UI_GRAPH->AddChild(glb2);
 
-			Actor* glb3 = new Actor(Transform(vec3(-150, -186, 0)));
-			glb3->AddComponent(new IActorComponent("UILabel", UI_FONT, "16ms", 18));
+			std::shared_ptr<Actor> glb3 = std::make_shared<Actor>(Transform(vec3(-150, -186, 0)));
+			glb3->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "16ms", 18));
 			UI_GRAPH->AddChild(glb3);
 
-			Actor* glb4 = new Actor(Transform(vec3(-150, 0, 0)));
-			glb4->AddComponent(new IActorComponent("UILabel", UI_FONT, "0ms", 18));
+			std::shared_ptr<Actor> glb4 = std::make_shared<Actor>(Transform(vec3(-150, 0, 0)));
+			glb4->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "0ms", 18));
 			UI_GRAPH->AddChild(glb4);
 
-			Actor* glb5 = new Actor(Transform(vec3(-150, 14, 0)));
-			glb5->AddComponent(new IActorComponent("UILabel", UI_FONT, "16ms", 18));
+			std::shared_ptr<Actor> glb5 = std::make_shared<Actor>(Transform(vec3(-150, 14, 0)));
+			glb5->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "16ms", 18));
 			UI_GRAPH->AddChild(glb5);
 
-			Actor* glb6 = new Actor(Transform(vec3(-150, 200, 0)));
-			glb6->AddComponent(new IActorComponent("UILabel", UI_FONT, "0ms", 18));
+			std::shared_ptr<Actor> glb6 = std::make_shared<Actor>(Transform(vec3(-150, 200, 0)));
+			glb6->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "0ms", 18));
 			UI_GRAPH->AddChild(glb6);
 
-			Actor* glb7 = new Actor(Transform(vec3(-150, 214, 0)));
-			glb7->AddComponent(new IActorComponent("UILabel", UI_FONT, "16ms", 18));
+			std::shared_ptr<Actor> glb7 = std::make_shared<Actor>(Transform(vec3(-150, 214, 0)));
+			glb7->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "16ms", 18));
 			UI_GRAPH->AddChild(glb7);
 
-			Actor* glb8 = new Actor(Transform(vec3(-150, 400, 0)));
-			glb8->AddComponent(new IActorComponent("UILabel", UI_FONT, "0ms", 18));
+			std::shared_ptr<Actor> glb8 = std::make_shared<Actor>(Transform(vec3(-150, 400, 0)));
+			glb8->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "0ms", 18));
 			UI_GRAPH->AddChild(glb8);
 
-			UI_PANEL = new Actor(Transform(vec3(150, 540, -1), vec3(300, 1080, 1)));
-			UI_PANEL->AddComponent(new UIPanel(new Texture2D(vec4(0.2, 0.2, 0.2, 0.5))));
+			UI_PANEL = std::make_shared<Actor>(Transform(vec3(150, 540, -1), vec3(300, 1080, 1)));
+			UI_PANEL->AddComponent(std::make_shared<UIPanel>(UI_PANEL_TEX));
 
-			Actor* button1 = new Actor(Transform(vec3(0, -440, 1), vec3(260, 75, 1)));
-			button1->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			std::shared_ptr<Actor> button1 = std::make_shared<Actor>(Transform(vec3(0, -440, 1), vec3(260, 75, 1)));
+			button1->AddComponent(std::make_shared<UIButton>(UI_BUTTON_TEX, [](UIButton* self) {
 				renderer.SetDebugMode(0);
 			}));
-			Actor* label1 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			label1->AddComponent(new IActorComponent("UILabel", UI_FONT, "Full render", 48));
+			std::shared_ptr<Actor> label1 = std::make_shared<Actor>(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label1->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "Full render", 48));
 			button1->AddChild(label1);
 			UI_PANEL->AddChild(button1);
 
-			Actor* button2 = new Actor(Transform(vec3(0, -340, 1), vec3(260, 75, 1)));
-			button2->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			std::shared_ptr<Actor> button2 = std::make_shared<Actor>(Transform(vec3(0, -340, 1), vec3(260, 75, 1)));
+			button2->AddComponent(std::make_shared<UIButton>(UI_BUTTON_TEX, [](UIButton* self) {
 				renderer.SetDebugMode(1);
 			}));
-			Actor* label2 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			label2->AddComponent(new IActorComponent("UILabel", UI_FONT, "World", 48));
+			std::shared_ptr<Actor> label2 = std::make_shared<Actor>(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label2->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "World", 48));
 			button2->AddChild(label2);
 			UI_PANEL->AddChild(button2);
 
-			Actor* button3 = new Actor(Transform(vec3(0, -240, 1), vec3(260, 75, 1)));
-			button3->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			std::shared_ptr<Actor> button3 = std::make_shared<Actor>(Transform(vec3(0, -240, 1), vec3(260, 75, 1)));
+			button3->AddComponent(std::make_shared<UIButton>(UI_BUTTON_TEX, [](UIButton* self) {
 				renderer.SetDebugMode(4);
 			}));
-			Actor* label3 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			label3->AddComponent(new IActorComponent("UILabel", UI_FONT, "Specular", 48));
+			std::shared_ptr<Actor> label3 = std::make_shared<Actor>(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label3->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "Specular", 48));
 			button3->AddChild(label3);
 			UI_PANEL->AddChild(button3);
 
-			Actor* button4 = new Actor(Transform(vec3(0, -140, 1), vec3(260, 75, 1)));
-			button4->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			std::shared_ptr<Actor> button4 = std::make_shared<Actor>(Transform(vec3(0, -140, 1), vec3(260, 75, 1)));
+			button4->AddComponent(std::make_shared<UIButton>(UI_BUTTON_TEX, [](UIButton* self) {
 				renderer.SetDebugMode(3);
 			}));
-			Actor* label4 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			label4->AddComponent(new IActorComponent("UILabel", UI_FONT, "Diffuse", 48));
+			std::shared_ptr<Actor> label4 = std::make_shared<Actor>(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label4->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "Diffuse", 48));
 			button4->AddChild(label4);
 			UI_PANEL->AddChild(button4);
 
-			Actor* button5 = new Actor(Transform(vec3(0, -40, 1), vec3(260, 75, 1)));
-			button5->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			std::shared_ptr<Actor> button5 = std::make_shared<Actor>(Transform(vec3(0, -40, 1), vec3(260, 75, 1)));
+			button5->AddComponent(std::make_shared<UIButton>(UI_BUTTON_TEX, [](UIButton* self) {
 				renderer.SetDebugMode(2);
 			}));
-			Actor* label5 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			label5->AddComponent(new IActorComponent("UILabel", UI_FONT, "Normal XY", 48));
+			std::shared_ptr<Actor> label5 = std::make_shared<Actor>(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label5->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "Normal XY", 48));
 			button5->AddChild(label5);
 			UI_PANEL->AddChild(button5);
 
-			Actor* button6 = new Actor(Transform(vec3(0, 60, 1), vec3(260, 75, 1)));
-			button6->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			std::shared_ptr<Actor> button6 = std::make_shared<Actor>(Transform(vec3(0, 60, 1), vec3(260, 75, 1)));
+			button6->AddComponent(std::make_shared<UIButton>(UI_BUTTON_TEX, [](UIButton* self) {
 				renderer.SetDebugMode(5);
 			}));
-			Actor* label6 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			label6->AddComponent(new IActorComponent("UILabel", UI_FONT, "Shadow", 48));
+			std::shared_ptr<Actor> label6 = std::make_shared<Actor>(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label6->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "Shadow", 48));
 			button6->AddChild(label6);
 			UI_PANEL->AddChild(button6);
 
-			Actor* button7 = new Actor(Transform(vec3(0, 160, 1), vec3(260, 75, 1)));
-			button7->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			std::shared_ptr<Actor> button7 = std::make_shared<Actor>(Transform(vec3(0, 160, 1), vec3(260, 75, 1)));
+			button7->AddComponent(std::make_shared<UIButton>(UI_BUTTON_TEX, [](UIButton* self) {
 				renderer.SetDebugMode(6);
 			}));
-			Actor* label7 = new Actor(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
-			label7->AddComponent(new IActorComponent("UILabel", UI_FONT, "SSAO", 48));
+			std::shared_ptr<Actor> label7 = std::make_shared<Actor>(Transform(vec3(-120, 20, 10), vec3(1, 1, 1)));
+			label7->AddComponent(std::make_shared<IActorComponent>("UILabel", UI_FONT, "SSAO", 48));
 			button7->AddChild(label7);
 			UI_PANEL->AddChild(button7);
 
-			Actor* button8 = new Actor(Transform(vec3(0, 260, 1), vec3(260, 75, 1)));
-			button8->AddComponent(new UIButton(new Texture2D(vec4(0.15, 0.15, 0.15, 0.7)), [](UIButton* self) {
+			std::shared_ptr<Actor> button8 = std::make_shared<Actor>(Transform(vec3(0, 260, 1), vec3(260, 75, 1)));
+			button8->AddComponent(std::make_shared<UIButton>(UI_BUTTON_TEX, [](UIButton* self) {
 			}));
 
-			Actor* label8 = new Actor(Transform(vec3(0, 0, 10), vec3(1, 1, 1)));
-			label8->AddComponent(new UITextArea(vec2(240, 40), UI_FONT, 48));
+			std::shared_ptr<Actor> label8 = std::make_shared<Actor>(Transform(vec3(0, 0, 10), vec3(1, 1, 1)));
+			label8->AddComponent(std::make_shared<UITextArea>(vec2(240, 40), UI_FONT, 48));
 			button8->AddChild(label8);
 			UI_PANEL->AddChild(button8);
 
@@ -250,26 +260,16 @@ void Update() {
 
 std::map<std::string, std::function<void*()>> TypeFactory::_factories;
 
-struct Test {
-	int x;
-
-	void Save(Database& db) {
-		db.Start<Test>();
-		db.Push(x);
-		db.End();
-	}
-};
-
-BE_SERILIZATION_TYPE(i32);
-BE_SERILIZATION_TYPE(i64);
-BE_SERILIZATION_TYPE(f32);
-BE_SERILIZATION_TYPE(f64);
-BE_SERILIZATION_TYPE(Test);
-
 i32 main(i32 argc, c8** argv) {
 	//Database db("name");
-	//Test t = { 100 };
+	//Test t = { 100, "whooo" };
 	//t.Save(db);
+	//
+	//Test t2;
+	//db.Load();
+	//t2.Save(db);
+
+
 
 	Scripting::InitLua();
 	Scripting::RunFile("scr/lib/init.lua");
@@ -283,13 +283,10 @@ i32 main(i32 argc, c8** argv) {
 	GUI::Win32WindowMenuBar menu;
 
 	GUI::Win32WindowSubMenu file("&File");
-	file.AddChild(new GUI::Win32WindowSubMenuItem("&Do nothing", []() {}));
 	file.AddChild(new GUI::Win32WindowSubMenuItem("&Close", [&testwin]() { testwin.Close(); }));
 	menu.AddChild(&file);
 
 	GUI::Win32WindowSubMenu edit("&Edit");
-	edit.AddChild(new GUI::Win32WindowSubMenuItem("&This is an option", []() {}));
-	edit.AddChild(new GUI::Win32WindowSubMenuItem("&Olle suger", []() {}));
 	menu.AddChild(&edit);
 
 	testwin.AddComponent(&menu);
@@ -303,7 +300,7 @@ i32 main(i32 argc, c8** argv) {
 	Timer timer;
 	timer.Start();
 
-	Resource::LoadAssetDefinitions();
+	ResourceMap::LoadAssetDefinitions();
 
 	Scripting::RegisterMath();
 	Scripting::RegisterCore();
@@ -327,25 +324,31 @@ i32 main(i32 argc, c8** argv) {
 	f32 secondTimer = 0;
 
 	UI_FONT = new Font("res/Roboto.ttf");
+	UI_PANEL_TEX = new Texture2D(vec4(0.2, 0.2, 0.2, 0.5));
+	UI_GRAPH_TEX = new Texture2D(vec4(0.2, 0.2, 0.2, 0.65));
+	UI_BUTTON_TEX = new Texture2D(vec4(0.15, 0.15, 0.15, 0.7));
 
-	Mesh mesh = Asset<Model>::Get("man")->ToMesh();
-	Mesh mesh2 = Asset<Model>::Get("plane")->ToMesh();
-	
-	Texture2D* texture = Asset<Texture2D>::Get("bricks");
-	Texture2D* normalMap = Asset<Texture2D>::Get("bricksNormal");
+	Resource<Mesh> mesh = Resource<Mesh>::Get("man");
+	Resource<Mesh> mesh2 = Resource<Mesh>::Get("plane");
 
-	Texture2D* texture2 = Asset<Texture2D>::Get("defaultNormal");
+	Resource<Texture> texture = Resource<Texture>::Get("bricks2");
+	Resource<Texture> normalMap = Resource<Texture>::Get("bricks2Normal");
 
-	TextureCube* skybox = new TextureCube(Asset<string>::GetPath("right"), Asset<string>::GetPath("left"), Asset<string>::GetPath("top"),
-										  Asset<string>::GetPath("bottom"), Asset<string>::GetPath("front"), Asset<string>::GetPath("back"));
+	Resource<Texture> texture2 = Resource<Texture>::Get("defnorm");
 
-	Mesh cp1(mesh);
-	Mesh cp2(mesh);
-	Mesh cp3(mesh);
+	Resource<TextureCube> skybox = Resource<TextureCube>::Get("");
+
+	mesh.WaitForLoad();
+	Mesh cp1(*mesh.Get());
+	Mesh cp2(*mesh.Get());
+	Mesh cp3(*mesh.Get());
 	
 	Material dude("Dude", new Shader("res/phong.vert", "res/phong.frag"));
 	dude.Set("diffuse", texture2);
 	dude.Set("normalMap", texture2);
+	dude.Set("SpecularColor", vec3(1));
+	dude.Set("GglossColor", 1.f);
+
 
 	Material red("red", new Shader("res/phong.vert", "res/red.frag"));
 
@@ -354,22 +357,25 @@ i32 main(i32 argc, c8** argv) {
 	brickMaterial.Set("normalMap", normalMap);
 
 	Material pbrTest("PBR", new Shader("res/PBR.vert", "res/PBR.frag"));
-	pbrTest.Set("AlbedoColor", vec4(0.7, 0.7, 0.7, 1.0f));
-	pbrTest.Set("SpecularColor", vec3(0.2f));
-	pbrTest.Set("GlossColor", 0.25f);
-	pbrTest.Set("NormalMap", texture2);
-	pbrTest.Set("UsingNormalMap", 1.f);
+	pbrTest.Set("AlbedoColor", vec4(0, 0, 0, 1.0f));
+	pbrTest.Set("SpecularColor", vec3(0.1f));
+	pbrTest.Set("UsingNormalMap", 0.f);
+
+	Material* mat = new Material(pbrTest);
+	mat->Set("GlossColor", 1.f);
+	mat->Set("UsingGlossMap", 0.f);
+	mat->Set("UsingSpecularMap", 0.f);
 
 	renderer.SetPreFG(Asset<Texture2D>::Get("PreFG"));
-	renderer.SetEnvironmentMap(skybox);
+	//renderer.SetEnvironmentMap(skybox);
 
-	object1->AddComponent(new AnimatedMeshRendererComponent("animation", 0.5f, &cp1, &pbrTest));
-	object2->AddComponent(new AnimatedMeshRendererComponent("animation", 1.0f, &cp2, &pbrTest));
-	object3->AddComponent(new AnimatedMeshRendererComponent("animation", 2.0f, &cp3, &pbrTest));
-		   
-	object3->GetTransform().Rotate(vec3(1, 0, 0), AsRadians(-90.f));
-	object1->GetTransform().Rotate(vec3(1, 0, 0), AsRadians(-90.f));
-	object2->GetTransform().Rotate(vec3(1, 0, 0), AsRadians(-90.f));
+	//object1->AddComponent(new AnimatedMeshRendererComponent("animation", 0.5f, &cp1, mat));
+	//object2->AddComponent(new AnimatedMeshRendererComponent("animation", 1.0f, &cp2, mat));
+	//object3->AddComponent(new AnimatedMeshRendererComponent("animation", 2.0f, &cp3, mat));
+	//	   
+	//object3->GetTransform().Rotate(vec3(1, 0, 0), AsRadians(-90.f));
+	//object1->GetTransform().Rotate(vec3(1, 0, 0), AsRadians(-90.f));
+	//object2->GetTransform().Rotate(vec3(1, 0, 0), AsRadians(-90.f));
 
 	Shader::Set("PBR", new Shader("res/PBR.vert", "res/PBR.frag"));
 
@@ -377,7 +383,7 @@ i32 main(i32 argc, c8** argv) {
 	for (i32 i = 0; i < 10; i++) {
 		for (i32 j = 0; j < 10; j++) {
 			for (i32 k = 0; k < 5; k++) {
-				Actor* a = new Actor(Transform(vec3(3 + i * 1.5f, k * 1.5f, 3 + j * 1.5f), vec3(0.1f)));
+				std::shared_ptr<Actor> a = std::make_shared<Actor>(Transform(vec3(3 + i * 1.5f, k * 1.5f, 3 + j * 1.5f), vec3(0.1f)));
 				a->GetTransform().Rotate(vec3(1, 0, 0), AsRadians(-90.f));
 				a->AddComponent(new MeshRendererComponent(&mesh, &texture2));
 				actors.push_back(a);
@@ -386,56 +392,55 @@ i32 main(i32 argc, c8** argv) {
 	}
 #endif
 
-	fpsCounter->AddComponent(new UILabel(new Font("res/Roboto.ttf"), "FPS: 0", 48));
+	fpsCounter->AddComponent(std::make_shared<UILabel>(new Font("res/Roboto.ttf"), "FPS: 0", 48));
 	actors.push_back(fpsCounter);
 
-	vertCounter->AddComponent(new UILabel(new Font("res/Roboto.ttf"), "Verts: 0", 16));
+	vertCounter->AddComponent(std::make_shared<UILabel>(new Font("res/Roboto.ttf"), "Verts: 0", 16));
 	actors.push_back(vertCounter);
-	faceCounter->AddComponent(new UILabel(new Font("res/Roboto.ttf"), "Faces: 0", 16));
+	faceCounter->AddComponent(std::make_shared<UILabel>(new Font("res/Roboto.ttf"), "Faces: 0", 16));
 	actors.push_back(faceCounter);
-	passCounter->AddComponent(new UILabel(new Font("res/Roboto.ttf"), "Passes: 0", 16));
+	passCounter->AddComponent(std::make_shared<UILabel>(new Font("res/Roboto.ttf"), "Passes: 0", 16));
 	actors.push_back(passCounter);
-	callCounter->AddComponent(new UILabel(new Font("res/Roboto.ttf"), "Drawcalls: 0", 16));
+	callCounter->AddComponent(std::make_shared<UILabel>(new Font("res/Roboto.ttf"), "Drawcalls: 0", 16));
 	actors.push_back(callCounter);
 
-	player = new Actor(Transform(vec3(0, 0, 0)));
-	player->AddComponent(new SkyboxComponent(skybox));
+	player = std::make_shared<Actor>(Transform(vec3(0, 0, 0)));
+	player->AddComponent(std::make_shared<SkyboxComponent>(skybox));
 
-	player->AddComponent(new IActorComponent("CameraComponent"));
+	player->AddComponent(std::make_shared<IActorComponent>("CameraComponent"));
 
 	//player->AddComponent(new IActorComponent("EditorLookComponent"));
-	player->AddComponent(new IActorComponent("FreeLookComponent", 0.6f));
-	player->AddComponent(new IActorComponent("FreeMoveComponent", 1.0f / 6.0f));
+	player->AddComponent(std::make_shared<IActorComponent>("FreeLookComponent", 0.6f));
+	player->AddComponent(std::make_shared<IActorComponent>("FreeMoveComponent", 1.0f / 6.0f));
 	Mouse::FreeFromCentre();
 
-	for (auto x = 0; x < 10; x++) {
-		Material* mat = new Material(pbrTest);
-		f32 xx = x * 10.0f;
+	//for (auto x = 0; x < 10; x++) {
+	//	Material* mat = new Material(pbrTest);
+	//	f32 xx = x * 10.0f;
+	//
+	//	f32 roughness = x / 10.0f;
+	//	vec3 spec(1.0f);
+	//	vec4 diffuse(0.0f, 0.0f, 0.0f, 1.0f);
+	//
+	//	mat->Set("AlbedoColor", diffuse);
+	//	mat->Set("SpecularColor", spec);
+	//	mat->Set("GlossColor", 1.0f - roughness);
+	//
+	//	for (auto y = 0; y < 10; y++) {
+	//		std::shared_ptr<Actor> plane = std::make_shared<Actor>(Transform(vec3(x * 10.f, -2.5f, y * 10.f), vec3(5.f, 1.f, 5.f)));
+	//
+	//		plane->AddComponent(new MeshRendererComponent(&mesh2, &brickMaterial));
+	//		actors.push_back(plane);
+	//	}
+	//}
 
-		f32 roughness = x / 10.0f;
-		vec3 spec(1.0f);
-		vec4 diffuse(0.0f, 0.0f, 0.0f, 1.0f);
+	std::shared_ptr<Actor> dir = std::make_shared<Actor>(Transform(vec3(0, 0.f, 0), vec3(1.f), quat().CreateRotation(vec3(1.f, 0.f, 0.f), AsRadians(83.f))));
+	dir->AddComponent(std::make_shared<DirectionalLightComponent>(vec3(1.f), 0.1f, 0.2f));
 
-		mat->Set("AlbedoColor", diffuse);
-		mat->Set("SpecularColor", spec);
-		mat->Set("GlossColor", 1.0f - roughness);
-
-		for (auto y = 0; y < 10; y++) {
-			Actor* plane = new Actor(Transform(vec3(x * 10.f, -2.5f, y * 10.f), vec3(5.f, 1.f, 5.f)));
-
-			plane->AddComponent(new MeshRendererComponent(&mesh2, &brickMaterial));
-			//actors.push_back(plane);
-		}
-	}
-
-	Actor* dir = new Actor(Transform(vec3(0, 0.f, 0), vec3(1.f), quat().CreateRotation(vec3(1.f, 0.f, 0.f), AsRadians(83.f))));
-	dir->AddComponent(new DirectionalLightComponent(vec3(1.f), 0.1f, 0.2f));
-
-	Actor* ples = new Actor(Transform(vec3(2.f, 15.f, 0)));
-	ples->AddComponent(new PointLightComponent(vec3(1.f), 0.f, Attenuation(0.f, 0.f, 0.0055f), 0.3f));
+	std::shared_ptr<Actor> ples = std::make_shared<Actor>(Transform(vec3(2.f, 15.f, 0)));
+	ples->AddComponent(std::make_shared<PointLightComponent>(vec3(1.f), 0.f, Attenuation(0.f, 0.f, 0.0055f), 0.3f));
 	actors.push_back(ples);
 
-	actors.push_back(player);
 	actors.push_back(object1);
 	//
 	actors.push_back(object2);
@@ -446,131 +451,130 @@ i32 main(i32 argc, c8** argv) {
 	Material* thornMaterial = new Material(pbrTest);
 	thornMaterial->Set("UsingAlbedoMap", 1.f);
 	thornMaterial->Set("UsingSpecularMap", 1.f);
-	thornMaterial->Set("AlbedoMap", new Texture("asset/sponza2/thorn.bet"));
-	thornMaterial->Set("SpecularMap", new Texture("asset/sponza2/thorn_spec.bet"));
-	thornMaterial->Set("NormalMap", new Texture("asset/sponza2/thorn_bump.bet"));
+	thornMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/thorn"));
+	thornMaterial->Set("SpecularMap", Resource<Texture>::Get("sponza2/thorn_spec"));
+	thornMaterial->Set("NormalMap", Resource<Texture>::Get("sponza2/thorn_bump"));
 
-	//Material* colAMaterial = new Material(pbrTest);
-	//colAMaterial->Set("UsingAlbedoMap", 1.f);
-	//colAMaterial->Set("UsingSpecularMap", 1.f);
-	//colAMaterial->Set("AlbedoMap", Asset<Texture>::Get("@asset/sponza2/cola.bet"));
-	//colAMaterial->Set("SpecularMap", new Texture("asset/sponza2/cola_spec.bet"));
-	//colAMaterial->Set("NormalMap", new Texture("asset/sponza2/cola_bump.bet"));
-	Material* colAMaterial = Asset<Material>::Get("@asset/material.bemat");
-
+	Material* colAMaterial = new Material(pbrTest);
+	colAMaterial->Set("UsingAlbedoMap", 1.f);
+	colAMaterial->Set("UsingSpecularMap", 1.f);
+	colAMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/cola"));
+	colAMaterial->Set("SpecularMap", Resource<Texture>::Get("sponza2/cola_spec"));
+	colAMaterial->Set("NormalMap", Resource<Texture>::Get("sponza2/cola_bump"));
+	//Material* colAMaterial = Asset<Material>::Get("@asset/material.bemat");
 
 	Material* colBMaterial = new Material(pbrTest);
 	colBMaterial->Set("UsingAlbedoMap", 1.f);
 	colBMaterial->Set("UsingSpecularMap", 1.f);
-	colBMaterial->Set("AlbedoMap", new Texture("asset/sponza2/colb.bet"));
-	colBMaterial->Set("SpecularMap", new Texture("asset/sponza2/colb_spec.bet"));
-	colBMaterial->Set("NormalMap", new Texture("asset/sponza2/colb_bump.bet"));
+	colBMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/colb"));
+	colBMaterial->Set("SpecularMap", Resource<Texture>::Get("sponza2/colb_spec"));
+	colBMaterial->Set("NormalMap", Resource<Texture>::Get("sponza2/colb_bump"));
 
 	Material* colCMaterial = new Material(pbrTest);
 	colCMaterial->Set("UsingAlbedoMap", 1.f);
 	colCMaterial->Set("UsingSpecularMap", 1.f);
-	colCMaterial->Set("AlbedoMap", new Texture("asset/sponza2/colc.bet"));
-	colCMaterial->Set("SpecularMap", new Texture("asset/sponza2/colc_spec.bet"));
-	colCMaterial->Set("NormalMap", new Texture("asset/sponza2/colc_bump.bet"));
+	colCMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/colc"));
+	colCMaterial->Set("SpecularMap", Resource<Texture>::Get("sponza2/colc_spec"));
+	colCMaterial->Set("NormalMap", Resource<Texture>::Get("sponza2/colc_bump"));
 
 	Material* ceilAMaterial = new Material(pbrTest);
 	ceilAMaterial->Set("UsingAlbedoMap", 1.f);
 	ceilAMaterial->Set("UsingSpecularMap", 1.f);
-	ceilAMaterial->Set("AlbedoMap", new Texture("asset/sponza2/ceila.bet"));
-	ceilAMaterial->Set("SpecularMap", new Texture("asset/sponza2/ceila_spec.bet"));
+	ceilAMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/ceila"));
+	ceilAMaterial->Set("SpecularMap", Resource<Texture>::Get("sponza2/ceila_spec"));
 
 	Material* archMaterial = new Material(pbrTest);
 	archMaterial->Set("UsingAlbedoMap", 1.f);
 	archMaterial->Set("UsingSpecularMap", 1.f);
-	archMaterial->Set("AlbedoMap", new Texture("asset/sponza2/arch.bet"));
-	archMaterial->Set("SpecularMap", new Texture("asset/sponza2/arch_spec.bet"));
-	archMaterial->Set("NormalMap", new Texture("asset/sponza2/arch_bump.bet"));
+	archMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/arch"));
+	archMaterial->Set("SpecularMap", Resource<Texture>::Get("sponza2/arch_spec"));
+	archMaterial->Set("NormalMap", Resource<Texture>::Get("sponza2/arch_bump"));
 
 	Material* bricksAMaterial = new Material(pbrTest);
 	bricksAMaterial->Set("UsingAlbedoMap", 1.f);
 	bricksAMaterial->Set("UsingSpecularMap", 1.f);
-	bricksAMaterial->Set("AlbedoMap", new Texture("asset/sponza2/bricksa.bet"));
-	bricksAMaterial->Set("SpecularMap", new Texture("asset/sponza2/bricksa_spec.bet"));
-	bricksAMaterial->Set("NormalMap", new Texture("asset/sponza2/bricksa_bump.bet"));
+	bricksAMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/bricksa"));
+	bricksAMaterial->Set("SpecularMap", Resource<Texture>::Get("sponza2/bricksa_spec"));
+	bricksAMaterial->Set("NormalMap", Resource<Texture>::Get("sponza2/bricksa_bump"));
 
 	Material* floorAMaterial = new Material(pbrTest);
 	floorAMaterial->Set("UsingAlbedoMap", 1.f);
 	floorAMaterial->Set("UsingSpecularMap", 1.f);
-	floorAMaterial->Set("AlbedoMap", new Texture("asset/sponza2/floora.bet"));
-	floorAMaterial->Set("SpecularMap", new Texture("asset/sponza2/floora_spec.bet"));
+	floorAMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/floora"));
+	floorAMaterial->Set("SpecularMap", Resource<Texture>::Get("sponza2/floora_spec"));
 
 	Material* detailMaterial = new Material(pbrTest);
 	detailMaterial->Set("UsingAlbedoMap", 1.f);
 	detailMaterial->Set("UsingSpecularMap", 1.f);
-	detailMaterial->Set("AlbedoMap", new Texture("asset/sponza2/details.bet"));
-	detailMaterial->Set("SpecularMap", new Texture("asset/sponza2/details_spec.bet"));
+	detailMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/details"));
+	detailMaterial->Set("SpecularMap", Resource<Texture>::Get("sponza2/details_spec"));
 
 	Material* vaseMaterial = new Material(pbrTest);
 	vaseMaterial->Set("UsingAlbedoMap", 1.f);
-	vaseMaterial->Set("AlbedoMap", new Texture("asset/sponza2/vase.bet"));
+	vaseMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/vase"));
 
 	Material* chainMaterial = new Material(pbrTest);
 	chainMaterial->Set("UsingAlbedoMap", 1.f);
-	chainMaterial->Set("AlbedoMap", new Texture("asset/sponza2/chain.bet"));
-	chainMaterial->Set("NormalMap", new Texture("asset/sponza2/chain_bump.bet"));
+	chainMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/chain"));
+	chainMaterial->Set("NormalMap", Resource<Texture>::Get("sponza2/chain_bump"));
 
 	Material* backgroundMaterial = new Material(pbrTest);
 	backgroundMaterial->Set("UsingAlbedoMap", 1.f);
-	backgroundMaterial->Set("AlbedoMap", new Texture("asset/sponza2/background.bet"));
-	backgroundMaterial->Set("NormalMap", new Texture("asset/sponza2/background_bump.bet"));
+	backgroundMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/background"));
+	backgroundMaterial->Set("NormalMap", Resource<Texture>::Get("sponza2/background_bump"));
 
 	Material* lionMaterial = new Material(pbrTest);
 	lionMaterial->Set("UsingAlbedoMap", 1.f);
-	lionMaterial->Set("AlbedoMap", new Texture("asset/sponza2/lion.bet"));
-	lionMaterial->Set("NormalMap", new Texture("asset/sponza2/lion_bump.bet"));
+	lionMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/lion"));
+	lionMaterial->Set("NormalMap", Resource<Texture>::Get("sponza2/lion_bump"));
 
 	Material* flagpoleMaterial = new Material(pbrTest);
 	flagpoleMaterial->Set("UsingAlbedoMap", 1.f);
 	flagpoleMaterial->Set("UsingSpecularMap", 1.f);
-	flagpoleMaterial->Set("AlbedoMap", new Texture("asset/sponza2/flagpole.bet"));
-	flagpoleMaterial->Set("SpecularMap", new Texture("asset/sponza2/flagpole_spec.bet"));
+	flagpoleMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/flagpole"));
+	flagpoleMaterial->Set("SpecularMap", Resource<Texture>::Get("sponza2/flagpole_spec"));
 
 	Material* roofMaterial = new Material(pbrTest);
 	roofMaterial->Set("UsingAlbedoMap", 1.f);
-	roofMaterial->Set("AlbedoMap", new Texture("asset/sponza2/roof.bet"));
+	roofMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/roof"));
 
 	Material* curtRedMaterial = new Material(pbrTest);
 	curtRedMaterial->Set("UsingAlbedoMap", 1.f);
-	curtRedMaterial->Set("AlbedoMap", new Texture("asset/sponza2/curtain.bet"));
+	curtRedMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/curtain"));
 
 	Material* curtBlueMaterial = new Material(pbrTest);
 	curtBlueMaterial->Set("UsingAlbedoMap", 1.f);
-	curtBlueMaterial->Set("AlbedoMap", new Texture("asset/sponza2/curtain_blue.bet"));
+	curtBlueMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/curtain_blue"));
 
 	Material* curtGreenMaterial = new Material(pbrTest);
 	curtGreenMaterial->Set("UsingAlbedoMap", 1.f);
-	curtGreenMaterial->Set("AlbedoMap", new Texture("asset/sponza2/curtain_green.bet"));
+	curtGreenMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/curtain_green"));
 
 	Material* fabRedMaterial = new Material(pbrTest);
 	fabRedMaterial->Set("UsingAlbedoMap", 1.f);
 	fabRedMaterial->Set("UsingSpecularMap", 1.f);
-	fabRedMaterial->Set("AlbedoMap", new Texture("asset/sponza2/fabric.bet"));
-	fabRedMaterial->Set("SpecularMap", new Texture("asset/sponza2/fabric_spec.bet"));
+	fabRedMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/fabric"));
+	fabRedMaterial->Set("SpecularMap", Resource<Texture>::Get("sponza2/fabric_spec"));
 
 	Material* fabBlueMaterial = new Material(pbrTest);	
 	fabBlueMaterial->Set("UsingAlbedoMap", 1.f);
 	fabBlueMaterial->Set("UsingSpecularMap", 1.f);
-	fabBlueMaterial->Set("AlbedoMap", new Texture("asset/sponza2/fabric_blue.bet"));
-	fabBlueMaterial->Set("SpecularMap", new Texture("asset/sponza2/fabric_spec.bet"));
+	fabBlueMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/fabric_blue"));
+	fabBlueMaterial->Set("SpecularMap", Resource<Texture>::Get("sponza2/fabric_spec"));
 
 	Material* fabGreenMaterial = new Material(pbrTest);
 	fabGreenMaterial->Set("UsingAlbedoMap", 1.f);
 	fabGreenMaterial->Set("UsingSpecularMap", 1.f);
-	fabGreenMaterial->Set("AlbedoMap", new Texture("asset/sponza2/fabric_green.bet"));
-	fabGreenMaterial->Set("SpecularMap", new Texture("asset/sponza2/fabric_spec.bet"));
+	fabGreenMaterial->Set("AlbedoMap", Resource<Texture>::Get("sponza2/fabric_green"));
+	fabGreenMaterial->Set("SpecularMap", Resource<Texture>::Get("sponza2/fabric_spec"));
 
 
 	std::vector<std::pair<std::vector<i32>, Material*>> materials = {
-		{{0, 2, 45, 145, 146, 333, 370, 371, 44, 95, 96, 97, 208, 209, 216, 217}, thornMaterial},
+		{{0, 2, 45, 145, 146, 333, 370, 371}, thornMaterial},
 		{{42, 82, 83, 137, 138, 139, 140, 141, 143, 144, 374, 375}, colAMaterial},
 		{{1, 3, 14, 15, 19, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 130, 131, 132, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 259, 260, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 299, 300, 301, 302, 303, 304 ,305, 306, 307, 308, 321, 322, 323, 324, 325, 326, 327, 328, 335, 336, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 372, 373, 378, 380, 381}, colBMaterial},
 		{{16, 17, 20, 21, 84, 85, 88, 89, 90, 91, 94, 98, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 192, 193, 194, 195, 196, 197, 198, 199, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 261, 262, 263, 264, 265, 266, 267, 268, 360, 361, 362, 363}, colCMaterial},
-		{{43, 73, 75, 77, 79, 81, 129, 136, 182, 184, 186, 365, 368}, ceilAMaterial},
+		{{43, 73, 75, 77, 79, 81, 129, 136, 182, 184, 186, 365, 368, 44, 95, 96, 97, 208, 209, 216, 217 }, ceilAMaterial},
 		{{26, 49, 72, 74, 76, 78, 80, 142, 180, 181, 183, 185, 187, 188, 189, 269, 270, 311, 312, 313, 314, 315, 317, 318, 367, 369, 376, 377, 379}, archMaterial},
 		{{4, 5, 10, 11, 13, 55, 56, 57, 58, 60, 178, 179, 190, 191, 215, 292}, chainMaterial},
 		{{6, 7, 8, 9, 12, 51, 52, 53, 54, 59, 210, 211, 212, 213, 214, 291, 293, 294, 295, 296, 99, 100, 101, 339}, vaseMaterial},
@@ -590,31 +594,28 @@ i32 main(i32 argc, c8** argv) {
 	};
 
 	for (i32 i = 0; i < 393; i++) {
-		auto model = Asset<Model>::Get("@asset/sponza2/sponza_" + std::to_string(i) + ".bem");
-		Actor* a = new Actor(Transform(vec3(0, 0, 0), vec3(0.01)));
-		Material* mat = &pbrTest;
+		std::shared_ptr<Actor> a = std::make_shared<Actor>(Transform(vec3(0, 0, 0), vec3(0.01)));
+		Material* mat = 0;
+		string name = "sponza2/sponza_" + std::to_string(i);
+		string matn = "Mesh_" + std::to_string(381-i);
 
-		if (model->name.find("Mesh", 0) == string::npos) {
-			mat = thornMaterial;
-		}
-		else {
-			for (auto& material : materials) {
-				for (auto& num : material.first) {
-					if (model->name == std::string("Mesh") + (num == 0 ? "" : "_") + 
-						(num > 0 && num < 100 ? "0" : "") +
-						(num > 0 && num < 10 ? "0" : "") + std::to_string(num))
-						mat = material.second;
-				}
+		
+		mat = colCMaterial;
+
+		for (auto& material : materials) {
+			for (auto& num : material.first) {
+				if (matn == std::string("Mesh") + (num == 0 ? "" : "_") + std::to_string(num))
+					mat = material.second;
 			}
 		}
 
-		a->AddComponent(new MeshRendererComponent(new Mesh(model), mat));
+		a->AddComponent(new MeshRendererComponent(Resource<Mesh>::Get("sponza2/sponza_" + std::to_string(i)), mat));
 		actors.push_back(a);
 	}
 #elif 0
 for (i32 i = 0; i < 1087; i++) {
 	auto model = Model("asset/sibenik/sibenik_" + std::to_string(i) + ".bem");
-	Actor* a = new Actor(Transform(vec3(0), vec3(1)));
+	std::shared_ptr<Actor> a = std::make_shared<Actor>(Transform(vec3(0), vec3(1)));
 	Material* mat = &pbrTest;
 
 	a->AddComponent(new MeshRendererComponent(new Mesh(&model), mat));
@@ -623,14 +624,13 @@ for (i32 i = 0; i < 1087; i++) {
 #elif 0
 for (i32 i = 0; i < 41; i++) {
 	auto model = Model("asset/conference/conference_" + std::to_string(i) + ".bem");
-	Actor* a = new Actor(Transform(vec3(0), vec3(0.01)));
+	std::shared_ptr<Actor> a = std::make_shared<Actor>(Transform(vec3(0), vec3(0.01)));
 	Material* mat = &pbrTest;
 
-	a->AddComponent(new MeshRendererComponent(new Mesh(model), mat));
+	a->AddComponent(new MeshRendererComponent(new Mesh(model.ToMesh()), mat));
 	actors.push_back(a);
 }
-#endif
-#if 1
+#elif 0
 	for (i32 i = 0; i < 10; i++) {
 		for (i32 j = 0; j < 10; j++) {
 			Material* mat = new Material(pbrTest);
@@ -638,19 +638,50 @@ for (i32 i = 0; i < 41; i++) {
 			mat->Set("AlbedoColor", vec4(0.2f, 0.2f, 0.2f, 1.f));
 			mat->Set("SpecularColor", vec3(1.f - (f32)i / 10 - 0.01f));
 			mat->Set("GlossColor", 1.f - (f32)j / 10.f - 0.01f);
-			Mesh* sphere = new Mesh(Model("res/models/sphere.bem").ToMesh());
-			Actor* a = new Actor(Transform(vec3(-5.f+i, 1.5f, -5.f+j), vec3(0.09f)));
+			Resource<Mesh> sphere = Resource<Mesh>::Get("sphere");
+			std::shared_ptr<Actor> a = std::make_shared<Actor>(Transform(vec3(-5.f+i, 1.5f, -5.f+j), vec3(0.09f)));
 			a->AddComponent(new MeshRendererComponent(sphere, mat));
 			actors.push_back(a);
 		}
 	}
-
+#elif 1
+	Resource<Mesh> chalet = Resource<Mesh>::Get("shalet");
+	Material* mate = new Material(pbrTest);
+	mate->Set("UsingAlbedoMap", 1.f);
+	mate->Set("AlbedoMap", Resource<Texture>::Get("shalet"));
+	mate->Set("SpecularColor", vec3(0.1f));
+	mate->Set("GlossColor", 0.1f);
+	std::shared_ptr<Actor> a = std::make_shared<Actor>(Transform(vec3(0), vec3(6)));
+	a->GetTransform().Rotate(vec3(-1, 0, 0), RADIANS * 90.f);
+	a->AddComponent(std::make_shared<MeshRendererComponent>(chalet, mate));
+	actors.push_back(a);
 #endif
+
 	renderer.SetActorReference(&actors);
 	//renderer.SetWindow(&window);
 
 	//window.SetVsync(0);
+	
+	std::string out;
+	std::stringstream ss;
+	{
+		std::ofstream ofs("player.bin");
+		cereal::BinaryOutputArchive ar(ofs);
+		ar(CEREAL_NVP(player));
+	}
 
+	Logger::Info(ss.str());
+
+
+	std::shared_ptr<Actor> player2;
+	{
+		std::ifstream ifs("player.bin");
+		cereal::BinaryInputArchive ar(ifs);
+		ar(player2); 
+	}
+
+	//actors.push_back(player);
+	actors.push_back(player2);
 	i64 f = 0;
 	f64 updateTimer = 0;
 
@@ -667,11 +698,51 @@ for (i32 i = 0; i < 41; i++) {
 	f32 lastUpdateTime = 0;
 	bool updated = false;
 
+	SerialPort port("COM6");
+	u8* buffer = new u8[1024];
 
 	while (testwin.IsOpen()) {
 		updated = false;
 		lastFrameTimer.LoopMS();
 		while (updateTimer > UPDATE_TIME) {
+			i32 len = port.ReadData(buffer, 1024);
+			buffer[len + 1] = '\0';
+			
+			f32 x = 0;
+			f32 y = 0;
+			f32 xaim = 0;
+			f32 yaim = 0;
+			i32 up = 0, down = 0;
+
+			if (port.IsConnected()) {
+				try {
+					usize ptr;
+					string str((c8*)buffer);
+					str = str.substr(0, str.find_first_of('\n'));
+					x = std::stof(str, &ptr);
+					str = str.substr(ptr);
+					y = std::stof(str, &ptr);
+					str = str.substr(ptr);
+					xaim = std::stof(str, &ptr);
+					str = str.substr(ptr);
+					yaim = std::stof(str, &ptr);
+					str = str.substr(ptr);
+					up = 1 - std::stoi(str, &ptr);
+					str = str.substr(ptr);
+					down = 1 - std::stoi(str, &ptr);
+				}
+				catch (std::exception e) {}
+			}
+
+			//player->GetTransform().GetTranslation() += vec3(player->GetTransform().GetRotation().Right() * (0.05f * x));
+			//player->GetTransform().GetTranslation() += vec3(player->GetTransform().GetRotation().Forward() * (-0.05f * y));
+			
+			player->GetTransform().GetTranslation() += vec3(player->GetTransform().GetRotation().Up() * (0.05f * up));
+			//player->GetTransform().GetTranslation() += vec3(player->GetTransform().GetRotation().Down() * (0.05f * down));
+
+			//player->GetTransform().Rotate(Math::vec3(0, 1, 0), -xaim * 0.015f);
+			//player->GetTransform().Rotate(player->GetTransform().GetRotation().Right(), -yaim * 0.015f);
+
 			Update();
 			Keyboard::Update();
 			Mouse::Update();
@@ -707,7 +778,6 @@ for (i32 i = 0; i < 41; i++) {
 		}
 
 		testwin.Update();
-
 
 		fps++;
 

@@ -12,7 +12,6 @@ namespace Bearish { namespace Components {
 			UIButton(Graphics::Texture* texture, std::function<void(UIButton*)> action) : _mesh(Graphics::Mesh::CreateQuad()), _texture(texture), _action(action) {}
 			~UIButton() {
 				delete _mesh;
-				delete _texture;
 			}
 
 			void FixedUpdate() override {
