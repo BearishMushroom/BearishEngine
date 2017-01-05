@@ -1,0 +1,13 @@
+res/ = base folder for source
+asset/ = base folder for dest
+
+"ResourceName" "SourceFile.png" "DestFile.bet"
+"Resource2" "SourceModel.bem" "TestModel.bem"
+
+Spits out 2 files.
+asset/assetdef.def which contains
+"ResourceName" "DestFile.bet"
+"Resource2" "TestModel.bem"
+and ./assetbuild.def which contains
+"ResourceName" timestamp
+"Resource2" timestamp

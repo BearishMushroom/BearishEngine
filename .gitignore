@@ -17,18 +17,19 @@
 *.bemat
 *.lnk
 
+BESandbox/
+
+lib/
+
 ipch/
 .vs/
 
-*/Release/*
-*/Debug/*
+Release/
+Debug/
 
-WorkingCopy/*
+WorkingCopy/
 Build/
 Intermediates/
-
-/Release/*
-/Debug/*
 
 *.exe
 *.dll
