@@ -662,26 +662,27 @@ for (i32 i = 0; i < 41; i++) {
 
 	//window.SetVsync(0);
 	
-	std::string out;
-	std::stringstream ss;
-	{
-		std::ofstream ofs("player.bin");
-		cereal::BinaryOutputArchive ar(ofs);
-		ar(CEREAL_NVP(player));
-	}
+	//std::string out;
+	//std::stringstream ss;
+	//{
+	//	std::ofstream ofs("player.bin");
+	//	cereal::BinaryOutputArchive ar(ofs);
+	//	ar(CEREAL_NVP(player));
+	//}
+	//
+	//Logger::Info(ss.str());
+	//
+	//
+	//std::shared_ptr<Actor> player2;
+	//{
+	//	std::ifstream ifs("player.bin");
+	//	cereal::BinaryInputArchive ar(ifs);
+	//	ar(player2); 
+	//}
+	//
+	actors.push_back(player);
+	//actors.push_back(player2);
 
-	Logger::Info(ss.str());
-
-
-	std::shared_ptr<Actor> player2;
-	{
-		std::ifstream ifs("player.bin");
-		cereal::BinaryInputArchive ar(ifs);
-		ar(player2); 
-	}
-
-	//actors.push_back(player);
-	actors.push_back(player2);
 	i64 f = 0;
 	f64 updateTimer = 0;
 
