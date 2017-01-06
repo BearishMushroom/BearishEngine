@@ -18,8 +18,12 @@ namespace Bearish { namespace Graphics { namespace API {
 		// Implicit conversion for calling vkXXX
 		operator VkInstance() { return _instance; } 
 	private:
+		void CreateDebugCallback();
+		void DestroyDebugCallback();
+
 		VkApplicationInfo _applicationInfo;
 		VkInstance _instance;
+		VkDebugReportCallbackEXT _callback;
 
 		u32 _numExtensions;
 		VkExtensionProperties* _extensions;

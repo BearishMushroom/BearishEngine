@@ -18,7 +18,9 @@ using namespace Graphics;
 //using namespace Serilization;
 
 int main(int argc, char** argv) {
-	API::Instance inst;
+	{
+		API::Instance inst;
+	}
 	printf("");
 	return 0;
 }

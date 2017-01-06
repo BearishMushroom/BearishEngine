@@ -1,14 +1,12 @@
 #ifndef _BEARISH_CORE_LOGGER_H_
 #define _BEARISH_CORE_LOGGER_H_
 
-#define BEARISH_DEBUG	  1  // Do we even print to the log?
 #define BEARISH_VERBOSE	  0  // Prints file and line of every info piece.
 #define BEARISH_WARNLEVEL 3  // 0 = Crashes only, 1 = Errors, 2 = Warnings, 3 = Info
 
 #include <BE/Types.h>
 #include <mutex>
 
-#if BEARISH_DEBUG
 #define BEARISH_ASSERT(x, m) \
 		if(!(x)) { \
 			Bearish::Core::Logger::Instance().Log("*************************\n"); \
@@ -22,7 +20,6 @@
 #define BEARISH_ASSERT_PRINTFILE()	std::string name(__FILE__); \
 								name = name.substr(name.find("\src") == std::string::npos ? 0 : name.find("\src"), name.length()); \
 								Bearish::Core::Logger::Instance().FormatLog("(%s:%d)\n", name.c_str(), __LINE__);
-#endif
 
 namespace Bearish { 
 	static void Assert(bool condition, string message) {
