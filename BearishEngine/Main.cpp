@@ -1,20 +1,29 @@
 
-#include <Bearish.h>
+//#include <Bearish.h>
 #include <vector>
 #include <crtdbg.h>
 #include <sstream>
 
-#include "src\BE\Util\SerialPort.h"
+#include <BE/Graphics/API/Instance.h>
+
+//#include "src\BE\Util\SerialPort.h"
 
 using namespace Bearish;
 
-using namespace Components;
+//using namespace Components;
 using namespace Graphics;
-using namespace Core;
-using namespace Math;
-using namespace Util;
-using namespace Serilization;
+//using namespace Core;
+//using namespace Math;
+//using namespace Util;
+//using namespace Serilization;
 
+int main(int argc, char** argv) {
+	API::Instance inst;
+	printf("");
+	return 0;
+}
+
+/*
 CEREAL_REGISTER_TYPE(MeshRendererComponent);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(IActorComponent, MeshRendererComponent);
 
@@ -805,4 +814,4 @@ for (i32 i = 0; i < 41; i++) {
 
 	//Scripting::KillLua();
 	return 0;
-}
+}*/
