@@ -231,6 +231,7 @@
     <ClCompile Include="src\BE\Core\ResourceManager.cpp" />
     <ClCompile Include="src\BE\Core\Settings.cpp" />
     <ClCompile Include="src\BE\Core\Transform.cpp" />
+    <ClCompile Include="src\BE\Graphics\API\GPU.cpp" />
     <ClCompile Include="src\BE\Graphics\API\Instance.cpp" />
     <ClCompile Include="src\BE\Graphics\Buffer\UniformBuffer.cpp" />
     <ClCompile Include="src\BE\Graphics\Buffer\VertexLayout.cpp" />
@@ -303,6 +304,7 @@
     <ClInclude Include="src\BE\Core\Settings.h" />
     <ClInclude Include="src\BE\Core\Shared.h" />
     <ClInclude Include="src\BE\Core\Transform.h" />
+    <ClInclude Include="src\BE\Graphics\API\GPU.h" />
     <ClInclude Include="src\BE\Graphics\API\Instance.h" />
     <ClInclude Include="src\BE\Graphics\Buffer\IndexBuffer.h" />
     <ClInclude Include="src\BE\Serialization\Database.h" />
