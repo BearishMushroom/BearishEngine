@@ -1,4 +1,5 @@
 #include <BE/Graphics/API/Instance.h>
+#include <BE/Graphics/API/Util.h>
 #include <BE/Core/Logger.h>
 
 using namespace Bearish;
@@ -87,6 +88,8 @@ void Instance::Init(string name) {
 	_applicationInfo.pEngineName = "BearishEngine";
 	_applicationInfo.engineVersion = VK_MAKE_VERSION(0, 1, 0);
 	_applicationInfo.apiVersion = VK_API_VERSION_1_0;
+
+	Core::Logger::Info("Vulkan instance API version: %s", VkVersionToString(VK_API_VERSION_1_0).c_str());
 
 	VkInstanceCreateInfo incr = {};
 	incr.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;

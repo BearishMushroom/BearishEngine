@@ -26,8 +26,8 @@ namespace Bearish { namespace Graphics { namespace API {
 	class GPU {
 	public:
 		GPU();
-		GPU(Instance instance, VkPhysicalDevice device);
-		GPU(Instance instance, VkPhysicalDeviceFeatures features, VkPhysicalDeviceProperties properties, VkPhysicalDevice device);
+		GPU(Instance* instance, VkPhysicalDevice device);
+		GPU(Instance* instance, VkPhysicalDeviceFeatures features, VkPhysicalDeviceProperties properties, VkPhysicalDevice device);
 
 		~GPU();
 
@@ -38,11 +38,11 @@ namespace Bearish { namespace Graphics { namespace API {
 		const VkPhysicalDeviceFeatures& GetFeatures() { return _features; }
 		const VkPhysicalDeviceProperties& GetProperties() { return _properties; }
 
-		static std::vector<GPU> GetAll(Instance instance);
+		static std::vector<GPU> GetAll(Instance* instance);
 		static GPU GetMostSuitable(std::vector<GPU> gpus);
 	private:
 
-		Instance _instance;
+		Instance* _instance;
 		std::vector<GPUQueue> _queues;
 		VkPhysicalDeviceFeatures _features;
 		VkPhysicalDeviceProperties _properties;

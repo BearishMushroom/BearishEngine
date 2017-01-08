@@ -5,6 +5,9 @@
 #include <sstream>
 
 #include <BE/Graphics/API/Instance.h>
+#include <BE/Graphics/API/Util.h>
+#include <BE/Graphics/API/GPU.h>
+#include <BE/Core/Logger.h>
 
 //#include "src\BE\Util\SerialPort.h"
 
@@ -20,6 +23,9 @@ using namespace Graphics;
 int main(int argc, char** argv) {
 	{
 		API::Instance inst;
+		API::GPU gpu = API::GPU::GetMostSuitable(API::GPU::GetAll(&inst));
+		Core::Logger::Info("Found suitable GPU (%s).", gpu.GetName().c_str());
+		Core::Logger::Info("Vulkan GPU driver version: %s", API::VkVersionToString(gpu.GetProperties().apiVersion).c_str());
 	}
 	printf("");
 	return 0;

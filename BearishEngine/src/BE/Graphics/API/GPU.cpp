@@ -9,7 +9,7 @@ using namespace API;
 GPU::GPU() {
 }
 
-GPU::GPU(Instance instance, VkPhysicalDevice device) {
+GPU::GPU(Instance* instance, VkPhysicalDevice device) {
 	_instance = instance;
 	_device = device;
 
@@ -17,7 +17,7 @@ GPU::GPU(Instance instance, VkPhysicalDevice device) {
 	vkGetPhysicalDeviceFeatures(device, &_features);
 }
 
-GPU::GPU(Instance instance, VkPhysicalDeviceFeatures features, VkPhysicalDeviceProperties properties, VkPhysicalDevice device) {
+GPU::GPU(Instance* instance, VkPhysicalDeviceFeatures features, VkPhysicalDeviceProperties properties, VkPhysicalDevice device) {
 	_instance = instance;
 	_device = device;
 
@@ -28,14 +28,14 @@ GPU::GPU(Instance instance, VkPhysicalDeviceFeatures features, VkPhysicalDeviceP
 GPU::~GPU() {
 }
 
-std::vector<GPU> GPU::GetAll(Instance instance) {
+std::vector<GPU> GPU::GetAll(Instance* instance) {
 	u32 deviceCount = 0;
-	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+	vkEnumeratePhysicalDevices(*instance, &deviceCount, nullptr);
 
 	std::vector<VkPhysicalDevice> devices(deviceCount);
-	vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+	vkEnumeratePhysicalDevices(*instance, &deviceCount, devices.data());
 
-	std::vector<GPU> gpus(deviceCount);
+	std::vector<GPU> gpus;
 	for (auto& device : devices) {
 		gpus.push_back(GPU(instance, device));
 	}

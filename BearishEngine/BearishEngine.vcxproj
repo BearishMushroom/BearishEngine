@@ -306,6 +306,7 @@
     <ClInclude Include="src\BE\Core\Transform.h" />
     <ClInclude Include="src\BE\Graphics\API\GPU.h" />
     <ClInclude Include="src\BE\Graphics\API\Instance.h" />
+    <ClInclude Include="src\BE\Graphics\API\Util.h" />
     <ClInclude Include="src\BE\Graphics\Buffer\IndexBuffer.h" />
     <ClInclude Include="src\BE\Serialization\Database.h" />
     <ClInclude Include="src\BE\Serialization\Field.h" />
