@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <BE/Graphics/API/Util.h>
 #include <BE/Graphics/API/GPU.h>
 #include <BE/Core/Logger.h>
 
@@ -48,29 +49,47 @@ GPU GPU::GetMostSuitable(std::vector<GPU> gpus) {
 		Core::Logger::Fatal("Failed to find suitable Vulkan GPU!");
 	}
 	
+	GPU gpur;
+	bool found = false;
+
 	// look for dedicated:
-	for (GPU& gpu : gpus) {
-		if (gpu.GetAdapterType() == AdapterType::Discrete) {
-			return gpu;
+	if (!found) {
+		for (GPU& gpu : gpus) {
+			if (gpu.GetAdapterType() == AdapterType::Discrete) {
+				gpur = gpu;
+				found = true;
+			}
 		}
 	}
 
 	// look for virtual
-	for (GPU& gpu : gpus) {
-		if (gpu.GetAdapterType() == AdapterType::Virtual) {
-			return gpu;
+	if (!found) {
+		for (GPU& gpu : gpus) {
+			if (gpu.GetAdapterType() == AdapterType::Virtual) {
+				gpur = gpu;
+				found = true;
+			}
 		}
 	}
 
 	// look for integrated
-	for (GPU& gpu : gpus) {
-		if (gpu.GetAdapterType() == AdapterType::Integrated) {
-			return gpu;
+	if (!found) {
+		for (GPU& gpu : gpus) {
+			if (gpu.GetAdapterType() == AdapterType::Integrated) {
+				gpur = gpu;
+				found = true;
+			}
 		}
 	}
 
 	// no idea
-	return gpus[0];
+	if (!found) {
+		gpur = gpus[0];
+	}
+
+	Core::Logger::Info("Found suitable GPU (%s).", gpur.GetName().c_str());
+	Core::Logger::Info("Vulkan GPU driver version: %s", VkVersionToString(gpur.GetProperties().apiVersion).c_str());
+	return gpur;
 }
 
 GPUQueue GPU::GetGraphicsQueue() {
