@@ -12,6 +12,10 @@ namespace Bearish { namespace Graphics { namespace API {
 
 		return std::to_string(maj) + "." + std::to_string(min) + "." + std::to_string(rev);
 	}
+
+	static bool VkError(VkResult res) {
+		return res != VK_SUCCESS;
+	}
 } } }
 
 #endif //_BEARISH_GRAPHICS_API_UTIL_H_

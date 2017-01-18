@@ -13,7 +13,7 @@ namespace Bearish { namespace Graphics { namespace API {
 		CPU,
 	};
 
-	struct GPUQueue {
+	struct GPUQueueIndex {
 		i32 index = -1;
 
 		operator i32() { return index; }
@@ -33,17 +33,21 @@ namespace Bearish { namespace Graphics { namespace API {
 
 		AdapterType GetAdapterType() { return (AdapterType)_properties.deviceType; }
 		std::string GetName() { return std::string(_properties.deviceName); }
-		GPUQueue GetGraphicsQueue();
+		GPUQueueIndex GetGraphicsQueue() const;
 
-		const VkPhysicalDeviceFeatures& GetFeatures() { return _features; }
-		const VkPhysicalDeviceProperties& GetProperties() { return _properties; }
+		const VkPhysicalDeviceFeatures& GetFeatures() const { return _features; }
+		const VkPhysicalDeviceProperties& GetProperties() const { return _properties; }
+
+		const Instance* GetInstance() const { return _instance; }
+
+		operator VkPhysicalDevice() const { return _device; }
+		const VkPhysicalDevice& GetPhyiscalDevice() const { return _device; }
 
 		static std::vector<GPU> GetAll(Instance* instance);
 		static GPU GetMostSuitable(std::vector<GPU> gpus);
-	private:
 
+	private:
 		Instance* _instance;
-		std::vector<GPUQueue> _queues;
 		VkPhysicalDeviceFeatures _features;
 		VkPhysicalDeviceProperties _properties;
 		VkPhysicalDevice _device;

@@ -92,8 +92,8 @@ GPU GPU::GetMostSuitable(std::vector<GPU> gpus) {
 	return gpur;
 }
 
-GPUQueue GPU::GetGraphicsQueue() {
-	GPUQueue q;
+GPUQueueIndex GPU::GetGraphicsQueue() const {
+	GPUQueueIndex q;
 
 	u32 count = 0;
 	vkGetPhysicalDeviceQueueFamilyProperties(_device, &count, nullptr);

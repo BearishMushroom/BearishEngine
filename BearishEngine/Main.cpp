@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include <BE/Graphics/API/Instance.h>
+#include <BE/Graphics/API/Device.h>
 #include <BE/Graphics/API/Util.h>
 #include <BE/Graphics/API/GPU.h>
 #include <BE/Core/Logger.h>
@@ -24,6 +25,7 @@ int main(int argc, char** argv) {
 	{
 		API::Instance inst;
 		API::GPU gpu = API::GPU::GetMostSuitable(API::GPU::GetAll(&inst));
+		API::Device device(&gpu);
 	}
 
 	printf("");
