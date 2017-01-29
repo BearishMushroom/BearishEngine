@@ -5,6 +5,8 @@
 #include <assimp\postprocess.h>
 #include <assimp/scene.h>
 #include <vector>
+#include <unordered_map>
+#include <Windows.h>
 
 BEMNode AiToBEMNode(aiNode* node) {
 	string name = string(node->mName.data);
@@ -17,6 +19,187 @@ BEMNode AiToBEMNode(aiNode* node) {
 	return BEMNode{ name, transform, nodes };
 }
 
+struct Vertex {
+	vec3 pos;
+	vec2 tex;
+	vec3 norm;
+	vec3 tang;
+	vec4i bid;
+	vec4 bweight;
+
+	bool operator==(const Vertex const& other) const {
+		return pos == other.pos && tex == other.tex && norm == other.norm;
+	}
+};
+
+namespace std {
+	template <> struct hash<vec3> {
+		size_t operator()(vec3 const& vec) const {
+			return (((u32&)vec.x * 5209) ^ ((u32&)vec.y * 1811)) ^ ((u32&)vec.z * 7297);
+		}
+	};
+
+	template <> struct hash<vec2> {
+		size_t operator()(vec2 const& vec) const {
+			return ((u32&)vec.x * 5209) ^ ((u32&)vec.y * 1811);
+		}
+	};
+
+	template <> struct hash<vec4> {
+		size_t operator()(vec4 const& vec) const {
+			std::size_t seed = 4;
+			for (i32 i = 0; i < 3; i++) {
+				seed ^= (size_t)(vec.v[i] + 0x9e3779b9 + (seed << 6) + (seed >> 2));
+			}
+			return seed;
+		}
+	};
+
+	template <> struct hash<vec4i> {
+		size_t operator()(vec4i const& vec) const {
+			std::size_t seed = 4;
+			for (i32 i = 0; i < 4; i++) {
+				seed ^= (size_t)(vec.v[i] + 0x9e3779b9 + (seed << 6) + (seed >> 2));
+			}
+			return seed;
+		}
+	};
+
+	template<> struct hash<Vertex> {
+		size_t operator()(Vertex const& vertex) const {
+			return ((hash<vec3>()(vertex.pos) ^
+				(hash<vec2>()(vertex.tex) << 1)) >> 1) ^
+				(hash<vec3>()(vertex.norm) << 1);
+		}
+	};
+}
+
+void Optimize(BEMFile* file, i32 level, const aiMesh* mesh) {
+	aiVector3D zero(0, 0, 0);
+
+	file->numVertices = mesh->mNumVertices;
+	file->AllocateVertexData(mesh->HasBones());
+	for (u32 i = 0; i < mesh->mNumVertices; i++) {
+		const aiVector3D* pos = &(mesh->mVertices[i]);
+		const aiVector3D* normal = mesh->HasNormals() ? &(mesh->mNormals[i]) : &zero;
+		const aiVector3D* texCoord = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &zero;
+		const aiVector3D* tangent = mesh->HasTangentsAndBitangents() ? &(mesh->mTangents[i]) : &zero;
+
+		file->positionData[i] = vec3(pos->x, pos->y, pos->z);
+		file->uvData[i] = vec2(texCoord->x, texCoord->y);
+		file->normalData[i] = vec3(normal->x, normal->y, normal->z);
+		file->tangentData[i] = vec3(tangent->x, tangent->y, tangent->z);
+	}
+
+	for (u32 i = 0; i < mesh->mNumBones; i++) {
+		u32 boneIndex = 0;
+		string boneName(mesh->mBones[i]->mName.data);
+
+		if (file->boneMap.find(boneName) == file->boneMap.end()) {
+			boneIndex = file->numBones++;
+			file->boneOffsets.push_back(mat4());
+			file->boneMap[boneName] = boneIndex;
+		}
+		else {
+			boneIndex = file->boneMap[boneName];
+		}
+
+		file->boneOffsets.at(boneIndex) = mat4(mesh->mBones[i]->mOffsetMatrix);
+
+		for (u32 j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
+			for (u32 id = 0; id < 4; id++) {
+				if (file->boneIDData[mesh->mBones[i]->mWeights[j].mVertexId][id] == -1) {
+					file->boneIDData[mesh->mBones[i]->mWeights[j].mVertexId][id] = boneIndex;
+					file->boneWeightData[mesh->mBones[i]->mWeights[j].mVertexId][id] = mesh->mBones[i]->mWeights[j].mWeight;
+				}
+			}
+		}
+	}
+
+	if (level == 0) {
+		printf("No mesh optimization done.\n");
+		std::vector<u32> indices;
+		for (u32 i = 0; i < mesh->mNumFaces; i++) {
+			const aiFace& face = mesh->mFaces[i];
+			indices.push_back(face.mIndices[0]);
+			indices.push_back(face.mIndices[1]);
+			indices.push_back(face.mIndices[2]);
+		}
+
+		file->numIndices = (i32)indices.size();
+		file->indices = new u32[indices.size()];
+		memcpy(file->indices, indices.data(), indices.size() * sizeof(u32));
+	}
+
+	if (level >= 1) {
+		// Remove deplicate vertices
+		printf("Removing duplicate vertices...\n");
+		if (mesh->mNumFaces > 100) printf("0%%");
+
+		u32 unum = 0;
+		std::unordered_map<Vertex, i32> uniques(4096);
+		std::vector<Vertex> vertices;
+		aiVector3D zero(0, 0, 0);
+
+		vec3* positions = file->positionData;
+		vec2* texCoords = file->uvData;
+		vec3* norms = file->normalData;
+		vec3* tangs = file->tangentData;
+		vec4i* bids = file->skinned ? file->boneIDData : 0;
+		vec4* bwghs = file->skinned ? file->boneWeightData : 0;
+
+		std::vector<u32> indices;
+		for (u32 i = 0; i < mesh->mNumFaces; i++) {
+			if (mesh->mNumFaces > 100 && i % (mesh->mNumFaces / 100) == 0) {
+				HANDLE hout = GetStdHandle((DWORD)-11);
+				CONSOLE_SCREEN_BUFFER_INFO info;
+				GetConsoleScreenBufferInfo(hout, &info);
+				COORD pos = { 0, info.dwCursorPosition.Y };
+				SetConsoleCursorPosition(hout, pos);
+				printf("%d%%", (i32)(((f32)i / (f32)mesh->mNumFaces) * 100.f));
+			}
+
+			const aiFace& face = mesh->mFaces[i];
+			for (u32 j = 0; j < face.mNumIndices; j++) {
+				u32 idx = face.mIndices[j];
+				Vertex v = {
+					positions[idx], texCoords[idx], norms[idx], tangs[idx],
+					bids ? bids[idx] : vec4i(-1, -1, -1, -1),
+					bwghs ? bwghs[idx] : vec4(0, 0, 0, 0),
+				};
+
+				if (uniques.count(v) == 0) {
+					uniques[v] = vertices.size();
+					vertices.push_back(v);
+				}
+
+				indices.push_back(uniques[v]);
+			}
+		}
+
+		printf("\nMesh optimized from %dv to %dv (%.2f%% of original complexity)\n", file->numVertices, vertices.size(), 
+				((f32)vertices.size() / (f32)file->numVertices) * 100.f);
+
+		printf("Resizing mesh data...\n");
+		file->numVertices = vertices.size();
+		file->AllocateVertexData(mesh->HasBones());
+		for (i32 i = 0; i < vertices.size(); i++) {
+			Vertex& v = vertices[i];
+
+			file->positionData[i] = v.pos;
+			file->uvData[i] = v.tex;
+			file->normalData[i] = v.norm;
+			file->tangentData[i] = v.tang;
+			
+			if(mesh->HasBones()) file->boneIDData[i] = v.bid;
+			if (mesh->HasBones()) file->boneWeightData[i] = v.bweight;
+		}
+
+		file->numIndices = (i32)indices.size();
+		file->indices = new u32[indices.size()];
+		memcpy(file->indices, indices.data(), indices.size() * sizeof(u32));
+	}
+}
 
 i32 main(i32 argc, cstring* argv) {
 	if (argc < 3) {
@@ -27,6 +210,13 @@ i32 main(i32 argc, cstring* argv) {
 
 	string inputPath = string(argv[1]);
 	string outputPath = string(argv[2]);
+
+	u8 opl = 1;
+
+	for (i32 i = 3; i < argc; i++) {
+		if (strcmp(argv[i], "-O1") == 0) opl = 1;
+		if (strcmp(argv[i], "-O0") == 0) opl = 0;
+	}
 
 	BEMFile output;
 
@@ -58,45 +248,6 @@ i32 main(i32 argc, cstring* argv) {
 			const aiMesh* mesh = scene->mMeshes[root->mChildren[i]->mMeshes[0]];
 			printf("Processing mesh: %s\n", root->mChildren[i]->mName.C_Str());
 			output.name = std::string(root->mChildren[i]->mName.C_Str(), root->mChildren[i]->mName.length);
-			output.numVertices = mesh->mNumVertices;
-			output.AllocateVertexData(mesh->HasBones());
-
-			for (u32 i = 0; i < mesh->mNumVertices; i++) {
-				const aiVector3D* pos = &(mesh->mVertices[i]);
-				const aiVector3D* normal = mesh->HasNormals() ? &(mesh->mNormals[i]) : &zero;
-				const aiVector3D* texCoord = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &zero;
-				const aiVector3D* tangent = mesh->HasTangentsAndBitangents() ? &(mesh->mTangents[i]) : &zero;
-
-				output.positionData[i] = vec3(pos->x, pos->y, pos->z);
-				output.uvData[i] = vec2(texCoord->x, texCoord->y);
-				output.normalData[i] = vec3(normal->x, normal->y, normal->z);
-				output.tangentData[i] = vec3(tangent->x, tangent->y, tangent->z);
-			}
-
-			for (u32 i = 0; i < mesh->mNumBones; i++) {
-				u32 boneIndex = 0;
-				string boneName(mesh->mBones[i]->mName.data);
-
-				if (output.boneMap.find(boneName) == output.boneMap.end()) {
-					boneIndex = output.numBones++;
-					output.boneOffsets.push_back(mat4());
-					output.boneMap[boneName] = boneIndex;
-				}
-				else {
-					boneIndex = output.boneMap[boneName];
-				}
-
-				output.boneOffsets.at(boneIndex) = mat4(mesh->mBones[i]->mOffsetMatrix);
-
-				for (u32 j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
-					for (u32 id = 0; id < 4; id++) {
-						if (output.boneIDData[mesh->mBones[i]->mWeights[j].mVertexId][id] == -1) {
-							output.boneIDData[mesh->mBones[i]->mWeights[j].mVertexId][id] = boneIndex;
-							output.boneWeightData[mesh->mBones[i]->mWeights[j].mVertexId][id] = mesh->mBones[i]->mWeights[j].mWeight;
-						}
-					}
-				}
-			}
 
 			output.rootNode = AiToBEMNode(scene->mRootNode);
 
@@ -142,17 +293,7 @@ i32 main(i32 argc, cstring* argv) {
 			output.numAnimations = (i32)animations.size();
 			output.animations = animations;
 
-			std::vector<u32> indices;
-
-			for (u32 i = 0; i < mesh->mNumFaces; i++) {
-				const aiFace& face = mesh->mFaces[i];
-				indices.push_back(face.mIndices[0]);
-				indices.push_back(face.mIndices[1]);
-				indices.push_back(face.mIndices[2]);
-			}
-
-			output.numIndices = (i32)indices.size();
-			output.indices = &indices[0];
+			Optimize(&output, opl, mesh);
 
 			output.WriteToFile(path);
 		}
