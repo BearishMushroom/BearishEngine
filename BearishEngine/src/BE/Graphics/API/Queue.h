@@ -6,11 +6,21 @@
 
 namespace Bearish { namespace Graphics { namespace API {
 	struct GPUQueueIndex;
+	class Device;
 
 	class Queue {
 	public:
+		Queue();
+		Queue(const Device& device, const GPUQueueIndex& index);
+		~Queue();
+
+		operator VkQueue() { return _queue; }
+		operator VkQueue&() { return _queue; }
+		operator VkQueue*() { return &_queue; }
+
 		static VkDeviceQueueCreateInfo CreateDeviceQueue(const GPUQueueIndex& index, f32 priority = 1.0f);
 	private:
+		VkQueue _queue;
 	};
 } } }
 

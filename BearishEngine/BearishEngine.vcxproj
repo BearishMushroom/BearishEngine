@@ -235,6 +235,7 @@
     <ClCompile Include="src\BE\Graphics\API\GPU.cpp" />
     <ClCompile Include="src\BE\Graphics\API\Instance.cpp" />
     <ClCompile Include="src\BE\Graphics\API\Queue.cpp" />
+    <ClCompile Include="src\BE\Graphics\API\Surface.cpp" />
     <ClCompile Include="src\BE\Graphics\Buffer\UniformBuffer.cpp" />
     <ClCompile Include="src\BE\Graphics\Buffer\VertexLayout.cpp" />
     <ClCompile Include="src\BE\Graphics\Camera.cpp" />
@@ -310,6 +311,7 @@
     <ClInclude Include="src\BE\Graphics\API\GPU.h" />
     <ClInclude Include="src\BE\Graphics\API\Instance.h" />
     <ClInclude Include="src\BE\Graphics\API\Queue.h" />
+    <ClInclude Include="src\BE\Graphics\API\Surface.h" />
     <ClInclude Include="src\BE\Graphics\API\Util.h" />
     <ClInclude Include="src\BE\Graphics\Buffer\IndexBuffer.h" />
     <ClInclude Include="src\BE\Serialization\Database.h" />

@@ -37,6 +37,8 @@ namespace Bearish {	namespace GUI {
 
 		const i32 GetWidth() const { return _width; }
 		const i32 GetHeight() const { return _height; }
+
+		HWND GetHandle() const { return (HWND)_handle; }
 	private:
 		string _title;
 		i32 _width, _height;

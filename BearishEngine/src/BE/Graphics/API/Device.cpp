@@ -13,26 +13,54 @@ Bearish::Graphics::API::Device::Device()
 
 Device::Device(const GPU* gpu) {
 	_gpu = gpu;
+	_instance = gpu->GetInstance();
+}
 
-	VkDeviceQueueCreateInfo gqinf = Queue::CreateDeviceQueue(gpu->GetGraphicsQueue(), 1.0f);
-	VkPhysicalDeviceFeatures features = gpu->GetFeatures();
+void Device::Init(Surface* surface) {
+	_surface = surface;
+
+	std::vector<VkDeviceQueueCreateInfo> gqinfs = {
+		Queue::CreateDeviceQueue(_gpu->GetGraphicsQueue(), 1.0f),
+		Queue::CreateDeviceQueue(_gpu->GetPresentQueue(surface), 1.0f)
+	};
+
+	// @HACK: Make this good.
+	if (gqinfs[0].queueFamilyIndex == gqinfs[1].queueFamilyIndex) {
+		gqinfs = std::vector<VkDeviceQueueCreateInfo>{ gqinfs[0] };
+	}
+
+	VkPhysicalDeviceFeatures features = _gpu->GetFeatures();
 
 	VkDeviceCreateInfo createInfo {};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	createInfo.pQueueCreateInfos = &gqinf;
-	createInfo.queueCreateInfoCount = 1;
+	createInfo.pQueueCreateInfos = &gqinfs[0];
+	createInfo.queueCreateInfoCount = gqinfs.size();
 	createInfo.pEnabledFeatures = &features;
 
-	//createInfo.enabledExtensionCount = gpu->GetInstance()->GetNumExtensions();
-	//
-	//VkExtensionProperties* exts = gpu->GetInstance()->GetExtensions();
-	//char** names = new char*[createInfo.enabledExtensionCount];
-	//
-	//for (i32 i = 0; i < createInfo.enabledExtensionCount; i++) {
-	//	names[i] = exts[i].extensionName;
-	//}
-	//
-	//createInfo.ppEnabledExtensionNames = names;
+	u32 count = _gpu->GetExtensionCount();
+	VkExtensionProperties* exts = _gpu->GetExtensions();
+	std::vector<VkExtensionProperties> extensions;
+
+	for (i32 i = 0; i < count; i++) {
+		VkExtensionProperties& ext = exts[i];
+		
+		// @TODO: Make this not hardcoded.
+		if (strcmp(ext.extensionName, "VK_NVX_device_generated_commands") == 0) {
+			continue;
+		}
+
+		extensions.push_back(ext);
+	}
+
+	createInfo.enabledExtensionCount = extensions.size();
+	char** names = new char*[createInfo.enabledExtensionCount];
+	
+	i32 i = 0;
+	for (auto& ext : extensions) {
+		names[i++] = ext.extensionName;
+	}
+	
+	createInfo.ppEnabledExtensionNames = names;
 
 #ifdef BEARISH_DEBUG
 	createInfo.enabledLayerCount = 1;
@@ -40,9 +68,11 @@ Device::Device(const GPU* gpu) {
 	Core::Logger::Info("Requesting Vulkan device valdation layers...");
 #endif
 
-	if (VkError(vkCreateDevice(gpu->GetPhyiscalDevice(), &createInfo, nullptr, &_device))) {
+	if (VkError(vkCreateDevice(_gpu->GetPhyiscalDevice(), &createInfo, nullptr, &_device))) {
 		Core::Logger::Fatal("Failed to create Vulkan logical device.");
 	}
+
+	GetQueues();
 }
 
 Device::~Device() {
@@ -50,4 +80,14 @@ Device::~Device() {
 		vkDestroyDevice(_device, nullptr);
 		_device = nullptr;
 	}
+
+	if (_surface) {
+		delete _surface;
+		_surface = nullptr;
+	}
+}
+
+void Device::GetQueues() {
+	_graphicsQueue = Queue(*this, _gpu->GetGraphicsQueue());
+	_presentQueue = Queue(*this, _gpu->GetPresentQueue(_surface));
 }

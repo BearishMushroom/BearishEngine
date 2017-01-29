@@ -2,8 +2,7 @@
 #define _BEARISH_GRAPHICS_API_INSTANCE_H_
 
 #include <BE/Types.h>
-
-#include <vulkan\vulkan.h>
+#include <BE/Graphics/API/Util.h>
 
 namespace Bearish { namespace Graphics { namespace API {
 	class Instance {
@@ -16,10 +15,12 @@ namespace Bearish { namespace Graphics { namespace API {
 		void Init(string name);
 
 		// Implicit conversion for calling vkXXX
-		operator VkInstance() { return _instance; } 
+		operator VkInstance() const { return _instance; }
+		operator VkInstance&() { return _instance; }
+		operator VkInstance*() { return &_instance; }
 
-		u32 GetNumExtensions() const { return _numExtensions; }
-		u32 GetNumValidationLayers() const { return _numLayers; }
+		u32 GetExtensionCount() const { return _numExtensions; }
+		u32 GetValidationLayerCount() const { return _numLayers; }
 
 		VkExtensionProperties* GetExtensions() const { return _extensions; }
 	private:

@@ -2,6 +2,8 @@
 #define _BEARISH_GRAPHICS_API_UTIL_H_
 
 #include <BE/Types.h>
+
+#define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan\vulkan.h>
 
 namespace Bearish { namespace Graphics { namespace API {

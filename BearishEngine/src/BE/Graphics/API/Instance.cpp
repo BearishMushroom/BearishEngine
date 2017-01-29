@@ -40,7 +40,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugReportFlagsEXT flags,
 		severity += "DBG";
 	}
 	
-	Core::Logger::Info("[VULKAN][%s(%s)](%lld) %s", layerPrefix, severity, obj, msg);
+	Core::Logger::Info("[VULKAN][%s(%s)] %s", layerPrefix, severity.c_str(), msg);
 
 	return VK_FALSE;
 }

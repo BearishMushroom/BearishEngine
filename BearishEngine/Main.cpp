@@ -5,10 +5,14 @@
 #include <sstream>
 
 #include <BE/Graphics/API/Instance.h>
+#include <BE/Graphics/API/Surface.h>
 #include <BE/Graphics/API/Device.h>
 #include <BE/Graphics/API/Util.h>
 #include <BE/Graphics/API/GPU.h>
 #include <BE/Core/Logger.h>
+
+#include <BE/GUI/Win32Window.h>
+#include <BE/Core/Settings.h>
 
 //#include "src\BE\Util\SerialPort.h"
 
@@ -16,16 +20,31 @@ using namespace Bearish;
 
 //using namespace Components;
 using namespace Graphics;
-//using namespace Core;
+using namespace Core;
 //using namespace Math;
 //using namespace Util;
 //using namespace Serilization;
 
 int main(int argc, char** argv) {
 	{
+		GUI::Win32Window window("VULKAN", 1280, 720);
+		window.Open();
+		
 		API::Instance inst;
 		API::GPU gpu = API::GPU::GetMostSuitable(API::GPU::GetAll(&inst));
 		API::Device device(&gpu);
+		device.Init(new API::Surface(device, window.GetHandle()));
+
+		Scripting::InitLua();
+		Scripting::RunFile("scr/lib/init.lua");
+		Scripting::RunFile("scr/lib/class.lua");
+		Scripting::InitMoonScript();
+
+		Settings::Load();
+
+		while (window.IsOpen()) {
+			window.Update();
+		}
 	}
 
 	printf("");
