@@ -20,7 +20,6 @@ LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 		break;
 	case WM_DESTROY:
 		Win32Window::ACTIVE_WINDOW->SetOpen(false);
-		PostQuitMessage(0);
 		break;
 	case WM_COMMAND:
 		Win32Window::ACTIVE_WINDOW->Command(LOWORD(wparam));

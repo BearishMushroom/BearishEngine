@@ -7,8 +7,7 @@ using namespace Bearish;
 using namespace Graphics;
 using namespace API;
 
-Bearish::Graphics::API::Device::Device()
-{
+Device::Device() {
 }
 
 Device::Device(const GPU* gpu) {

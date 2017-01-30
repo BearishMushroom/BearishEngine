@@ -1,4 +1,4 @@
-
+#include <BE/Types.h>
 //#include <Bearish.h>
 #include <vector>
 #include <crtdbg.h>
@@ -33,7 +33,8 @@ int main(int argc, char** argv) {
 		API::Instance inst;
 		API::GPU gpu = API::GPU::GetMostSuitable(API::GPU::GetAll(&inst));
 		API::Device device(&gpu);
-		device.Init(new API::Surface(device, window.GetHandle()));
+		API::Surface* surface = new API::Surface(device, &window);
+		device.Init(surface);
 
 		Scripting::InitLua();
 		Scripting::RunFile("scr/lib/init.lua");

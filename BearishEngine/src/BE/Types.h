@@ -1,6 +1,9 @@
 #ifndef _BEARISH_TYPES_H_
 #define _BEARISH_TYPES_H_
 
+// Removes windows' min and max macros.
+#define NOMINMAX
+
 #include <pch.h>
 
 namespace Bearish {
