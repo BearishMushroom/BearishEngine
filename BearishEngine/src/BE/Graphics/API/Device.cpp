@@ -79,11 +79,6 @@ Device::~Device() {
 		vkDestroyDevice(_device, nullptr);
 		_device = nullptr;
 	}
-
-	if (_surface) {
-		delete _surface;
-		_surface = nullptr;
-	}
 }
 
 void Device::GetQueues() {

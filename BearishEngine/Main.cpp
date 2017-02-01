@@ -46,6 +46,8 @@ int main(int argc, char** argv) {
 		while (window.IsOpen()) {
 			window.Update();
 		}
+
+		delete surface;
 	}
 
 	printf("");
