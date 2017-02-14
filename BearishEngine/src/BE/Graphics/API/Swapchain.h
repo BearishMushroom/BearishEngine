@@ -3,9 +3,13 @@
 
 #include <BE/Types.h>
 #include <BE\Graphics\API\Util.h>
+#include <BE\Graphics\API\ImageView.h>
 #include <BE\GUI\Win32Window.h>
 
 namespace Bearish { namespace Graphics { namespace API {
+	class Surface;
+	class Device;
+
 	struct SwapchainSupportDetails {
 		VkSurfaceCapabilitiesKHR capabilities;
 		std::vector<VkSurfaceFormatKHR> formats;
@@ -15,7 +19,7 @@ namespace Bearish { namespace Graphics { namespace API {
 	class Swapchain {
 	public:
 		Swapchain();
-		Swapchain(SwapchainSupportDetails support, const GUI::Win32Window* window);
+		Swapchain(const Device* device);
 		~Swapchain();
 
 	private:
@@ -24,10 +28,19 @@ namespace Bearish { namespace Graphics { namespace API {
 		VkExtent2D         FindExtent();
 
 		const GUI::Win32Window* _window;
+		const Surface* _surface;
+		const Device* _device;
+
+		VkSwapchainKHR _swapchain;
 		VkSurfaceFormatKHR _format;
 		VkPresentModeKHR _mode;
 		VkExtent2D _extent;
 		SwapchainSupportDetails _support;
+
+		VkFormat _imageFormat;
+		VkImage* _images;
+		ImageView* _views;
+		u32 _imageCount;
 	};
 } } }
 

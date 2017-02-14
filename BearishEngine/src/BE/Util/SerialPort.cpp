@@ -1,9 +1,8 @@
 #include "SerialPort.h"
 
 using namespace Bearish;
-using namespace Util;
 
-SerialPort::SerialPort(string portName) {
+Util::SerialPort::SerialPort(string portName) {
 	_connected = false;
 
 	_hSerial = CreateFile(portName.c_str(),
@@ -48,14 +47,14 @@ SerialPort::SerialPort(string portName) {
 
 }
 
-SerialPort::~SerialPort(){
+Util::SerialPort::~SerialPort(){
 	if (_connected) {
 		_connected = false;
 		CloseHandle(_hSerial);
 	}
 }
 
-i32 SerialPort::ReadData(u8* buffer, i32 nbChar) {
+i32 Util::SerialPort::ReadData(u8* buffer, i32 nbChar) {
 	DWORD bytesRead;
 	u32 toRead;
 
@@ -68,7 +67,7 @@ i32 SerialPort::ReadData(u8* buffer, i32 nbChar) {
 			toRead = _status.cbInQue;
 		}
 
-		if (ReadFile(_hSerial, buffer, toRead, &bytesRead, NULL)) {
+		if (::ReadFile(_hSerial, buffer, toRead, &bytesRead, NULL)) {
 			return bytesRead;
 		}
 
@@ -78,7 +77,7 @@ i32 SerialPort::ReadData(u8* buffer, i32 nbChar) {
 }
 
 
-bool SerialPort::WriteData(u8* buffer, i32 nbChar) {
+bool Util::SerialPort::WriteData(u8* buffer, i32 nbChar) {
 	DWORD bytesSend;
 
 	if (!WriteFile(_hSerial, (void *)buffer, nbChar, &bytesSend, 0)) {
@@ -90,6 +89,6 @@ bool SerialPort::WriteData(u8* buffer, i32 nbChar) {
 	}
 }
 
-bool SerialPort::IsConnected() {
+bool Util::SerialPort::IsConnected() {
 	return _connected;
 }

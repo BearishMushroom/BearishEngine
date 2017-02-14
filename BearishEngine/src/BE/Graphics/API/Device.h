@@ -11,11 +11,9 @@ namespace Bearish { namespace Graphics { namespace API {
 	class Device {
 	public:
 		Device();
-		Device(const GPU* gpu);
+		Device(const Surface* surface);
 
 		~Device();
-
-		void Init(Surface* surface);
 
 		operator VkDevice() const { return _device; }
 		operator VkDevice&() { return _device; }
@@ -23,15 +21,16 @@ namespace Bearish { namespace Graphics { namespace API {
 
 		const GPU* GetGPU() const { return _gpu; }
 		const Instance* GetInstance() const { return _instance; }
+		const Surface* GetSurface() const { return _surface; }
 	private:
 		void GetQueues();
 
 		const GPU* _gpu;
 		const Instance* _instance;
+		const Surface* _surface;
 
 		Queue _graphicsQueue;
 		Queue _presentQueue;
-		Surface* _surface;
 
 		VkDevice _device;
 	};

@@ -40,7 +40,7 @@ namespace Bearish { namespace Graphics { namespace API {
 		
 		std::vector<VkQueueFamilyProperties> GetAllQueues() const;
 		GPUQueueIndex GetGraphicsQueue() const;
-		GPUQueueIndex GetPresentQueue(Surface* surface) const;
+		GPUQueueIndex GetPresentQueue(const Surface* surface) const;
 
 		const VkPhysicalDeviceFeatures& GetFeatures() const { return _features; }
 		const VkPhysicalDeviceProperties& GetProperties() const { return _properties; }

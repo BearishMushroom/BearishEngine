@@ -159,7 +159,7 @@ GPUQueueIndex GPU::GetGraphicsQueue() const {
 	return q;
 }
 
-GPUQueueIndex GPU::GetPresentQueue(Surface* surface) const {
+GPUQueueIndex GPU::GetPresentQueue(const Surface* surface) const {
 	GPUQueueIndex q;
 
 	i32 i = 0;

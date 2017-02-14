@@ -30,11 +30,15 @@ int main(int argc, char** argv) {
 		GUI::Win32Window window("VULKAN", 1280, 720);
 		window.Open();
 		
-		API::Instance inst;
-		API::GPU gpu = API::GPU::GetMostSuitable(API::GPU::GetAll(&inst));
-		API::Device device(&gpu);
-		API::Surface* surface = new API::Surface(device, &window);
-		device.Init(surface);
+		API::Instance instance;
+		API::GPU gpu = API::GPU::GetMostSuitable(API::GPU::GetAll(&instance));
+		API::Surface surface(&gpu, &instance, &window);
+		
+		API::Device device(&surface);
+		API::Swapchain swapchain(&device);
+		
+		Util::File vshc = Util::ReadFile("res/vulkan/vert.spv", true);
+		Util::File fshc = Util::ReadFile("res/vulkan/frag.spv", true);
 
 		Scripting::InitLua();
 		Scripting::RunFile("scr/lib/init.lua");
@@ -47,10 +51,11 @@ int main(int argc, char** argv) {
 			window.Update();
 		}
 
-		delete surface;
+		delete[] vshc.content;
+		delete[] fshc.content;
 	}
 
-	printf("");
+
 	return 0;
 }
 

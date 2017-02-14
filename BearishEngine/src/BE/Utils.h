@@ -121,5 +121,32 @@ namespace Bearish { namespace Util {
 	static f32 Round2P(f32 value) {
 		return floor(value * 100 + 0.5) / 100;
 	}
+
+	struct File {
+		c8* content;
+		u32 length;
+		bool binary;
+	};
+
+	static File ReadFile(string path, bool binary) {
+		std::ifstream fs(path, std::ios::ate | (binary ? std::ios::binary : 0));
+		if (!fs.is_open()) {
+			Core::Logger::Error("Failed to open file %s.", path.c_str());
+			return {0, 0, 0};
+		}
+
+		u32 size = fs.tellg();
+		c8* buffer = new c8[size];
+
+		fs.seekg(0);
+		fs.read(buffer, size);
+		fs.close();
+
+		return {
+			buffer,
+			size,
+			binary
+		};
+	}
 } }
 #endif

@@ -11,16 +11,20 @@ namespace Bearish { namespace Graphics { namespace API {
 	
 	class Surface {
 	public:
-		Surface(const Device& device, GUI::Win32Window* window);
+		Surface(const GPU* gpu, const Instance* instance, GUI::Win32Window* window);
 		~Surface();
 
 		operator VkSurfaceKHR() const { return _surface; }
 
 		SwapchainSupportDetails GetSwapchainSupportDetails() const;
+		const GUI::Win32Window* GetWindow() const { return _window; }
+
+		const Instance* GetInstance() const { return _instance; }
+		const GPU* GetGPU() const { return _gpu; }
 	private:
 		const GUI::Win32Window* _window;
 		const GPU* _gpu;
-		const Device& _device;
+		const Instance* _instance;
 		Swapchain _swapchain;
 		VkSurfaceKHR _surface;
 	};

@@ -310,6 +310,7 @@
     <ClInclude Include="src\BE\Core\Transform.h" />
     <ClInclude Include="src\BE\Graphics\API\Device.h" />
     <ClInclude Include="src\BE\Graphics\API\GPU.h" />
+    <ClInclude Include="src\BE\Graphics\API\ImageView.h" />
     <ClInclude Include="src\BE\Graphics\API\Instance.h" />
     <ClInclude Include="src\BE\Graphics\API\Queue.h" />
     <ClInclude Include="src\BE\Graphics\API\Surface.h" />

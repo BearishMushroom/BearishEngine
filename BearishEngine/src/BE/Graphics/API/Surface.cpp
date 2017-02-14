@@ -6,8 +6,9 @@ using namespace Bearish;
 using namespace Graphics;
 using namespace API;
 
-Surface::Surface(const Device& device, GUI::Win32Window* window) : _device(device) {
-	_gpu = _device.GetGPU();
+Surface::Surface(const GPU* gpu, const Instance* instance, GUI::Win32Window* window) {
+	_instance = instance;
+	_gpu = gpu;
 	_window = window;
 
 	VkWin32SurfaceCreateInfoKHR createInfo {};
@@ -15,23 +16,16 @@ Surface::Surface(const Device& device, GUI::Win32Window* window) : _device(devic
 	createInfo.hwnd = window->GetHandle();
 	createInfo.hinstance = GetModuleHandle(nullptr);
 	
-	auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(*_device.GetInstance(), "vkCreateWin32SurfaceKHR");
+	auto CreateWin32SurfaceKHR = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(*instance, "vkCreateWin32SurfaceKHR");
 
 	if (!CreateWin32SurfaceKHR || CreateWin32SurfaceKHR
-		(*_device.GetInstance(), &createInfo, nullptr, &_surface) != VK_SUCCESS) {
+		(*instance, &createInfo, nullptr, &_surface) != VK_SUCCESS) {
 		Core::Logger::Fatal("Failed to create Win32 surface!");
 	}
-
-	SwapchainSupportDetails support = GetSwapchainSupportDetails();
-	if (support.formats.empty() || support.presentModes.empty()) {
-		Core::Logger::Fatal("No suitable swapchain for surface!");
-	}
-
-	_swapchain = Swapchain(support, _window);
 }
 
 Surface::~Surface() {
-	vkDestroySurfaceKHR(*_device.GetInstance(), _surface, nullptr);
+	vkDestroySurfaceKHR(*_instance, _surface, nullptr);
 }
 
 SwapchainSupportDetails Surface::GetSwapchainSupportDetails() const {

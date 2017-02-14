@@ -1,3 +1,4 @@
+#include <BE/Graphics/API/Surface.h>
 #include <BE/Graphics/API/Device.h>
 #include <BE/Graphics/API/Queue.h>
 #include <BE/Graphics/API/Util.h>
@@ -10,12 +11,10 @@ using namespace API;
 Device::Device() {
 }
 
-Device::Device(const GPU* gpu) {
-	_gpu = gpu;
-	_instance = gpu->GetInstance();
-}
+Device::Device(const Surface* surface) {
+	_gpu = surface->GetGPU();
+	_instance = _gpu->GetInstance();
 
-void Device::Init(Surface* surface) {
 	_surface = surface;
 
 	std::vector<VkDeviceQueueCreateInfo> gqinfs = {
@@ -30,7 +29,7 @@ void Device::Init(Surface* surface) {
 
 	VkPhysicalDeviceFeatures features = _gpu->GetFeatures();
 
-	VkDeviceCreateInfo createInfo {};
+	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	createInfo.pQueueCreateInfos = &gqinfs[0];
 	createInfo.queueCreateInfoCount = gqinfs.size();
@@ -42,7 +41,7 @@ void Device::Init(Surface* surface) {
 
 	for (i32 i = 0; i < count; i++) {
 		VkExtensionProperties& ext = exts[i];
-		
+
 		// @TODO: Make this not hardcoded.
 		if (strcmp(ext.extensionName, "VK_NVX_device_generated_commands") == 0) {
 			continue;
@@ -53,12 +52,12 @@ void Device::Init(Surface* surface) {
 
 	createInfo.enabledExtensionCount = extensions.size();
 	char** names = new char*[createInfo.enabledExtensionCount];
-	
+
 	i32 i = 0;
 	for (auto& ext : extensions) {
 		names[i++] = ext.extensionName;
 	}
-	
+
 	createInfo.ppEnabledExtensionNames = names;
 
 #ifdef BEARISH_DEBUG
