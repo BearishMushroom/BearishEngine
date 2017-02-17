@@ -122,17 +122,21 @@ namespace Bearish { namespace Util {
 		return floor(value * 100 + 0.5) / 100;
 	}
 
+	enum class FileType {
+		Invalid, Text, Binary
+	};
+
 	struct File {
 		c8* content;
 		u32 length;
-		bool binary;
+		FileType type;
 	};
 
-	static File ReadFile(string path, bool binary) {
-		std::ifstream fs(path, std::ios::ate | (binary ? std::ios::binary : 0));
+	static File ReadFile(string path, FileType type) {
+		std::ifstream fs(path, std::ios::ate | (type == FileType::Binary ? std::ios::binary : 0));
 		if (!fs.is_open()) {
 			Core::Logger::Error("Failed to open file %s.", path.c_str());
-			return {0, 0, 0};
+			return {0, 0, FileType::Invalid};
 		}
 
 		u32 size = fs.tellg();
@@ -145,7 +149,7 @@ namespace Bearish { namespace Util {
 		return {
 			buffer,
 			size,
-			binary
+			type
 		};
 	}
 } }

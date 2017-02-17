@@ -18,6 +18,8 @@ namespace Bearish { namespace Graphics { namespace API {
 			A = 0x06,
 
 			RGBA = (Swizzle::R << 24) | (Swizzle::G << 16) | (Swizzle::B << 8) | Swizzle::A,
+			ARGB = (Swizzle::A << 24) | (Swizzle::R << 16) | (Swizzle::G << 8) | Swizzle::B,
+			RRRR = (Swizzle::R << 24) | (Swizzle::R << 16) | (Swizzle::R << 8) | Swizzle::R,
 		};
 
 		ImageView() { _view = 0; _device = 0; }

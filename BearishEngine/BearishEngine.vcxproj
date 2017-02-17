@@ -313,6 +313,7 @@
     <ClInclude Include="src\BE\Graphics\API\ImageView.h" />
     <ClInclude Include="src\BE\Graphics\API\Instance.h" />
     <ClInclude Include="src\BE\Graphics\API\Queue.h" />
+    <ClInclude Include="src\BE\Graphics\API\ShaderModule.h" />
     <ClInclude Include="src\BE\Graphics\API\Surface.h" />
     <ClInclude Include="src\BE\Graphics\API\Swapchain.h" />
     <ClInclude Include="src\BE\Graphics\API\Util.h" />

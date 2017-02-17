@@ -4,6 +4,7 @@
 #include <crtdbg.h>
 #include <sstream>
 
+#include <BE/Graphics/API/ShaderModule.h>
 #include <BE/Graphics/API/Instance.h>
 #include <BE/Graphics/API/Surface.h>
 #include <BE/Graphics/API/Device.h>
@@ -37,8 +38,11 @@ int main(int argc, char** argv) {
 		API::Device device(&surface);
 		API::Swapchain swapchain(&device);
 		
-		Util::File vshc = Util::ReadFile("res/vulkan/vert.spv", true);
-		Util::File fshc = Util::ReadFile("res/vulkan/frag.spv", true);
+		Util::File vshc = Util::ReadFile("res/vulkan/vert.spv", Util::FileType::Binary);
+		Util::File fshc = Util::ReadFile("res/vulkan/frag.spv", Util::FileType::Binary);
+
+		API::ShaderModule vsh(&device, vshc.content, vshc.length);
+		API::ShaderModule fsh(&device, fshc.content, fshc.length);
 
 		Scripting::InitLua();
 		Scripting::RunFile("scr/lib/init.lua");
@@ -53,8 +57,8 @@ int main(int argc, char** argv) {
 
 		delete[] vshc.content;
 		delete[] fshc.content;
-	}
 
+	}
 
 	return 0;
 }
