@@ -12,6 +12,7 @@ Swapchain::Swapchain() {
 }
 
 Swapchain::Swapchain(const Device* device) {
+	_framebuffers = 0;
 	_device = device;
 	_surface = _device->GetSurface();
 	_window = _surface->GetWindow();
@@ -76,18 +77,58 @@ Swapchain::Swapchain(const Device* device) {
 	_images = new VkImage[_imageCount];
 	vkGetSwapchainImagesKHR(*_device, _swapchain, &_imageCount, _images);
 
-	_views = new ImageView[_imageCount];
+	_views = new ImageView*[_imageCount];
 	for (u32 i = 0; i < _imageCount; i++) {
-		_views[i] = ImageView(_device, _images[i], _imageFormat, ImageView::Swizzle::RGBA);
+		_views[i] = new ImageView(_device, _images[i], _imageFormat, ImageView::Swizzle::RGBA);
 	}
+
+
 }
 
 Swapchain::~Swapchain() {
-	//delete[] _views;
+	
+	if (_views) {
+		for (i32 i = 0; i < _imageCount; i++) {
+			delete _views[i];
+		}
+
+		delete[] _views;
+	}
+
+	if (_framebuffers) {
+		for (i32 i = 0; i < _imageCount; i++) {
+			vkDestroyFramebuffer(*_device, _framebuffers[i], nullptr);
+		}
+
+		delete[] _framebuffers;
+	}
+
 	delete[] _images;
 
 	if (_swapchain) {
 		vkDestroySwapchainKHR(*_device, _swapchain, nullptr);
+	}
+}
+
+void Swapchain::CreateFramebuffers(VkRenderPass* renderpass) {
+	_framebuffers = new VkFramebuffer[_imageCount];
+	for (u32 i = 0; i < _imageCount; i++) {
+		VkImageView views[] = {
+			*_views[i]
+		};
+
+		VkFramebufferCreateInfo info = {};
+		info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		info.renderPass = *renderpass;
+		info.attachmentCount = 1;
+		info.pAttachments = views;
+		info.width = _extent.width;
+		info.height = _extent.height;
+		info.layers = 1;
+
+		if (VkError(vkCreateFramebuffer(*_device, &info, nullptr, &_framebuffers[i]))) {
+			Core::Logger::Fatal("Failed to create swapchain framebuffer!");
+		}
 	}
 }
 

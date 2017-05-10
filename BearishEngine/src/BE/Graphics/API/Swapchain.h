@@ -22,6 +22,14 @@ namespace Bearish { namespace Graphics { namespace API {
 		Swapchain(const Device* device);
 		~Swapchain();
 
+		u32 GetWidth() const { return _extent.width; }
+		u32 GetHeight() const { return _extent.height; }
+
+		VkExtent2D GetExtent() const { return _extent; }
+		VkFormat   GetFormat() const { return _imageFormat; }
+
+		void CreateFramebuffers(VkRenderPass* renderpass); 
+
 	private:
 		VkSurfaceFormatKHR FindFormat();
 		VkPresentModeKHR   FindPresentMode();
@@ -39,7 +47,8 @@ namespace Bearish { namespace Graphics { namespace API {
 
 		VkFormat _imageFormat;
 		VkImage* _images;
-		ImageView* _views;
+		ImageView** _views;
+		VkFramebuffer* _framebuffers;
 		u32 _imageCount;
 	};
 } } }

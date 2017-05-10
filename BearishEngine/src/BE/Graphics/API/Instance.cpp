@@ -62,6 +62,8 @@ Instance::~Instance() {
 		delete[] _layers;
 
 	vkDestroyInstance(_instance, NULL);
+
+	Core::Logger::Info("Vulkan instance destroyed.");
 }
 
 void Instance::Init(string name) {
